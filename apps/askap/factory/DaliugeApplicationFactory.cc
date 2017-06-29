@@ -8,15 +8,14 @@
 /// which one will be instantiated.
 ///
 // Package level header file
-#include <askap_daliuge_pipeline.h>
+
 
 // ASKAPsoft includes
 #include <askap/AskapLogging.h>
-ASKAP_LOGGER(logger, ".daliuge.factory");
+
 #include <askap/AskapError.h>
 #include <casacore/casa/OS/DynLib.h>        // for dynamic library loading
 #include <casacore/casa/BasicSL/String.h>   // for downcase
-
 
 // Local package includes
 
@@ -25,8 +24,10 @@ ASKAP_LOGGER(logger, ".daliuge.factory");
 
 // Apps need to be here - or can we register them from Somewhere else
 #include <factory/Example.h>
+#include <factory/LoadParset.h>
 //
 
+ASKAP_LOGGER(logger, ".daliuge.factory");
 namespace askap {
 
 
