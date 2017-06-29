@@ -43,11 +43,11 @@
 using namespace askap;
 
 DaliugeApplication::DaliugeApplication() {
-    fprintf(stdout,"DaliugeApplication default constructor");
+    fprintf(stdout,"\t DaliugeApplication - default constructor\n");
 }
 
 DaliugeApplication::~DaliugeApplication() {
-    fprintf(stdout,"DaliugeApplication default destructor");
+    fprintf(stdout,"\t DaliugeApplication - default destructor\n");
 }
 
 DaliugeApplication::ShPtr DaliugeApplication::createDaliugeApplication(const std::string& name)
