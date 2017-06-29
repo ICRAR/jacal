@@ -105,12 +105,17 @@ namespace askap {
     // lets open the input and read it
         char buf[64*1024];
         size_t n_read = app->inputs[0].read(buf, 64*1024);
-        // fprintf(stderr,"%s",buf);
+
         to_app_data(app)->parset = new LOFAR::ParameterSet(true);
         to_app_data(app)->parset->adoptBuffer(buf);
 
-        std::cout << *(to_app_data(app)->parset) << std::endl;
         // write it to the outputs
+        std::cout << *(to_app_data(app)->parset) << std::endl;
+
+
+        for (int i = 0; i < app->n_outputs; i++) {
+            app->outputs[i].write(buf, n_read);
+        }
 
         return 0;
     }
@@ -127,7 +132,7 @@ namespace askap {
             drop_status status) {
 
         app->done(APP_FINISHED);
-
+        delete(to_app_data(app)->parset);
     }
 
 
