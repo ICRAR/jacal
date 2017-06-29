@@ -17,13 +17,14 @@
 #include <Common/ParameterSet.h>
 
 #include <string.h>
-
+#include <sys/time.h>
 
 ASKAP_LOGGER(logger, ".daliuge.factory");
 namespace askap {
 
 
     struct app_data {
+        short print_stats;
         unsigned long total;
         unsigned long write_duration;
         boost::shared_ptr<LOFAR::ParameterSet> parset;
