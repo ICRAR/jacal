@@ -2,6 +2,7 @@
 // If Daliuge changes its API - you will have to change these functions
 // but hopefully all the issues will be hidden behind the structures
 
+
 #include<daliuge/DaliugeApplication.h>
 #include<factory/DaliugeApplicationFactory.h>
 #include<factory/Interface.h>
@@ -21,6 +22,8 @@ int init(dlg_app_info *app, const char ***arguments) {
             break;
         }
 
+        fprintf(stdout, "param is: %s\n",param[0]);
+
         if (strcmp(param[0], "name") == 0) {
             app->appname = strdup(param[1]);
             got_name = true;
@@ -29,7 +32,7 @@ int init(dlg_app_info *app, const char ***arguments) {
         param++;
     }
     if (got_name == false) {
-        app->appname = strdup("Example");
+        app->appname = strdup("LoadParset");
     }
     // need to set the app->appname here .... from the arguments ....
     askap::DaliugeApplication::ShPtr thisApp = askap::DaliugeApplicationFactory::make(app->appname);

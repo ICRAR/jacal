@@ -9,11 +9,12 @@
 ///
 
 // ASKAPsoft includes
-#include <askap/AskapLogging.h>
+
 
 #include <askap/AskapError.h>
 #include <casacore/casa/OS/DynLib.h>        // for dynamic library loading
 #include <casacore/casa/BasicSL/String.h>   // for downcase
+#include <boost/program_options.hpp>
 
 // Local package includes
 
@@ -25,7 +26,8 @@
 #include <factory/LoadParset.h>
 //
 
-ASKAP_LOGGER(logger, ".daliuge.factory");
+#include<string>
+
 namespace askap {
 
 
@@ -40,30 +42,29 @@ namespace askap {
   void DaliugeApplicationFactory::registerDaliugeApplication (const std::string& name,
                                            DaliugeApplicationFactory::DaliugeApplicationCreator* creatorFunc)
   {
-    ASKAPLOG_INFO_STR(logger, "     - Adding "<<name<<"  to the application registry");
+    fprintf(stdout, "     - Adding %s to the application registry", name.c_str());
     theirRegistry[name] = creatorFunc;
   }
 
   DaliugeApplication::ShPtr DaliugeApplicationFactory::createDaliugeApplication (const std::string& name)
   {
-    ASKAPLOG_DEBUG_STR(logger, " Attempting to find "<<name<< " in the registry");
+    fprintf(stdout, " Attempting to find %s in the registry",name.c_str());
     std::map<std::string,DaliugeApplicationCreator*>::const_iterator it = theirRegistry.find (name);
     if (it == theirRegistry.end()) {
       // Unknown Application. Try to load from a dynamic library
       // with that lowercase name (without possible template extension).
-      std::string libname(toLower(name));
+      std::string libname(casa::downcase(name));
       const std::string::size_type pos = libname.find_first_of (".<");
       if (pos != std::string::npos) {
         libname = libname.substr (0, pos);      // only take before . or <
       }
       // Try to load the dynamic library and execute its register function.
       // Do not dlclose the library.
-      ASKAPLOG_INFO_STR(logger, "Application "<<name<<
-                 " is not in the Daliuge Application registry, attempting to load it dynamically");
+      fprintf(stdout, "Application %s is not in the Daliuge Application registry, attempting to load it dynamically", name.c_str());
       casa::DynLib dl(libname, string("libaskap_"), "register_"+libname, false);
       if (dl.getHandle()) {
         // Successfully loaded. Get the creator function.
-        ASKAPLOG_INFO_STR(logger, "Dynamically loaded ASKAP/Daliuge Application " << name);
+        fprintf(stdout, "Dynamically loaded ASKAP/Daliuge Application %s\n", name.c_str());
         // the first thing the Application in the shared library is supposed to do is to
         // register itself. Therefore, its name will appear in the registry.
         it = theirRegistry.find (name);
@@ -86,8 +87,9 @@ DaliugeApplication::ShPtr DaliugeApplicationFactory::make(const std::string &nam
     if (theirRegistry.size() == 0) {
         // this is the first call of the method, we need to fill the registry with
         // all pre-defined applications
-        ASKAPLOG_INFO_STR(logger, "Filling the registry with predefined applications");
+        fprintf(stdout, "Filling the registry with predefined applications");
         addPreDefinedDaliugeApplication<Example>();
+        addPreDefinedDaliugeApplication<LoadParset>();
 
 
 

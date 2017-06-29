@@ -35,28 +35,19 @@
 #include <iostream>
 
 // ASKAPsoft includes
-#include "askap/AskapLogging.h"
-#include "askap/AskapError.h"
-#include "askap/Log4cxxLogSink.h"
-#include "log4cxx/logger.h"
-#include "log4cxx/logmanager.h"
-#include "log4cxx/consoleappender.h"
-#include "log4cxx/patternlayout.h"
-#include "boost/program_options.hpp"
-#include "casacore/casa/Logging/LogIO.h"
-#include "casacore/casa/Logging/LogSinkInterface.h"
 
-ASKAP_LOGGER(logger, ".DaliugeApplication");
+#include "askap/AskapError.h"
+
 
 // Using/namespace
 using namespace askap;
 
 DaliugeApplication::DaliugeApplication() {
-    ASKAPLOG_DEBUG_STR(logger,"DaliugeApplication default constructor");
+    fprintf(stdout,"DaliugeApplication default constructor");
 }
 
 DaliugeApplication::~DaliugeApplication() {
-    ASKAPLOG_DEBUG_STR(logger,"DaliugeApplication default destructor");
+    fprintf(stdout,"DaliugeApplication default destructor");
 }
 
 DaliugeApplication::ShPtr DaliugeApplication::createDaliugeApplication(const std::string& name)

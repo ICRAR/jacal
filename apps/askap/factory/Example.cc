@@ -10,13 +10,13 @@
 #include <daliuge/DaliugeApplication.h>
 #include <factory/Example.h>
 #include <askap/AskapError.h>
-#include <askap/AskapLogging.h>
+
 #include <Common/ParameterSet.h>
 
 
 #include <sys/time.h>
 
-ASKAP_LOGGER(logger, ".daliuge.factory");
+
 namespace askap {
 
 
@@ -40,7 +40,7 @@ namespace askap {
 
 
     Example::Example() {
-        ASKAPLOG_DEBUG_STR(logger,"Example default contructor");
+        fprintf(stdout,"Example default contructor");
     }
 
 
@@ -50,7 +50,7 @@ namespace askap {
 
     DaliugeApplication::ShPtr Example::createDaliugeApplication(const std::string &name)
     {
-        ASKAPLOG_DEBUG_STR(logger, "createDaliugeApplication for Example ");
+        fprintf(stdout, "createDaliugeApplication for Example ");
 
         Example::ShPtr ptr;
 
@@ -60,7 +60,7 @@ namespace askap {
 
         ptr.reset( new Example());
 
-        ASKAPLOG_DEBUG_STR(logger,"Created Example DaliugeApplication instance");
+        fprintf(stdout,"Created Example DaliugeApplication instance");
         return ptr;
 
     }

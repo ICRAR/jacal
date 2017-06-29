@@ -10,22 +10,19 @@
 
 #include <daliuge/DaliugeApplication.h>
 #include <factory/LoadParset.h>
-// ASKAP Logging etc
-#include <askap/AskapError.h>
-#include <askap/AskapLogging.h>
+
 // LOFAR ParameterSet
 #include <Common/ParameterSet.h>
 
 #include <string.h>
 #include <sys/time.h>
 
-ASKAP_LOGGER(logger, ".daliuge.factory");
+
 namespace askap {
 
 
     struct app_data {
-
-        boost::shared_ptr<LOFAR::ParameterSet> parset;
+        LOFAR::ParameterSet *parset;
     };
 
     static inline
@@ -42,7 +39,7 @@ namespace askap {
 
 
     LoadParset::LoadParset() {
-        ASKAPLOG_DEBUG_STR(logger,"LoadParset default contructor");
+        fprintf(stdout,"LoadParset default contructor");
     }
 
 
@@ -52,7 +49,7 @@ namespace askap {
 
     DaliugeApplication::ShPtr LoadParset::createDaliugeApplication(const std::string &name)
     {
-        ASKAPLOG_DEBUG_STR(logger, "createDaliugeApplication for LoadParset ");
+        fprintf(stdout, "createDaliugeApplication for LoadParset ");
 
         LoadParset::ShPtr ptr;
 
@@ -62,19 +59,23 @@ namespace askap {
 
         ptr.reset( new LoadParset());
 
-        ASKAPLOG_DEBUG_STR(logger,"Created LoadParset DaliugeApplication instance");
+        fprintf(stdout,"Created LoadParset DaliugeApplication instance");
         return ptr;
 
     }
     int LoadParset::init(dlg_app_info *app, const char ***arguments) {
 
+        std::cerr << "Hello World from init method" << std::endl;
+
+        // Argument parsing is not working as yet
+#if 0
 
         char *parset_filename = 0;
         const char **param = arguments[0];
         while (1) {
 
             // Sentinel
-            if (*param == NULL) {
+            if (param == NULL) {
                 break;
             }
             // any params I might need go here
@@ -85,7 +86,12 @@ namespace askap {
             param++;
         }
 
-        to_app_data(app)->parset.reset( new LOFAR::ParameterSet(parset_filename));
+    //    to_app_data(app)->parset.reset( new LOFAR::ParameterSet(parset_filename));
+#endif
+        app->data = malloc(sizeof(struct app_data));
+        if (!app->data) {
+            return 1;
+        }
 
         return 0;
     }
@@ -93,10 +99,17 @@ namespace askap {
     int LoadParset::run(dlg_app_info *app) {
 
         // load the parset and print it out to the screen
+        std::cerr << "Hello World from run method" << std::endl;
+    //    std::cout << *to_app_data(app)->parset << std::endl;
 
-        std::cout << *to_app_data(app)->parset << std::endl;
+    // lets open the input and read it
+        char buf[64*1024];
+        size_t n_read = app->inputs[0].read(buf, 64*1024);
+        // fprintf(stderr,"%s",buf);
+        to_app_data(app)->parset = new LOFAR::ParameterSet(true);
+        to_app_data(app)->parset->adoptBuffer(buf);
 
-
+        std::cout << *(to_app_data(app)->parset) << std::endl;
         // write it to the outputs
 
         return 0;
