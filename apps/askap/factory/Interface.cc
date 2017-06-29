@@ -13,23 +13,21 @@
 int init(dlg_app_info *app, const char ***arguments) {
     // this means we have to instantiate an application
     // and call its init
-    const char **param = arguments[0];
     bool got_name = false;
     while (1) {
 
         // Sentinel
-        if (*param == NULL) {
+        if (*arguments == NULL) {
             break;
         }
 
-        fprintf(stdout, "param is: %s\n",param[0]);
-
+        const char **param = arguments[0];
         if (strcmp(param[0], "name") == 0) {
             app->appname = strdup(param[1]);
             got_name = true;
         }
 
-        param++;
+        arguments++;
     }
     if (got_name == false) {
         app->appname = strdup("LoadParset");
