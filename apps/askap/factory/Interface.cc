@@ -2,8 +2,6 @@
 // If Daliuge changes its API - you will have to change these functions
 // but hopefully all the issues will be hidden behind the structures
 
-#include "askap_daliuge_pipeline.h"
-
 #include<daliuge/DaliugeApplication.h>
 #include<factory/DaliugeApplicationFactory.h>
 #include<factory/Interface.h>

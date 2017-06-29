@@ -7,8 +7,6 @@
 /// Maintains a registry of possible applications and selects - based upon a name
 /// which one will be instantiated.
 ///
-// Package level header file
-
 
 // ASKAPsoft includes
 #include <askap/AskapLogging.h>
