@@ -24,9 +24,7 @@ namespace askap {
 
 
     struct app_data {
-        short print_stats;
-        unsigned long total;
-        unsigned long write_duration;
+
         boost::shared_ptr<LOFAR::ParameterSet> parset;
     };
 
@@ -70,7 +68,7 @@ namespace askap {
     }
     int LoadParset::init(dlg_app_info *app, const char ***arguments) {
 
-        short print_stats = 0;
+
         char *parset_filename = 0;
         const char **param = arguments[0];
         while (1) {
@@ -88,81 +86,35 @@ namespace askap {
         }
 
         to_app_data(app)->parset.reset( new LOFAR::ParameterSet(parset_filename));
-        to_app_data(app)->total = 0;
-        to_app_data(app)->write_duration = 0;
+
         return 0;
     }
 
     int LoadParset::run(dlg_app_info *app) {
 
-        char buf[64*1024];
-        unsigned int total = 0, i;
-        unsigned long read_duration = 0, write_duration = 0;
-        struct timeval start, end;
+        // load the parset and print it out to the screen
 
-        if (to_app_data(app)->print_stats) {
-            printf("running / done methods addresses are %p / %p\n", app->running, app->done);
-        }
+        std::cout << *to_app_data(app)->parset << std::endl;
 
-        while (1) {
 
-            gettimeofday(&start, NULL);
-            size_t n_read = app->inputs[0].read(buf, 64*1024);
-            gettimeofday(&end, NULL);
-            read_duration += usecs(&start, &end);
-            if (!n_read) {
-                break;
-            }
-
-            gettimeofday(&start, NULL);
-            for (i = 0; i < app->n_outputs; i++) {
-                app->outputs[i].write(buf, n_read);
-            }
-            gettimeofday(&end, NULL);
-            write_duration += usecs(&start, &end);
-            total += n_read;
-        }
-
-        double duration = (read_duration + write_duration) / 1000000.;
-        double total_mb = total / 1024. / 1024.;
-
-        if (to_app_data(app)->print_stats) {
-            printf("Read %.3f [MB] of data at %.3f [MB/s]\n", total_mb, total_mb / (read_duration / 1000000.));
-            printf("Wrote %.3f [MB] of data at %.3f [MB/s]\n", total_mb, total_mb / (write_duration / 1000000.));
-            printf("Copied %.3f [MB] of data at %.3f [MB/s]\n", total_mb, total_mb / duration);
-        }
+        // write it to the outputs
 
         return 0;
     }
 
+
     void LoadParset::data_written(dlg_app_info *app, const char *uid,
         const char *data, size_t n) {
-            unsigned int i;
-            struct timeval start, end;
 
-            app->running();
-            gettimeofday(&start, NULL);
-            for (i = 0; i < app->n_outputs; i++) {
-                app->outputs[i].write(data, n);
-            }
-            gettimeofday(&end, NULL);
+        app->running();
 
-            to_app_data(app)->total += n;
-            to_app_data(app)->write_duration += usecs(&start, &end);
     }
 
     void LoadParset::drop_completed(dlg_app_info *app, const char *uid,
             drop_status status) {
-                /* We only have one output so we're finished */
-                double total_mb = (to_app_data(app)->total / 1024. / 1024.);
-                if (to_app_data(app)->print_stats) {
-                    printf("Wrote %.3f [MB] of data to %u outputs in %.3f [ms] at %.3f [MB/s]\n",
-                    total_mb, app->n_outputs,
-                    to_app_data(app)->write_duration / 1000.,
-                    total_mb / (to_app_data(app)->write_duration / 1000000.));
-                }
-                app->done(APP_FINISHED);
-                free(app->data);
+
+        app->done(APP_FINISHED);
+
     }
 
 
