@@ -27,9 +27,6 @@
 // Include own header file first
 #include "daliuge/DaliugeApplication.h"
 
-// Include package level header file
-#include "askap_daliuge_pipeline.h"
-
 // System includes
 #include <string>
 #include <sstream>

@@ -6,8 +6,6 @@
 /// Implements the methods that evaluate the primary beam gain ain the case of a
 /// Gaussian
 ///
-#include "askap_daliuge_pipeline.h"
-
 
 #include <daliuge/DaliugeApplication.h>
 #include <factory/Example.h>
