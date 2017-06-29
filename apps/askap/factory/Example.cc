@@ -13,8 +13,6 @@
 #include <askap/AskapLogging.h>
 #include <Common/ParameterSet.h>
 
-#include <casacore/casa/Arrays/Vector.h>
-#include <casacore/casa/Arrays/IPosition.h>
 
 #include <sys/time.h>
 

@@ -12,12 +12,18 @@ ASKAP_INCDIRS = -I$(ASKAP_ROOT)/3rdParty/log4cxx/log4cxx-0.10.0/install/include 
                 -I$(ASKAP_ROOT)/3rdParty/LOFAR/Common/Common-3.3/Common-3.3/include \
                 -I$(ASKAP_ROOT)/Code/Base/askap/current/
 ASKAP_LIBDIRS = -L$(ASKAP_ROOT)/3rdParty/log4cxx/log4cxx-0.10.0/install/lib/ \
-				    -L$(ASKAP_ROOT)/3rdParty/LOFAR/Common
-ASKAP_LIBS = -llog4cxx
+				    -L$(ASKAP_ROOT)/3rdParty/LOFAR/Common \
+                    -L$(ASKAP_ROOT)/Code/Base/askap/current/install/lib
+
+CASA_INCDIRS = -I$(ASKAP_ROOT)/3rdParty/casacore/casacore-2.0.3/install/include/
+CASA_LIBDIRS = -L$(ASKAP_ROOT)/3rdParty/casacore/casacore-2.0.3/install/lib/
+
+ASKAP_LIBS = -llog4cxx -laskap_askap
+CASA_LIBS = -lcasa_casa
 
 # Combined flags
 CXXFLAGS += -fPIC -I. $(ASKAP_INCDIRS) $(DLG_INCDIRS)
-LDFLAGS += $(ASKAP_LIBDIRS) $(ASKAP_LIBS)
+LDFLAGS += $(ASKAP_LIBDIRS) $(ASKAP_LIBS) $(CASA_LIBDIRS) $(CASA_LIBS)
 
 
 #
