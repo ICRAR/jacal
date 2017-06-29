@@ -39,7 +39,7 @@ namespace askap {
 
 
     LoadParset::LoadParset() {
-        fprintf(stdout,"LoadParset default contructor");
+        fprintf(stdout,"\t LoadParset -  default contructor\n");
     }
 
 
@@ -49,7 +49,7 @@ namespace askap {
 
     DaliugeApplication::ShPtr LoadParset::createDaliugeApplication(const std::string &name)
     {
-        fprintf(stdout, "createDaliugeApplication for LoadParset ");
+        fprintf(stdout, "\t createDaliugeApplication - Instantiating LoadParset\n");
 
         LoadParset::ShPtr ptr;
 
@@ -59,16 +59,16 @@ namespace askap {
 
         ptr.reset( new LoadParset());
 
-        fprintf(stdout,"Created LoadParset DaliugeApplication instance");
+        fprintf(stdout,"\t createDaliugeApplication - Created LoadParset DaliugeApplication instance\n");
         return ptr;
 
     }
     int LoadParset::init(dlg_app_info *app, const char ***arguments) {
 
-        std::cerr << "Hello World from init method" << std::endl;
+        // std::cerr << "Hello World from init method" << std::endl;
 
         // Argument parsing is not working as yet
-#if 0
+
 
         char *parset_filename = 0;
         const char **param = arguments[0];
@@ -78,39 +78,47 @@ namespace askap {
             if (param == NULL) {
                 break;
             }
-            // any params I might need go here
-            if (strcmp(param[0], "parset_filename") == 0) {
-                parset_filename = strdup(param[1]);
-            }
+            // any params I might need go here:
+            // filename:
+            // no longer required as input comes from daliuge now
+            //if (strcmp(param[0], "parset_filename") == 0) {
+            //    parset_filename = strdup(param[1]);
+            //}
 
             param++;
         }
 
-    //    to_app_data(app)->parset.reset( new LOFAR::ParameterSet(parset_filename));
-#endif
         app->data = malloc(sizeof(struct app_data));
         if (!app->data) {
             return 1;
         }
-
+        //  FIXME:
+        //    This should be here but I could not get a boost smart pointer to work
+        //    to_app_data(app)->parset.reset( new LOFAR::ParameterSet(parset_filename));
+        //
         return 0;
     }
 
     int LoadParset::run(dlg_app_info *app) {
 
         // load the parset and print it out to the screen
-        std::cerr << "Hello World from run method" << std::endl;
+        // std::cerr << "Hello World from run method" << std::endl;
     //    std::cout << *to_app_data(app)->parset << std::endl;
 
     // lets open the input and read it
         char buf[64*1024];
         size_t n_read = app->inputs[0].read(buf, 64*1024);
-        // fprintf(stderr,"%s",buf);
+
         to_app_data(app)->parset = new LOFAR::ParameterSet(true);
         to_app_data(app)->parset->adoptBuffer(buf);
 
-        std::cout << *(to_app_data(app)->parset) << std::endl;
         // write it to the outputs
+        std::cout << *(to_app_data(app)->parset) << std::endl;
+
+
+        for (int i = 0; i < app->n_outputs; i++) {
+            app->outputs[i].write(buf, n_read);
+        }
 
         return 0;
     }
@@ -127,7 +135,7 @@ namespace askap {
             drop_status status) {
 
         app->done(APP_FINISHED);
-
+        delete(to_app_data(app)->parset);
     }
 
 

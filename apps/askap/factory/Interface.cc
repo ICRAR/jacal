@@ -25,6 +25,7 @@ int init(dlg_app_info *app, const char ***arguments) {
         if (strcmp(param[0], "name") == 0) {
             app->appname = strdup(param[1]);
             got_name = true;
+            fprintf(stdout,"\t init - Found %s in params\n",app->appname);
         }
 
         arguments++;

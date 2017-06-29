@@ -42,13 +42,13 @@ namespace askap {
   void DaliugeApplicationFactory::registerDaliugeApplication (const std::string& name,
                                            DaliugeApplicationFactory::DaliugeApplicationCreator* creatorFunc)
   {
-    fprintf(stdout, "     - Adding %s to the application registry", name.c_str());
+    fprintf(stdout, "\t factory - Adding %s to the application registry\n", name.c_str());
     theirRegistry[name] = creatorFunc;
   }
 
   DaliugeApplication::ShPtr DaliugeApplicationFactory::createDaliugeApplication (const std::string& name)
   {
-    fprintf(stdout, " Attempting to find %s in the registry",name.c_str());
+    fprintf(stdout, "\t factory - Attempting to find %s in the registry\n",name.c_str());
     std::map<std::string,DaliugeApplicationCreator*>::const_iterator it = theirRegistry.find (name);
     if (it == theirRegistry.end()) {
       // Unknown Application. Try to load from a dynamic library
@@ -60,18 +60,18 @@ namespace askap {
       }
       // Try to load the dynamic library and execute its register function.
       // Do not dlclose the library.
-      fprintf(stdout, "Application %s is not in the Daliuge Application registry, attempting to load it dynamically", name.c_str());
+      fprintf(stdout, "\t factory - Application %s is not in the Daliuge Application registry, attempting to load it dynamically\n", name.c_str());
       casa::DynLib dl(libname, string("libaskap_"), "register_"+libname, false);
       if (dl.getHandle()) {
         // Successfully loaded. Get the creator function.
-        fprintf(stdout, "Dynamically loaded ASKAP/Daliuge Application %s\n", name.c_str());
+        fprintf(stdout, "\t factory - Dynamically loaded ASKAP/Daliuge Application %s\n", name.c_str());
         // the first thing the Application in the shared library is supposed to do is to
         // register itself. Therefore, its name will appear in the registry.
         it = theirRegistry.find (name);
       }
     }
     if (it == theirRegistry.end()) {
-      ASKAPTHROW(AskapError, "Unknown Application " << name);
+      ASKAPTHROW(AskapError, "\t factory - Unknown Application " << name);
     }
     // Execute the registered function.
     return it->second(name);
@@ -87,7 +87,7 @@ DaliugeApplication::ShPtr DaliugeApplicationFactory::make(const std::string &nam
     if (theirRegistry.size() == 0) {
         // this is the first call of the method, we need to fill the registry with
         // all pre-defined applications
-        fprintf(stdout, "Filling the registry with predefined applications");
+        fprintf(stdout, "\t factory - Filling the registry with predefined applications\n");
         addPreDefinedDaliugeApplication<Example>();
         addPreDefinedDaliugeApplication<LoadParset>();
 
