@@ -81,8 +81,9 @@ namespace askap {
 
 
         char *parset_filename = 0;
-        const char **param = arguments[0];
         while (1) {
+
+            const char **param = *arguments;
 
             // Sentinel
             if (param == NULL) {
@@ -95,7 +96,7 @@ namespace askap {
             //    parset_filename = strdup(param[1]);
             //}
 
-            param++;
+            arguments++;
         }
 
         app->data = malloc(sizeof(struct app_data));
