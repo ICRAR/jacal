@@ -33,7 +33,8 @@ OBJS = daliuge/DaliugeApplication.o \
        factory/DaliugeApplicationFactory.o \
        factory/Example.o \
        factory/Interface.o \
-       factory/LoadParset.o
+       factory/LoadParset.o \
+       factory/LoadVis.o
 
 .PHONY: all clean
 
