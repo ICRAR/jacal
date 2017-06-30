@@ -13,7 +13,7 @@
 
 #include <Common/ParameterSet.h>
 
-
+#include <string.h>
 #include <sys/time.h>
 
 
@@ -68,11 +68,12 @@ namespace askap {
 
         short print_stats = 0;
 
-        const char **param = arguments[0];
         while (1) {
 
+            const char **param = *arguments;
+
             // Sentinel
-            if (*param == NULL) {
+            if (param == NULL) {
                 break;
             }
 
@@ -81,11 +82,8 @@ namespace askap {
                 strcmp(param[1], "true") == 0;
                 break;
             }
-            if (strcmp(param[0], "name") == 0) {
-                app->appname = strdup(param[1]);
-            }
 
-            param++;
+            arguments++;
         }
 
         app->data = malloc(sizeof(struct app_data));
