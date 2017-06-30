@@ -4,6 +4,10 @@
 # and can be loaded by the python executable
 #
 
+ifndef ASKAP_ROOT
+$(error ASKAP_ROOT is not set)
+endif
+
 # DALiuGE include dir
 DLG_INCDIRS = -I`python -c "import dfms; print(dfms.get_include_dir())"`
 
