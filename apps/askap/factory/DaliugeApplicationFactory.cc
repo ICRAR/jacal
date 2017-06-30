@@ -24,6 +24,8 @@
 // Apps need to be here - or can we register them from Somewhere else
 #include <factory/Example.h>
 #include <factory/LoadParset.h>
+#include <factory/LoadVis.h>
+
 //
 
 #include<string>
@@ -90,6 +92,7 @@ DaliugeApplication::ShPtr DaliugeApplicationFactory::make(const std::string &nam
         fprintf(stdout, "\t factory - Filling the registry with predefined applications\n");
         addPreDefinedDaliugeApplication<Example>();
         addPreDefinedDaliugeApplication<LoadParset>();
+        addPreDefinedDaliugeApplication<LoadVis>();
 
 
 
