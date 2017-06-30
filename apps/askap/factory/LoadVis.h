@@ -13,6 +13,9 @@
 
 #include <boost/shared_ptr.hpp>
 
+// LOFAR ParameterSet
+#include <Common/ParameterSet.h>
+
 
 
 namespace askap {
@@ -44,6 +47,13 @@ namespace askap {
             drop_status status);
 
         private:
+
+            LOFAR::ParameterSet itsParset;
+
+            // utiliy to get datasets from parset ....
+
+            std::vector<std::string> getDatasets();
+
 
     };
 

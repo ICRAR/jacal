@@ -6,6 +6,8 @@
 /// Implements a test method that uses the contents of the the parset to load
 /// in a measurement set and print a summary of its contents
 ///
+// for logging
+#define ASKAP_PACKAGE_NAME "LoadVis"
 
 #include <iostream>
 #include <vector>
@@ -16,6 +18,10 @@
 
 // LOFAR ParameterSet
 #include <Common/ParameterSet.h>
+// ASKAP Logger
+
+#include <askap/AskapLogging.h>
+#include <askap/AskapError.h>
 
 #include <string.h>
 #include <sys/time.h>
@@ -73,6 +79,7 @@ namespace askap {
         // Argument parsing is not working as yet
 
 
+
         char *parset_filename = 0;
         const char **param = arguments[0];
         while (1) {
@@ -110,20 +117,32 @@ namespace askap {
 
     // lets open the input and read it - get the parset - maybe this should be
     // in init
+        ASKAP_LOGGER(logger, ".run");
+
+    ///  int i = 1;
+    ///  ASKAP_LOGGER(locallog, ".test");
+    ///
+    ///  ASKAPLOG_WARN(locallog,"Warning. This is a warning.");
+    ///  ASKAPLOG_INFO(locallog,"This is an automatic (subpackage) log");
+    ///  ASKAPLOG_INFO_STR(locallog,"This is " << i << " log stream test.");
+    ///
+
 
         char buf[64*1024];
         size_t n_read = app->inputs[0].read(buf, 64*1024);
 
         to_app_data(app)->parset = new LOFAR::ParameterSet(true);
         to_app_data(app)->parset->adoptBuffer(buf);
-        std::vector<std::string> datasets(1,"hello");
-        // std::vector<std::string> datasets = to_app_data(app)->parset->getStringVector("dataset", true);
-        std::vector<std::string>::const_iterator iter = datasets.begin();
-        for (; iter != datasets.end(); iter++) {
+
+        this->itsParset = to_app_data(app)->parset->makeSubset("Cimager.");
+
+        vector<std::string> ms = this->getDatasets();
+
+        std::vector<std::string>::const_iterator iter = ms.begin();
+
+        for (; iter != ms.end(); iter++) {
             std::cout << *iter << std::endl;
         }
-
-
 
         return 0;
     }
@@ -142,6 +161,32 @@ namespace askap {
         app->done(APP_FINISHED);
         delete(to_app_data(app)->parset);
     }
+    std::vector<std::string> LoadVis::getDatasets()
+    {
+        if (itsParset.isDefined("dataset") && itsParset.isDefined("dataset0")) {
+            ASKAPTHROW(std::runtime_error,
+                "Both dataset and dataset0 are specified in the parset");
+        }
 
+        // First look for "dataset" and if that does not exist try "dataset0"
+        vector<string> ms;
+        if (itsParset.isDefined("dataset")) {
+            ms = itsParset.getStringVector("dataset", true);
+        } else {
+            string key = "dataset0";   // First key to look for
+            long idx = 0;
+            while (itsParset.isDefined(key)) {
+                const string value = itsParset.getString(key);
+                ms.push_back(value);
+
+                LOFAR::ostringstream ss;
+                ss << "dataset" << idx + 1;
+                key = ss.str();
+                ++idx;
+            }
+        }
+
+        return ms;
+    }
 
 } // namespace
