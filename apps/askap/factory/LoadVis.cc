@@ -26,6 +26,7 @@
 #include <string.h>
 #include <sys/time.h>
 
+ASKAP_LOGGER(logger, ".run");
 
 namespace askap {
 
@@ -58,8 +59,9 @@ namespace askap {
 
     DaliugeApplication::ShPtr LoadVis::createDaliugeApplication(const std::string &name)
     {
-        fprintf(stdout, "\t createDaliugeApplication - Instantiating LoadVis\n");
-
+        ASKAP_LOGGER(locallogger, ".create");
+        //fprintf(stdout, "\t createDaliugeApplication - Instantiating LoadVis\n");
+        ASKAPLOG_INFO_STR(locallogger,"createDaliugeApplication - Instantiating LoadVis");
         LoadVis::ShPtr ptr;
 
         // We need to pull all the parameters out of the parset - and set
@@ -118,7 +120,7 @@ namespace askap {
 
     // lets open the input and read it - get the parset - maybe this should be
     // in init
-        ASKAP_LOGGER(logger, ".run");
+
 
     ///  int i = 1;
     ///  ASKAP_LOGGER(locallog, ".test");
