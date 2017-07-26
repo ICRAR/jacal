@@ -138,14 +138,20 @@ namespace askap {
         to_app_data(app)->parset->adoptBuffer(buf);
 
         this->itsParset = to_app_data(app)->parset->makeSubset("Cimager.");
-
+        const string colName = this->itsParset.getString("datacolumn", "DATA");
         vector<std::string> ms = this->getDatasets();
 
         std::vector<std::string>::const_iterator iter = ms.begin();
 
         for (; iter != ms.end(); iter++) {
-            std::cout << *iter << std::endl;
+            accessors::TableDataSource ds(*iter, accessors::TableDataSource::DEFAULT, colName);
+        //    std::cout << *iter << std::endl;
+        //
+        //
         }
+
+        // need to select the part of the vis that I want to process
+        // need a time and frequency selection
 
         return 0;
     }

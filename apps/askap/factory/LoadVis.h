@@ -15,6 +15,8 @@
 
 // LOFAR ParameterSet
 #include <Common/ParameterSet.h>
+// ASKAPSoft data accessor
+#include <dataaccess/TableDataSource.h>
 
 
 
@@ -48,11 +50,19 @@ namespace askap {
 
         private:
 
+            // Parameter set
             LOFAR::ParameterSet itsParset;
 
             // utiliy to get datasets from parset ....
 
             std::vector<std::string> getDatasets();
+
+            // utility to build an Imaging Normal Equation from a parset
+            // void buildNE();
+
+            // these are the steps required by buildNE
+
+
 
 
     };
