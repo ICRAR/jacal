@@ -57,6 +57,13 @@ namespace askap {
 
             std::vector<std::string> getDatasets();
 
+            // Its channel of data
+
+            casa::IPosition freqInterval;
+
+            //
+
+            casa::IPosition timeInterval;
             // utility to build an Imaging Normal Equation from a parset
             // void buildNE();
 

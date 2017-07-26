@@ -24,7 +24,7 @@ CASA_INCDIRS = -I$(ASKAP_ROOT)/3rdParty/casacore/casacore-2.0.3/install/include/
 CASA_LIBDIRS = -L$(ASKAP_ROOT)/3rdParty/casacore/casacore-2.0.3/install/lib/
 
 ASKAP_LIBS = -llog4cxx -laskap_askap -lcommon -laskap_accessors
-CASA_LIBS = -lcasa_casa  $(ASKAP_ROOT)/3rdParty/cfitsio/cfitsio-3.35/cfitsio/libcfitsio.1.dylib
+CASA_LIBS = -lcasa_casa  -lcasa_measures $(ASKAP_ROOT)/3rdParty/cfitsio/cfitsio-3.35/cfitsio/libcfitsio.1.dylib
 
 # Combined flags
 CXXFLAGS += -fPIC -I. $(ASKAP_INCDIRS) $(DLG_INCDIRS)

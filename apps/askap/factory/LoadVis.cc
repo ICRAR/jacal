@@ -109,6 +109,15 @@ namespace askap {
         //    This should be here but I could not get a boost smart pointer to work
         //    to_app_data(app)->parset.reset( new LOFAR::ParameterSet(parset_filename));
         //
+
+        // FIXME:
+        // Arbitrarily setting frequency selection to 1
+        this->freqInterval = casa::IPosition(2,0);
+        this->timeInterval = casa::IPosition(2,0);
+
+        this->freqInterval[0] = 0;
+        this->freqInterval[1] = 1;
+
         return 0;
     }
 
@@ -145,9 +154,19 @@ namespace askap {
 
         for (; iter != ms.end(); iter++) {
             accessors::TableDataSource ds(*iter, accessors::TableDataSource::DEFAULT, colName);
-        //    std::cout << *iter << std::endl;
-        //
-        //
+
+            // this is the data selector for the measurement set
+            accessors::IDataSelectorPtr sel = ds.createSelector();
+
+            sel->chooseCrossCorrelations();
+            sel->chooseChannels(1, this->freqInterval[0]);
+
+            accessors::IDataConverterPtr conv = ds.createConverter();
+            conv->setFrequencyFrame(casa::MFrequency::Ref(casa::MFrequency::TOPO), "Hz");
+            conv->setDirectionFrame(casa::MDirection::Ref(casa::MDirection::J2000));
+            conv->setEpochFrame();
+
+
         }
 
         // need to select the part of the vis that I want to process
