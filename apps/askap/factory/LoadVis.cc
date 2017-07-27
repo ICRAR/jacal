@@ -160,6 +160,8 @@ namespace askap {
 
         askap::synthesis::IVisGridder::ShPtr itsGridder = askap::synthesis::IVisGridder::createGridder(this->itsParset);
 
+        // NE
+        askap::scimath::ImagingNormalEquations::ShPtr itsNe = askap::scimath::ImagingNormalEquations::ShPtr(new askap::scimath::ImagingNormalEquations(*itsModel));
 
         // I cant make the gridder smart funciton a member funtion as I cannot instantiate it until I have a parset.
 
@@ -193,6 +195,8 @@ namespace askap {
             // Set this to an empty pointer - no aggregation across groups for this
             fftEquation->setVisUpdateObject(boost::shared_ptr<askap::synthesis::GroupVisAggregator>());
 
+            fftEquation->calcEquations(*itsNe);
+            
 
         }
 
