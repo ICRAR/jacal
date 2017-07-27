@@ -55,6 +55,9 @@ namespace askap {
             /// The model
             askap::scimath::Params::ShPtr itsModel;
 
+
+        
+
             // Parameter set
             LOFAR::ParameterSet itsParset;
 

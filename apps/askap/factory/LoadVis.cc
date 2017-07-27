@@ -34,6 +34,7 @@
 // params helpers
 #include <measurementequation/SynthesisParamsHelper.h>
 #include <measurementequation/ImageParamsHelper.h>
+#include <measurementequation/ImageFFTEquation.h>
 
 #include <gridding/IVisGridder.h>
 
@@ -141,22 +142,7 @@ namespace askap {
 
     int LoadVis::run(dlg_app_info *app) {
 
-        // load the parset and print it out to the screen
-        // std::cerr << "Hello World from run method" << std::endl;
-    //    std::cout << *to_app_data(app)->parset << std::endl;
-
-    // lets open the input and read it - get the parset - maybe this should be
-    // in init
-
-
-    ///  int i = 1;
-    ///  ASKAP_LOGGER(locallog, ".test");
-    ///
-    ///  ASKAPLOG_WARN(locallog,"Warning. This is a warning.");
-    ///  ASKAPLOG_INFO(locallog,"This is an automatic (subpackage) log");
-    ///  ASKAPLOG_INFO_STR(locallog,"This is " << i << " log stream test.");
-    ///
-
+        // Lets get the key-value-parset
 
         char buf[64*1024];
         size_t n_read = app->inputs[0].read(buf, 64*1024);
@@ -171,6 +157,7 @@ namespace askap {
         // lets build a gridder
 
         askap::synthesis::IVisGridder::ShPtr itsGridder = askap::synthesis::IVisGridder::createGridder(this->itsParset);
+
 
         // I cant make the gridder smart funciton a member funtion as I cannot instantiate it until I have a parset.
 
@@ -195,7 +182,14 @@ namespace askap {
             // need to define an empty model (or pick one up from the parset)
 
 
-
+            ASKAPLOG_INFO_STR(logger,"Not applying calibration");
+            ASKAPLOG_INFO_STR(logger, "building FFT/measurement equation" );
+            boost::shared_ptr<askap::synthesis::ImageFFTEquation> fftEquation(new askap::synthesis::ImageFFTEquation (*itsModel, it, itsGridder));
+            ASKAPDEBUGASSERT(fftEquation);
+            fftEquation->useAlternativePSF(itsParset);
+            //
+            // What does this do .... fftEquation->setVisUpdateObject(GroupVisAggregator::create(itsComms));
+            
 
         }
 
