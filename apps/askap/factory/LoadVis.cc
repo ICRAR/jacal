@@ -23,6 +23,14 @@
 #include <askap/AskapLogging.h>
 #include <askap/AskapError.h>
 
+// Data accessors
+#include <dataaccess/TableConstDataSource.h>
+#include <dataaccess/IConstDataIterator.h>
+#include <dataaccess/IDataConverter.h>
+#include <dataaccess/IDataSelector.h>
+#include <dataaccess/IDataIterator.h>
+#include <dataaccess/SharedIter.h>
+
 #include <string.h>
 #include <sys/time.h>
 
@@ -165,6 +173,8 @@ namespace askap {
             conv->setFrequencyFrame(casa::MFrequency::Ref(casa::MFrequency::TOPO), "Hz");
             conv->setDirectionFrame(casa::MDirection::Ref(casa::MDirection::J2000));
             conv->setEpochFrame();
+
+            accessors::IDataSharedIter it = ds.createIterator(sel, conv);
 
 
         }
