@@ -17,6 +17,7 @@ ASKAP_INCDIRS = -I$(ASKAP_ROOT)/3rdParty/log4cxx/log4cxx-0.10.0/install/include 
                 -I$(ASKAP_ROOT)/3rdParty/LOFAR/Blob/Blob-1.2/install/include \
                 -I$(ASKAP_ROOT)/Code/Base/askap/current/ \
                 -I$(ASKAP_ROOT)/Code/Base/accessors/current/install/include \
+                -I$(ASKAP_ROOT)/Code/Base//askapparallel/current/install/include \
                 -I$(ASKAP_ROOT)/Code/Base/scimath/current/install/include \
                 -I$(ASKAP_ROOT)/Code/Components/Synthesis/synthesis/current/install/include
 

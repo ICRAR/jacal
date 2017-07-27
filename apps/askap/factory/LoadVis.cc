@@ -35,6 +35,8 @@
 #include <measurementequation/SynthesisParamsHelper.h>
 #include <measurementequation/ImageParamsHelper.h>
 #include <measurementequation/ImageFFTEquation.h>
+#include <parallel/GroupVisAggregator.h>
+
 
 #include <gridding/IVisGridder.h>
 
@@ -188,8 +190,9 @@ namespace askap {
             ASKAPDEBUGASSERT(fftEquation);
             fftEquation->useAlternativePSF(itsParset);
             //
-            // What does this do .... fftEquation->setVisUpdateObject(GroupVisAggregator::create(itsComms));
-            
+            // Set this to an empty pointer - no aggregation across groups for this
+            fftEquation->setVisUpdateObject(boost::shared_ptr<askap::synthesis::GroupVisAggregator>());
+
 
         }
 
