@@ -18,6 +18,8 @@
 // ASKAPSoft data accessor
 #include <dataaccess/TableDataSource.h>
 
+#include <fitting/Params.h>
+
 
 
 namespace askap {
@@ -50,10 +52,15 @@ namespace askap {
 
         private:
 
+            /// The model
+            askap::scimath::Params::ShPtr itsModel;
+
             // Parameter set
             LOFAR::ParameterSet itsParset;
 
             // utiliy to get datasets from parset ....
+
+
 
             std::vector<std::string> getDatasets();
 

@@ -31,6 +31,13 @@
 #include <dataaccess/IDataIterator.h>
 #include <dataaccess/SharedIter.h>
 
+// params helpers
+#include <measurementequation/SynthesisParamsHelper.h>
+#include <measurementequation/ImageParamsHelper.h>
+
+#include <fitting/Params.h>
+
+
 #include <string.h>
 #include <sys/time.h>
 
@@ -57,7 +64,8 @@ namespace askap {
 
 
     LoadVis::LoadVis() {
-        fprintf(stdout,"\t LoadVis -  default contructor\n");
+        ASKAP_LOGGER(locallogger,"\t LoadVis -  default contructor\n");
+        this->itsModel.reset(new scimath::Params());
     }
 
 
@@ -175,6 +183,10 @@ namespace askap {
             conv->setEpochFrame();
 
             accessors::IDataSharedIter it = ds.createIterator(sel, conv);
+
+            // need to define an empty model (or pick one up from the parset)
+
+
 
 
         }
