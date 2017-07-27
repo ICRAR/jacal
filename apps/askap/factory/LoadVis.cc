@@ -35,6 +35,8 @@
 #include <measurementequation/SynthesisParamsHelper.h>
 #include <measurementequation/ImageParamsHelper.h>
 
+#include <gridding/IVisGridder.h>
+
 #include <fitting/Params.h>
 
 
@@ -165,6 +167,12 @@ namespace askap {
         this->itsParset = to_app_data(app)->parset->makeSubset("Cimager.");
         const string colName = this->itsParset.getString("datacolumn", "DATA");
         vector<std::string> ms = this->getDatasets();
+
+        // lets build a gridder
+
+        askap::synthesis::IVisGridder::ShPtr itsGridder = askap::synthesis::IVisGridder::createGridder(this->itsParset);
+
+        // I cant make the gridder smart funciton a member funtion as I cannot instantiate it until I have a parset.
 
         std::vector<std::string>::const_iterator iter = ms.begin();
 

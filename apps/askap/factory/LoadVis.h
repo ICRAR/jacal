@@ -60,8 +60,6 @@ namespace askap {
 
             // utiliy to get datasets from parset ....
 
-
-
             std::vector<std::string> getDatasets();
 
             // Its channel of data
