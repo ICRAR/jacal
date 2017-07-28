@@ -11,6 +11,8 @@
 
 #include <daliuge/DaliugeApplication.h>
 
+#include <casacore/casa/Quanta/MVDirection.h>
+
 #include <boost/shared_ptr.hpp>
 
 // LOFAR ParameterSet
@@ -50,28 +52,29 @@ namespace askap {
         virtual void drop_completed(dlg_app_info *app, const char *uid,
             drop_status status);
 
+        static std::vector<std::string> getDatasets(const LOFAR::ParameterSet& parset);
+
+        static LOFAR::ParameterSet addMissingParameters(LOFAR::ParameterSet& parset);
+
         private:
 
             /// The model
             askap::scimath::Params::ShPtr itsModel;
 
-
-        
-
             // Parameter set
             LOFAR::ParameterSet itsParset;
-
-            // utiliy to get datasets from parset ....
-
-            std::vector<std::string> getDatasets();
 
             // Its channel of data
 
             casa::IPosition freqInterval;
 
-            //
 
             casa::IPosition timeInterval;
+
+            // Its tangent point
+            std::vector<casa::MVDirection> itsTangent;
+
+
             // utility to build an Imaging Normal Equation from a parset
             // void buildNE();
 
