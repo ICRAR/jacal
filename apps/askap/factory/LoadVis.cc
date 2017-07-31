@@ -174,9 +174,13 @@ namespace askap {
 
         // we need to fill the local parset with parameters that maybe missing
         //
-
-        this->itsParset = addMissingParameters(this->itsParset);
-
+        try {
+            this->itsParset = addMissingParameters(this->itsParset);
+        }
+        catch (std::runtime_error)
+        {
+            return -1;
+        }
         const string colName = this->itsParset.getString("datacolumn", "DATA");
         vector<std::string> ms = this->getDatasets(this->itsParset);
 
@@ -312,13 +316,13 @@ namespace askap {
         // set - or just throw an exception and make the user add
         // the info ....
 
-
-
         // test for missing image-specific parameters:
 
         // these parameters can be set globally or individually
         bool cellsizeNeeded = false;
         bool shapeNeeded = false;
+        bool directionNeeded = true;
+
         int nTerms = 1;
 
         string param;
@@ -330,8 +334,11 @@ namespace askap {
         if ( !parset.isDefined(param) ) {
 
             ASKAPLOG_WARN_STR(logger,"Param not found: " << param);
-            ASKAPTHROW(std::runtime_error,"direction not in parset");
+            directionNeeded = true;
 
+        }
+        else {
+            directionNeeded = false;
         }
         param = "Images.restFrequency";
 
@@ -370,9 +377,22 @@ namespace askap {
 
             }
             param ="Images."+imageNames[img]+".direction";
-            if ( !parset.isDefined(param) ) {
+            if ( !parset.isDefined(param) && directionNeeded) {
                 ASKAPLOG_WARN_STR(logger,"Param not found: " << param);
                 ASKAPTHROW(std::runtime_error,"direction not in parset");
+            }
+            else if (!parset.isDefined(param) && !directionNeeded) {
+                ASKAPLOG_INFO_STR(logger,"Root direction specified but no image direction. Assuming they are the same");
+                const vector<string> directionVector = parset.getStringVector("Images.direction");
+
+                std::ostringstream pstr;
+                pstr<<"["<< directionVector[0].c_str() <<","<<directionVector[1].c_str() <<"," << directionVector[2].c_str() << "]";
+                const string key="Images."+imageNames[img]+".direction";
+                ASKAPLOG_INFO_STR(logger, "  Advising on parameter " << param <<": " << pstr.str().c_str());
+
+                parset.add(param, pstr.str().c_str());
+                
+
             }
             param = "Images."+imageNames[img]+".nterms"; // if nterms is set, store it for later
             if (parset.isDefined(param)) {
