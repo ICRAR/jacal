@@ -12,13 +12,12 @@
 /// askap namespace
 namespace askap {
 /// @return version of the package
-std::string getAskapPackageVersion_LoadVis();
+    std::string getAskapPackageVersion_LoadVis(); 
+    std::string getAskapPackageVersion_synthesis() {
+        return std::string("LoadVis; ASKAPsoft==Unknown");
 
-std::string getAskapPackageVersion_synthesis() {
-    return std::string("LoadVis; ASKAPsoft==Unknown");
+    }
 }
-}
-
 /// The version of the package
 #define ASKAP_PACKAGE_VERSION askap::getAskapPackageVersion_LoadVis()
 
@@ -32,6 +31,12 @@ std::string getAskapPackageVersion_synthesis() {
 
 // LOFAR ParameterSet
 #include <Common/ParameterSet.h>
+// LOFAR Blob
+#include <Blob/BlobString.h>
+#include <Blob/BlobOBufString.h>
+#include <Blob/BlobIBufString.h>
+#include <Blob/BlobOStream.h>
+#include <Blob/BlobIStream.h>
 // ASKAP Logger
 
 #include <askap/AskapLogging.h>
@@ -256,11 +261,26 @@ namespace askap {
 
                 ASKAPLOG_INFO_STR(logger,"Param name: " << *iter2);
             }
+            LOFAR::BlobString b1;
+            LOFAR::BlobOBufString bob(b1);
+            LOFAR::BlobOStream bos(bob);
+            bos << *itsNe;
+            size_t itsNeSize = b1.size();
+            ASKAPLOG_INFO_STR(logger,"Size of Normal Equations " << itsNeSize << " bytes ");
+            // first the size
+            app->outputs[0].write((char *) &itsNeSize,sizeof(itsNeSize));
+            // then the actual data
+            app->outputs[0].write(b1.data(), b1.size());
+
 
         }
 
-        // need to select the part of the vis that I want to process
-        // need a time and frequency selection
+        // I am going to assume a single Ne output - even though I am not
+        // merging in the above loop - I should tho.
+
+        // This is just to test whether this works at all.
+
+
 
         return 0;
     }
@@ -391,7 +411,7 @@ namespace askap {
                 ASKAPLOG_INFO_STR(logger, "  Advising on parameter " << param <<": " << pstr.str().c_str());
 
                 parset.add(param, pstr.str().c_str());
-                
+
 
             }
             param = "Images."+imageNames[img]+".nterms"; // if nterms is set, store it for later
