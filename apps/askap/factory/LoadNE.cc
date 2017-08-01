@@ -171,6 +171,13 @@ namespace askap {
         LOFAR::BlobIStream bis(bib);
         bis >> *itsNe;
 
+        std::vector<std::string> toFitParams = itsNe->unknowns();
+        std::vector<std::string>::const_iterator iter2 = toFitParams.begin();
+        for (; iter2 != toFitParams.end(); iter2++) {
+
+            ASKAPLOG_INFO_STR(logger,"Param name: " << *iter2);
+        }
+
         return 0;
     }
 
