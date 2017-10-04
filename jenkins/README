@@ -1,0 +1,9 @@
+These are a set of test scripts that are run by jenkins/hudson to perform
+unit and functional tests. The first is just the build.
+
+A jenkins job builds askapsoft - after which daliuge is pulled from
+its repository.
+
+Then jacal is built.
+
+Subsequently a set of unit and functional test will be run.
