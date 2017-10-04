@@ -39,17 +39,17 @@ namespace askap {
 
 
     LoadParset::LoadParset() {
-        fprintf(stdout,"\t LoadParset -  default contructor\n");
+        std::cout << "LoadParset -  default contructor" << std::endl;
     }
 
 
     LoadParset::~LoadParset() {
-
+        std::cout << "LoadParset -  default destructor" << std::endl;
     }
 
     DaliugeApplication::ShPtr LoadParset::createDaliugeApplication(const std::string &name)
     {
-        fprintf(stdout, "\t createDaliugeApplication - Instantiating LoadParset\n");
+        std::cout << "createDaliugeApplication - Instantiating LoadParset" << std::endl;
 
         LoadParset::ShPtr ptr;
 
@@ -59,7 +59,7 @@ namespace askap {
 
         ptr.reset( new LoadParset());
 
-        fprintf(stdout,"\t createDaliugeApplication - Created LoadParset DaliugeApplication instance\n");
+        std::cout << "createDaliugeApplication - Created LoadParset DaliugeApplication instance" << std::endl;
         return ptr;
 
     }

@@ -2,6 +2,7 @@
 // If Daliuge changes its API - you will have to change these functions
 // but hopefully all the issues will be hidden behind the structures
 
+#include<iostream>
 
 #include<daliuge/DaliugeApplication.h>
 #include<factory/DaliugeApplicationFactory.h>
@@ -25,7 +26,7 @@ int init(dlg_app_info *app, const char ***arguments) {
         if (strcmp(param[0], "name") == 0) {
             app->appname = strdup(param[1]);
             got_name = true;
-            fprintf(stdout,"\t init - Found %s in params\n",app->appname);
+            std::cout << "init - Found " << app->appname <<  " in params" << std::endl;
         }
 
         arguments++;
