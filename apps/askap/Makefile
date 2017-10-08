@@ -52,7 +52,8 @@ OBJS = daliuge/DaliugeApplication.o \
        factory/Interface.o \
        factory/LoadParset.o \
        factory/LoadVis.o \
-	   factory/LoadNE.o
+	   factory/LoadNE.o \
+       factory/NEUtils.o
 
 .PHONY: all clean
 

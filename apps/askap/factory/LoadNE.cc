@@ -29,6 +29,7 @@ namespace askap {
 
 #include <daliuge/DaliugeApplication.h>
 #include <factory/LoadNE.h>
+#include <factory/NEUtils.h>
 
 // LOFAR ParameterSet
 #include <Common/ParameterSet.h>
@@ -153,23 +154,7 @@ namespace askap {
 
         askap::scimath::ImagingNormalEquations::ShPtr itsNe = askap::scimath::ImagingNormalEquations::ShPtr(new askap::scimath::ImagingNormalEquations());
 
-        size_t itsNESize;
-        size_t n_read = app->inputs[0].read((char *) &itsNESize, sizeof(itsNESize));
-
-        ASKAPLOG_INFO_STR(logger,"itsNeSize is " << itsNESize << " bytes ");
-
-        LOFAR::BlobString b1;
-        b1.resize(itsNESize);
-        n_read = app->inputs[0].read(b1.data(), itsNESize);
-
-        if (n_read != itsNESize) {
-            ASKAPLOG_WARN_STR(logger, "Failed to read NE of expected size");
-            return -1;
-        }
-
-        LOFAR::BlobIBufString bib(b1);
-        LOFAR::BlobIStream bis(bib);
-        bis >> *itsNe;
+        NEUtils::receiveNE(itsNe, app);
 
         std::vector<std::string> toFitParams = itsNe->unknowns();
         std::vector<std::string>::const_iterator iter2 = toFitParams.begin();
