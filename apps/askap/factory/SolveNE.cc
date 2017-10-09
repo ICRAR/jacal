@@ -147,13 +147,26 @@ namespace askap {
         to_app_data(app)->parset = new LOFAR::ParameterSet(true);
         to_app_data(app)->parset->adoptBuffer(buf);
 
+        this->itsParset = to_app_data(app)->parset->makeSubset("Cimager.");
+
+        try {
+            this->itsParset = NEUtils::addMissingParameters(this->itsParset);
+        }
+        catch (std::runtime_error)
+        {
+            return -1;
+        }
+
         // Actually there should be no model on input .... it should always be empty
         // it is my job to fill it.
 
         this->itsModel.reset(new scimath::Params());
 
+        askap::synthesis::SynthesisParamsHelper::setUpImages(itsModel,
+                                  this->itsParset.makeSubset("Images."));
+
         // Now we need to instantiate and initialise the solver from the parset
-        this->itsSolver = synthesis::ImageSolverFactory::make(*to_app_data(app)->parset);
+        this->itsSolver = synthesis::ImageSolverFactory::make(this->itsParset);
 
         this->itsNe = askap::scimath::ImagingNormalEquations::ShPtr(new askap::scimath::ImagingNormalEquations());
 

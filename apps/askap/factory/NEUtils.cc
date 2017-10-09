@@ -99,5 +99,135 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
       app->outputs[output].write(b1.data(), b1.size());
   }
 
+  LOFAR::ParameterSet NEUtils::addMissingParameters(LOFAR::ParameterSet& parset) {
+
+
+
+      // Need to get some information from the input dataset
+      // this is done in "prepare" in AdviseDI - need to get the minimum
+      // set - or just throw an exception and make the user add
+      // the info ....
+
+      // test for missing image-specific parameters:
+
+      // these parameters can be set globally or individually
+      
+      bool cellsizeNeeded = false;
+      bool shapeNeeded = false;
+      bool directionNeeded = true;
+
+      int nTerms = 1;
+
+      string param;
+
+      const vector<string> imageNames = parset.getStringVector("Images.Names", false);
+
+      param = "Images.direction";
+
+      if ( !parset.isDefined(param) ) {
+
+
+          directionNeeded = true;
+
+      }
+      else {
+          directionNeeded = false;
+      }
+      param = "Images.restFrequency";
+
+      if ( !parset.isDefined(param) ) {
+          std::ostringstream pstr;
+          // Only J2000 is implemented at the moment.
+          pstr<<"HI";
+
+          parset.add(param, pstr.str().c_str());
+      }
+
+      for (size_t img = 0; img < imageNames.size(); ++img) {
+
+          param = "Images."+imageNames[img]+".cellsize";
+          if ( !parset.isDefined(param) ) {
+              cellsizeNeeded = true;
+          }
+          else {
+               param = "Images.cellsize";
+               if (!parset.isDefined(param) ) {
+                   const vector<string> cellSizeVector = parset.getStringVector("Images.cellsize");
+                   std::ostringstream pstr;
+                   pstr<<"["<< cellSizeVector[0].c_str() <<"arcsec,"<<cellSizeVector[1].c_str() <<"arcsec]";
+
+                   parset.add(param, pstr.str().c_str());
+               }
+          }
+          param = "Images."+imageNames[img]+".shape";
+          if ( !parset.isDefined(param) ) shapeNeeded = true;
+
+          param = "Images."+imageNames[img]+".frequency";
+
+          if ( !parset.isDefined(param) ) {
+
+              ASKAPTHROW(std::runtime_error,"Frequency not in parset");
+
+          }
+          param ="Images."+imageNames[img]+".direction";
+          if ( !parset.isDefined(param) && directionNeeded) {
+
+              ASKAPTHROW(std::runtime_error,"direction not in parset");
+          }
+          else if (!parset.isDefined(param) && !directionNeeded) {
+
+              const vector<string> directionVector = parset.getStringVector("Images.direction");
+
+              std::ostringstream pstr;
+              pstr<<"["<< directionVector[0].c_str() <<","<<directionVector[1].c_str() <<"," << directionVector[2].c_str() << "]";
+              parset.add(param, pstr.str().c_str());
+
+
+          }
+          param = "Images."+imageNames[img]+".nterms"; // if nterms is set, store it for later
+          if (parset.isDefined(param)) {
+              if ((nTerms>1) && (nTerms!=parset.getInt(param))) {
+                std::cerr << "Imaging with different nterms may not work" << std::endl;
+              }
+              nTerms = parset.getInt(param);
+          }
+          param = "Images."+imageNames[img]+".nchan";
+          if ( !parset.isDefined(param)) {
+              std::cerr << "Param not found: " << param << std::cerr;
+          }
+      }
+
+      if (nTerms > 1) { // check required MFS parameters
+          param = "visweights"; // set to "MFS" if unset and nTerms > 1
+          if (!parset.isDefined(param)) {
+              std::ostringstream pstr;
+              pstr<<"MFS";
+              std::cout <<  "  Advising on parameter " << param <<": " << pstr.str().c_str() << std::endl;
+              parset.add(param, pstr.str().c_str());
+          }
+
+          param = "visweights.MFS.reffreq"; // set to average frequency if unset and nTerms > 1
+          if ((parset.getString("visweights")=="MFS")) {
+              if (!parset.isDefined(param)) {
+                  ASKAPTHROW(std::runtime_error,"MFS reference frequency not in parset");
+              }
+
+          }
+      }
+
+      // test for general missing parameters:
+      if ( cellsizeNeeded && !parset.isDefined("nUVWMachines") ) {
+
+      } else if ( cellsizeNeeded && !parset.isDefined("Images.cellsize") ) {
+
+      } else if ( shapeNeeded && !parset.isDefined("Images.shape") ) {
+
+      }
+      std::cout << "Done adding missing params " << std::endl;
+
+      return parset;
+  }
+
+
 
 } // namespace

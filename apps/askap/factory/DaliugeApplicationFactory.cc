@@ -26,6 +26,7 @@
 #include <factory/LoadParset.h>
 #include <factory/LoadVis.h>
 #include <factory/LoadNE.h>
+#include <factory/SolveNE.h>
 
 //
 
@@ -96,6 +97,7 @@ DaliugeApplication::ShPtr DaliugeApplicationFactory::make(const std::string &nam
         addPreDefinedDaliugeApplication<LoadParset>();
         addPreDefinedDaliugeApplication<LoadVis>();
         addPreDefinedDaliugeApplication<LoadNE>();
+        addPreDefinedDaliugeApplication<SolveNE>();
 
 
 

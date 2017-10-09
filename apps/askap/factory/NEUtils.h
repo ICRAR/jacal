@@ -56,7 +56,10 @@ namespace askap {
 
         static void sendNE(askap::scimath::ImagingNormalEquations::ShPtr itsNe, dlg_app_info *app, int output=0);
 
+        // add parameters that may be missing from a configuration file
+        static LOFAR::ParameterSet addMissingParameters(LOFAR::ParameterSet& parset);
 
+      
         private:
 
 
