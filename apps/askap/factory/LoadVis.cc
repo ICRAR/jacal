@@ -12,7 +12,7 @@
 /// askap namespace
 namespace askap {
 /// @return version of the package
-    std::string getAskapPackageVersion_LoadVis(); 
+    std::string getAskapPackageVersion_LoadVis();
     std::string getAskapPackageVersion_synthesis() {
         return std::string("LoadVis; ASKAPsoft==Unknown");
 
@@ -28,6 +28,8 @@ namespace askap {
 
 #include <daliuge/DaliugeApplication.h>
 #include <factory/LoadVis.h>
+#include <factory/NEUtils.h>
+
 
 // LOFAR ParameterSet
 #include <Common/ParameterSet.h>
@@ -253,25 +255,7 @@ namespace askap {
             itsEquation->calcEquations(*itsNe);
 
             // lets dump out some images
-
-            ASKAPCHECK(itsNe, "NormalEquations not defined");
-            std::vector<std::string> toFitParams = itsNe->unknowns();
-            std::vector<std::string>::const_iterator iter2 = toFitParams.begin();
-            for (; iter2 != toFitParams.end(); iter2++) {
-
-                ASKAPLOG_INFO_STR(logger,"Param name: " << *iter2);
-            }
-            LOFAR::BlobString b1;
-            LOFAR::BlobOBufString bob(b1);
-            LOFAR::BlobOStream bos(bob);
-            bos << *itsNe;
-            size_t itsNeSize = b1.size();
-            ASKAPLOG_INFO_STR(logger,"Size of Normal Equations " << itsNeSize << " bytes ");
-            // first the size
-            app->outputs[0].write((char *) &itsNeSize,sizeof(itsNeSize));
-            // then the actual data
-            app->outputs[0].write(b1.data(), b1.size());
-
+            NEUtils::sendNE(itsNe, app);
 
         }
 

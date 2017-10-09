@@ -37,7 +37,8 @@ namespace askap {
 
         // Needs a sendNE
 
-
+        static void sendNE(askap::scimath::ImagingNormalEquations::ShPtr itsNe, dlg_app_info *app);
+        
         private:
 
 

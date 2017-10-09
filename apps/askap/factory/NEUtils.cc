@@ -68,7 +68,7 @@ namespace askap {
 namespace askap {
 
 void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg_app_info *app) {
-
+    ASKAPCHECK(itsNE, "NormalEquations not defined");
     size_t itsNESize;
     size_t n_read = app->inputs[0].read((char *) &itsNESize, sizeof(itsNESize));
     LOFAR::BlobString b1;
@@ -82,5 +82,21 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
     bis >> *itsNE;
 
   }
+  void NEUtils::sendNE(askap::scimath::ImagingNormalEquations::ShPtr itsNe, dlg_app_info *app ) {
+
+      ASKAPCHECK(itsNe, "NormalEquations not defined");
+
+      LOFAR::BlobString b1;
+      LOFAR::BlobOBufString bob(b1);
+      LOFAR::BlobOStream bos(bob);
+      bos << *itsNe;
+      size_t itsNeSize = b1.size();
+      ASKAPCHECK(itsNeSize > 0,"Zero size NE");
+      // first the size
+      app->outputs[0].write((char *) &itsNeSize,sizeof(itsNeSize));
+      // then the actual data
+      app->outputs[0].write(b1.data(), b1.size());
+  }
+
 
 } // namespace
