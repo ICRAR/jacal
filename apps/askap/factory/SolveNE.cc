@@ -62,9 +62,14 @@ namespace askap {
 #include <gridding/IVisGridder.h>
 #include <gridding/VisGridderFactory.h>
 
+// Solver stuff
+
+#include <measurementequation/ImageSolverFactory.h>
+
+
 
 #include <fitting/Params.h>
-
+#include <fitting/Solver.h>
 
 #include <string.h>
 #include <sys/time.h>
@@ -142,9 +147,15 @@ namespace askap {
         to_app_data(app)->parset = new LOFAR::ParameterSet(true);
         to_app_data(app)->parset->adoptBuffer(buf);
 
+        // Actually there should be no model on input .... it should always be empty
+        // it is my job to fill it.
 
+        this->itsModel.reset(new scimath::Params());
 
-        askap::scimath::ImagingNormalEquations::ShPtr itsNe = askap::scimath::ImagingNormalEquations::ShPtr(new askap::scimath::ImagingNormalEquations());
+        // Now we need to instantiate and initialise the solver from the parset
+        this->itsSolver = synthesis::ImageSolverFactory::make(*to_app_data(app)->parset);
+
+        this->itsNe = askap::scimath::ImagingNormalEquations::ShPtr(new askap::scimath::ImagingNormalEquations());
 
         NEUtils::receiveNE(itsNe, app, 1);
 
@@ -158,6 +169,15 @@ namespace askap {
         }
 
         // Now we need to instantiate and initialise the solver
+        itsSolver->init();
+        itsSolver->addNormalEquations(*itsNe);
+
+        ASKAPLOG_INFO_STR(logger, "Solving Normal Equations");
+        askap::scimath::Quality q;
+
+        ASKAPDEBUGASSERT(itsModel);
+        itsSolver->solveNormalEquations(*itsModel, q);
+        ASKAPLOG_INFO_STR(logger, "Solved normal equations");
 
 
         return 0;

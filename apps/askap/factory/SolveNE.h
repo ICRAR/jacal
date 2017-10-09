@@ -11,16 +11,18 @@
 #define ASKAP_FACTORY_SolveNE_H
 
 #include <daliuge/DaliugeApplication.h>
+#include <factory/NEUtils.h>
 
 #include <casacore/casa/Quanta/MVDirection.h>
 
 #include <boost/shared_ptr.hpp>
 
-
-
 #include <fitting/Params.h>
+#include <fitting/Solver.h>
 
-
+// params helpers
+#include <measurementequation/SynthesisParamsHelper.h>
+#include <measurementequation/ImageParamsHelper.h>
 
 namespace askap {
 
@@ -54,7 +56,19 @@ namespace askap {
 
         private:
 
+          /// The model
+          askap::scimath::Params::ShPtr itsModel;
 
+          // Parameter set
+          LOFAR::ParameterSet itsParset;
+
+          // The Normal Equations
+
+          askap::scimath::ImagingNormalEquations::ShPtr itsNe;
+
+          // Its Solver
+
+          askap::scimath::Solver::ShPtr itsSolver;
 
             // utility to build an Imaging Normal Equation from a parset
             // void buildNE();
