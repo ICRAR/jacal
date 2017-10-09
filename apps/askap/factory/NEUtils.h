@@ -13,11 +13,28 @@
 #include <daliuge/DaliugeApplication.h>
 
 #include <boost/shared_ptr.hpp>
-
+// LOFAR ParameterSet
+#include <Common/ParameterSet.h>
 #include <fitting/ImagingNormalEquations.h>
 
 
 namespace askap {
+
+    struct app_data {
+      LOFAR::ParameterSet *parset;
+    };
+
+    static inline
+    struct app_data *to_app_data(dlg_app_info *app)
+    {
+      return (struct app_data *)app->data;
+    }
+
+    static inline
+    unsigned long usecs(struct timeval *start, struct timeval *end)
+    {
+      return (end->tv_sec - start->tv_sec) * 1000000 + (end->tv_usec - start->tv_usec);
+    }
 
     class NEUtils
 
@@ -33,12 +50,13 @@ namespace askap {
                               << std::endl;};
 
         // gets an NE from an app input and puts it into the ShPtr
-        static void receiveNE(askap::scimath::ImagingNormalEquations::ShPtr, dlg_app_info *app);
+        static void receiveNE(askap::scimath::ImagingNormalEquations::ShPtr, dlg_app_info *app, int input=0);
 
         // Needs a sendNE
 
-        static void sendNE(askap::scimath::ImagingNormalEquations::ShPtr itsNe, dlg_app_info *app);
-        
+        static void sendNE(askap::scimath::ImagingNormalEquations::ShPtr itsNe, dlg_app_info *app, int output=0);
+
+
         private:
 
 

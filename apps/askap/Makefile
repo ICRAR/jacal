@@ -53,14 +53,15 @@ OBJS = daliuge/DaliugeApplication.o \
        factory/LoadParset.o \
        factory/LoadVis.o \
 	   factory/LoadNE.o \
-       factory/NEUtils.o
+       factory/NEUtils.o \
+       factory/SolveNE.o
 
 .PHONY: all clean
 
 all: libaskapsoft_dlg.so
 
 clean:
-	rm -f factory/*.o daliuge/*.o
+	rm -f factory/*.o daliuge/*.o libaskapsoft_dlg.so
 
 libaskapsoft_dlg.so: $(OBJS)
 	$(CXX) -shared -o $@ $(OBJS) $(LDFLAGS)

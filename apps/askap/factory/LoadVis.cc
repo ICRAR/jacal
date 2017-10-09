@@ -74,24 +74,6 @@ namespace askap {
 
 namespace askap {
 
-
-    struct app_data {
-        LOFAR::ParameterSet *parset;
-    };
-
-    static inline
-    struct app_data *to_app_data(dlg_app_info *app)
-    {
-        return (struct app_data *)app->data;
-    }
-
-    static inline
-    unsigned long usecs(struct timeval *start, struct timeval *end)
-    {
-        return (end->tv_sec - start->tv_sec) * 1000000 + (end->tv_usec - start->tv_usec);
-    }
-
-
     LoadVis::LoadVis() {
         //ASKAP_LOGGER(locallogger,"\t LoadVis -  default contructor\n");
         std::cout << "LoadVis -  default constructor" << std::endl;

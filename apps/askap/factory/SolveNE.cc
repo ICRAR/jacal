@@ -1,26 +1,26 @@
-/// @file LoadNE.cc
+/// @file SoadNE.cc
 ///
 /// @abstract
 /// Derived from DaliugeApplication
 /// @ details
-/// Implements a test method that uses the contents of the the parset to load
-/// in a measurement set and print a summary of its contents
+/// IMplements an ASKAPSoft solver. This essentially takes a NormalEquation and generates a
+/// a set of "params" usually via a minor cycle deconvolution.
 ///
 // for logging
-#define ASKAP_PACKAGE_NAME "LoadNE"
+#define ASKAP_PACKAGE_NAME "SolveNE"
 #include <string>
 /// askap namespace
 namespace askap {
 /// @return version of the package
-    std::string getAskapPackageVersion_LoadNE() {
-        return std::string("LoadNE");
+    std::string getAskapPackageVersion_() {
+        return std::string("SolveNE");
     }
 
 
 } // namespace askap
 
 /// The version of the package
-#define ASKAP_PACKAGE_VERSION askap::getAskapPackageVersion_LoadNE()
+#define ASKAP_PACKAGE_VERSION askap::getAskapPackageVersion_SolveNE()
 
 #include <iostream>
 #include <vector>
@@ -28,7 +28,7 @@ namespace askap {
 
 
 #include <daliuge/DaliugeApplication.h>
-#include <factory/LoadNE.h>
+#include <factory/SolveNE.h>
 #include <factory/NEUtils.h>
 
 // LOFAR ParameterSet
@@ -75,39 +75,37 @@ namespace askap {
 namespace askap {
 
 
-  
 
-    LoadNE::LoadNE() {
-        //ASKAP_LOGGER(locallogger,"\t LoadNE -  default contructor\n");
-        std::cout << "LoadNE -  default constructor" << std::endl;
+    SolveNE::SolveNE() {
+        //ASKAP_LOGGER(locallogger,"\t SolveNE -  default contructor\n");
+        std::cout << "SolveNE -  default constructor" << std::endl;
 
     }
 
 
-    LoadNE::~LoadNE() {
-        //ASKAP_LOGGER(locallogger,"\t LoadNE -  default destructor\n");
-        std::cout << "LoadNE -  default destructor" << std::endl;
+    SolveNE::~SolveNE() {
+        //ASKAP_LOGGER(locallogger,"\t SolveNE -  default destructor\n");
+        std::cout << "SolveNE -  default destructor" << std::endl;
     }
 
-    DaliugeApplication::ShPtr LoadNE::createDaliugeApplication(const std::string &name)
+    DaliugeApplication::ShPtr SolveNE::createDaliugeApplication(const std::string &name)
     {
         // ASKAP_LOGGER(locallogger, ".create");
-        std::cout << "createDaliugeApplication - Instantiating LoadNE" << std::endl;
-        // ASKAPLOG_INFO_STR(locallogger,"createDaliugeApplication - Instantiating LoadNE");
-        LoadNE::ShPtr ptr;
+        std::cout << "createDaliugeApplication - Instantiating SolveNE" << std::endl;
+        // ASKAPLOG_INFO_STR(locallogger,"createDaliugeApplication - Instantiating SolveNE");
+        SolveNE::ShPtr ptr;
 
         // We need to pull all the parameters out of the parset - and set
         // all the private variables required to define the beam
 
 
-        ptr.reset( new LoadNE());
+        ptr.reset( new SolveNE());
 
-        std::cout << "createDaliugeApplication - Created LoadNE DaliugeApplication instance " << std::endl;
+        std::cout << "createDaliugeApplication - Created SolveNE DaliugeApplication instance " << std::endl;
         return ptr;
 
     }
-    int LoadNE::init(dlg_app_info *app, const char ***arguments) {
-
+    int SolveNE::init(dlg_app_info *app, const char ***arguments) {
 
 
         while (1) {
@@ -131,35 +129,49 @@ namespace askap {
         return 0;
     }
 
-    int LoadNE::run(dlg_app_info *app) {
+    int SolveNE::run(dlg_app_info *app) {
 
         // Lets get the key-value-parset
         ASKAPLOG_INIT("");
         ASKAP_LOGGER(logger, ".run");
 
+        // lets open the input and read it
+        char buf[64*1024];
+        size_t n_read = app->inputs[0].read(buf, 64*1024);
+
+        to_app_data(app)->parset = new LOFAR::ParameterSet(true);
+        to_app_data(app)->parset->adoptBuffer(buf);
+
+
+
         askap::scimath::ImagingNormalEquations::ShPtr itsNe = askap::scimath::ImagingNormalEquations::ShPtr(new askap::scimath::ImagingNormalEquations());
 
-        NEUtils::receiveNE(itsNe, app);
+        NEUtils::receiveNE(itsNe, app, 1);
 
         std::vector<std::string> toFitParams = itsNe->unknowns();
         std::vector<std::string>::const_iterator iter2 = toFitParams.begin();
+
         for (; iter2 != toFitParams.end(); iter2++) {
 
             ASKAPLOG_INFO_STR(logger,"Param name: " << *iter2);
+
         }
+
+        // Now we need to instantiate and initialise the solver
+
 
         return 0;
     }
 
 
-    void LoadNE::data_written(dlg_app_info *app, const char *uid,
+    void SolveNE::data_written(dlg_app_info *app, const char *uid,
         const char *data, size_t n) {
 
         app->running();
 
     }
 
-    void LoadNE::drop_completed(dlg_app_info *app, const char *uid,
+    void SolveNE::drop_completed(dlg_app_info *app, const char *uid,
             drop_status status) {
 
         app->done(APP_FINISHED);

@@ -10,6 +10,8 @@
 
 #include <daliuge/DaliugeApplication.h>
 #include <factory/LoadParset.h>
+#include <factory/NEUtils.h>
+
 
 // LOFAR ParameterSet
 #include <Common/ParameterSet.h>
@@ -19,24 +21,6 @@
 
 
 namespace askap {
-
-
-    struct app_data {
-        LOFAR::ParameterSet *parset;
-    };
-
-    static inline
-    struct app_data *to_app_data(dlg_app_info *app)
-    {
-        return (struct app_data *)app->data;
-    }
-
-    static inline
-    unsigned long usecs(struct timeval *start, struct timeval *end)
-    {
-        return (end->tv_sec - start->tv_sec) * 1000000 + (end->tv_usec - start->tv_usec);
-    }
-
 
     LoadParset::LoadParset() {
         std::cout << "LoadParset -  default contructor" << std::endl;

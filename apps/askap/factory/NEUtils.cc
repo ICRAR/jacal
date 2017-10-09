@@ -67,13 +67,14 @@ namespace askap {
 
 namespace askap {
 
-void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg_app_info *app) {
+
+void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg_app_info *app, int input) {
     ASKAPCHECK(itsNE, "NormalEquations not defined");
     size_t itsNESize;
-    size_t n_read = app->inputs[0].read((char *) &itsNESize, sizeof(itsNESize));
+    size_t n_read = app->inputs[input].read((char *) &itsNESize, sizeof(itsNESize));
     LOFAR::BlobString b1;
     b1.resize(itsNESize);
-    n_read = app->inputs[0].read(b1.data(), itsNESize);
+    n_read = app->inputs[input].read(b1.data(), itsNESize);
 
     ASKAPCHECK(n_read == itsNESize, "Unable to read NE of expected size");
 
@@ -82,7 +83,7 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
     bis >> *itsNE;
 
   }
-  void NEUtils::sendNE(askap::scimath::ImagingNormalEquations::ShPtr itsNe, dlg_app_info *app ) {
+  void NEUtils::sendNE(askap::scimath::ImagingNormalEquations::ShPtr itsNe, dlg_app_info *app, int output ) {
 
       ASKAPCHECK(itsNe, "NormalEquations not defined");
 
@@ -93,9 +94,9 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
       size_t itsNeSize = b1.size();
       ASKAPCHECK(itsNeSize > 0,"Zero size NE");
       // first the size
-      app->outputs[0].write((char *) &itsNeSize,sizeof(itsNeSize));
+      app->outputs[output].write((char *) &itsNeSize,sizeof(itsNeSize));
       // then the actual data
-      app->outputs[0].write(b1.data(), b1.size());
+      app->outputs[output].write(b1.data(), b1.size());
   }
 
 
