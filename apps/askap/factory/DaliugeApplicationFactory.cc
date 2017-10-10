@@ -27,6 +27,7 @@
 #include <factory/LoadVis.h>
 #include <factory/LoadNE.h>
 #include <factory/SolveNE.h>
+#include <factory/CalcNE.h>
 
 //
 

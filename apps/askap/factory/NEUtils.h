@@ -16,6 +16,7 @@
 // LOFAR ParameterSet
 #include <Common/ParameterSet.h>
 #include <fitting/ImagingNormalEquations.h>
+#include <fitting/Params.h>
 
 
 namespace askap {
@@ -51,15 +52,20 @@ namespace askap {
 
         // gets an NE from an app input and puts it into the ShPtr
         static void receiveNE(askap::scimath::ImagingNormalEquations::ShPtr, dlg_app_info *app, int input=0);
-
+        // Same for Params
+        static void receiveParams(askap::scimath::Params::ShPtr, dlg_app_info *app, int input=0);
         // Needs a sendNE
 
         static void sendNE(askap::scimath::ImagingNormalEquations::ShPtr itsNe, dlg_app_info *app, int output=0);
 
+        static void sendParams(askap::scimath::Params::ShPtr params,dlg_app_info *app, int output=0);
+
         // add parameters that may be missing from a configuration file
         static LOFAR::ParameterSet addMissingParameters(LOFAR::ParameterSet& parset);
 
-      
+        static std::vector<std::string> getDatasets(const LOFAR::ParameterSet& parset);
+
+
         private:
 
 

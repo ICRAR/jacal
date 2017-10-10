@@ -98,7 +98,37 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
       // then the actual data
       app->outputs[output].write(b1.data(), b1.size());
   }
+  void NEUtils::sendParams(askap::scimath::Params::ShPtr Params,dlg_app_info *app, int output) {
 
+    LOFAR::BlobString b1;
+    LOFAR::BlobOBufString bob(b1);
+    LOFAR::BlobOStream bos(bob);
+
+    bos << *Params;
+
+    size_t ParamsSize = b1.size();
+    ASKAPCHECK(ParamsSize > 0,"Zero size NE");
+    // first the size
+    app->outputs[output].write((char *) &ParamsSize,sizeof(ParamsSize));
+    // then the actual data
+    app->outputs[output].write(b1.data(), b1.size());
+
+  }
+  void NEUtils::receiveParams(askap::scimath::Params::ShPtr Params, dlg_app_info *app, int input) {
+      ASKAPCHECK(Params, "Params not defined");
+      size_t ParamsSize;
+      size_t n_read = app->inputs[input].read((char *) &ParamsSize, sizeof(ParamsSize));
+      LOFAR::BlobString b1;
+      b1.resize(ParamsSize);
+      n_read = app->inputs[input].read(b1.data(), ParamsSize);
+
+      ASKAPCHECK(n_read == ParamsSize, "Unable to read Params of expected size");
+
+      LOFAR::BlobIBufString bib(b1);
+      LOFAR::BlobIStream bis(bib);
+      bis >> *Params;
+
+    }
   LOFAR::ParameterSet NEUtils::addMissingParameters(LOFAR::ParameterSet& parset) {
 
 
@@ -111,7 +141,7 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
       // test for missing image-specific parameters:
 
       // these parameters can be set globally or individually
-      
+
       bool cellsizeNeeded = false;
       bool shapeNeeded = false;
       bool directionNeeded = true;
@@ -125,10 +155,7 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
       param = "Images.direction";
 
       if ( !parset.isDefined(param) ) {
-
-
           directionNeeded = true;
-
       }
       else {
           directionNeeded = false;
@@ -227,7 +254,33 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
 
       return parset;
   }
+  std::vector<std::string> NEUtils::getDatasets(const LOFAR::ParameterSet& parset)
+  {
+      if (parset.isDefined("dataset") && parset.isDefined("dataset0")) {
+          ASKAPTHROW(std::runtime_error,
+              "Both dataset and dataset0 are specified in the parset");
+      }
 
+      // First look for "dataset" and if that does not exist try "dataset0"
+      vector<string> ms;
+      if (parset.isDefined("dataset")) {
+          ms = parset.getStringVector("dataset", true);
+      } else {
+          string key = "dataset0";   // First key to look for
+          long idx = 0;
+          while (parset.isDefined(key)) {
+              const string value = parset.getString(key);
+              ms.push_back(value);
+
+              LOFAR::ostringstream ss;
+              ss << "dataset" << idx + 1;
+              key = ss.str();
+              ++idx;
+          }
+      }
+
+      return ms;
+  }
 
 
 } // namespace

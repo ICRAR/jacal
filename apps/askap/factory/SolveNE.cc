@@ -113,6 +113,7 @@ namespace askap {
     int SolveNE::init(dlg_app_info *app, const char ***arguments) {
 
 
+
         while (1) {
 
             const char **param = *arguments;
@@ -137,8 +138,15 @@ namespace askap {
     int SolveNE::run(dlg_app_info *app) {
 
         // Lets get the key-value-parset
-        ASKAPLOG_INIT("");
+        // ASKAPLOG_INIT("");
         ASKAP_LOGGER(logger, ".run");
+
+        // lets find the inputs
+        //
+        // the config file is -7 and the
+        for (int i = 0; i < app->n_inputs; i++) {
+            std::cout << "Input " << i << " UID: " << app->inputs[i].uid << " OID: " << app->inputs[i].oid << std::endl;
+        }
 
         // lets open the input and read it
         char buf[64*1024];
@@ -191,6 +199,27 @@ namespace askap {
         ASKAPDEBUGASSERT(itsModel);
         itsSolver->solveNormalEquations(*itsModel, q);
         ASKAPLOG_INFO_STR(logger, "Solved normal equations");
+
+
+        NEUtils::sendParams(itsModel,app,0);
+
+        synthesis::SynthesisParamsHelper::setUpImageHandler(itsParset);
+
+        vector<string> images=itsModel->names();
+
+        for (vector<string>::const_iterator it=images.begin(); it !=images.end(); it++) {
+          std::cout << "Model contains "<< *it << std::endl;
+          if (it->find("image") == 0) {
+            const synthesis::ImageParamsHelper iph(*it);
+            synthesis::SynthesisParamsHelper::saveImageParameter(*itsModel, *it, *it);
+          }
+          if (it->find("residual") == 0) {
+            const synthesis::ImageParamsHelper iph(*it);
+            synthesis::SynthesisParamsHelper::saveImageParameter(*itsModel, *it, *it);
+          }
+
+        }
+
 
 
         return 0;

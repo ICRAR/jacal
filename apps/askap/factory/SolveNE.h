@@ -57,18 +57,18 @@ namespace askap {
         private:
 
           /// The model
-          askap::scimath::Params::ShPtr itsModel;
+          scimath::Params::ShPtr itsModel;
 
           // Parameter set
           LOFAR::ParameterSet itsParset;
 
           // The Normal Equations
 
-          askap::scimath::ImagingNormalEquations::ShPtr itsNe;
+          scimath::ImagingNormalEquations::ShPtr itsNe;
 
           // Its Solver
 
-          askap::scimath::Solver::ShPtr itsSolver;
+          scimath::Solver::ShPtr itsSolver;
 
             // utility to build an Imaging Normal Equation from a parset
             // void buildNE();

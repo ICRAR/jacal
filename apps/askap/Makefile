@@ -54,7 +54,8 @@ OBJS = daliuge/DaliugeApplication.o \
        factory/LoadVis.o \
 	   factory/LoadNE.o \
        factory/NEUtils.o \
-       factory/SolveNE.o
+       factory/SolveNE.o \
+       factory/CalcNE.o
 
 .PHONY: all clean
 

@@ -12,8 +12,7 @@
 /// askap namespace
 namespace askap {
 /// @return version of the package
-    std::string getAskapPackageVersion_LoadVis();
-    std::string getAskapPackageVersion_synthesis() {
+    std::string getAskapPackageVersion_LoadVis() {
         return std::string("LoadVis; ASKAPsoft==Unknown");
 
     }
