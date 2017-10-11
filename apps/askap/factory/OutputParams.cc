@@ -7,20 +7,20 @@
 /// a set of "params" usually via a minor cycle deconvolution.
 ///
 // for logging
-#define ASKAP_PACKAGE_NAME "SolveNE"
+#define ASKAP_PACKAGE_NAME "OutputParams"
 #include <string>
 /// askap namespace
 namespace askap {
 /// @return version of the package
-    std::string getAskapPackageVersion_SolveNE() {
-        return std::string("SolveNE");
+    std::string getAskapPackageVersion_OutputParams() {
+        return std::string("OutputParams");
     }
 
 
 } // namespace askap
 
 /// The version of the package
-#define ASKAP_PACKAGE_VERSION askap::getAskapPackageVersion_SolveNE()
+#define ASKAP_PACKAGE_VERSION askap::getAskapPackageVersion_OutputParams()
 
 #include <iostream>
 #include <vector>
@@ -28,7 +28,7 @@ namespace askap {
 
 
 #include <daliuge/DaliugeApplication.h>
-#include <factory/SolveNE.h>
+#include <factory/OutputParams.h>
 #include <factory/NEUtils.h>
 
 // LOFAR ParameterSet
@@ -81,36 +81,36 @@ namespace askap {
 
 
 
-    SolveNE::SolveNE() {
-        //ASKAP_LOGGER(locallogger,"\t SolveNE -  default contructor\n");
-        std::cout << "SolveNE -  default constructor" << std::endl;
+    OutputParams::OutputParams() {
+        //ASKAP_LOGGER(locallogger,"\t OutputParams -  default contructor\n");
+        std::cout << "OutputParams -  default constructor" << std::endl;
 
     }
 
 
-    SolveNE::~SolveNE() {
-        //ASKAP_LOGGER(locallogger,"\t SolveNE -  default destructor\n");
-        std::cout << "SolveNE -  default destructor" << std::endl;
+    OutputParams::~OutputParams() {
+        //ASKAP_LOGGER(locallogger,"\t OutputParams -  default destructor\n");
+        std::cout << "OutputParams -  default destructor" << std::endl;
     }
 
-    DaliugeApplication::ShPtr SolveNE::createDaliugeApplication(const std::string &name)
+    DaliugeApplication::ShPtr OutputParams::createDaliugeApplication(const std::string &name)
     {
         // ASKAP_LOGGER(locallogger, ".create");
-        std::cout << "createDaliugeApplication - Instantiating SolveNE" << std::endl;
-        // ASKAPLOG_INFO_STR(locallogger,"createDaliugeApplication - Instantiating SolveNE");
-        SolveNE::ShPtr ptr;
+        std::cout << "createDaliugeApplication - Instantiating OutputParams" << std::endl;
+        // ASKAPLOG_INFO_STR(locallogger,"createDaliugeApplication - Instantiating OutputParams");
+        OutputParams::ShPtr ptr;
 
         // We need to pull all the parameters out of the parset - and set
         // all the private variables required to define the beam
 
 
-        ptr.reset( new SolveNE());
+        ptr.reset( new OutputParams());
 
-        std::cout << "createDaliugeApplication - Created SolveNE DaliugeApplication instance " << std::endl;
+        std::cout << "createDaliugeApplication - Created OutputParams DaliugeApplication instance " << std::endl;
         return ptr;
 
     }
-    int SolveNE::init(dlg_app_info *app, const char ***arguments) {
+    int OutputParams::init(dlg_app_info *app, const char ***arguments) {
 
 
 
@@ -122,8 +122,10 @@ namespace askap {
             if (param == NULL) {
                 break;
             }
-
-            arguments++;
+            // if (strcmp(param[0], "config") == 0) {
+            //    config_key = strdup(param[1]);
+            // }
+            // arguments++;
         }
 
         app->data = malloc(sizeof(struct app_data));
@@ -135,7 +137,7 @@ namespace askap {
         return 0;
     }
 
-    int SolveNE::run(dlg_app_info *app) {
+    int OutputParams::run(dlg_app_info *app) {
 
         // Lets get the key-value-parset
         // ASKAPLOG_INIT("");
@@ -150,7 +152,7 @@ namespace askap {
 
         // lets open the input and read it
         char buf[64*1024];
-        size_t n_read = app->inputs[0].read(buf, 64*1024);
+        size_t n_read = app->inputs[1].read(buf, 64*1024);
 
         to_app_data(app)->parset = new LOFAR::ParameterSet(true);
         to_app_data(app)->parset->adoptBuffer(buf);
@@ -167,54 +169,43 @@ namespace askap {
 
         // Actually there should be no model on input .... it should always be empty
         // it is my job to fill it.
-
         this->itsModel.reset(new scimath::Params());
+        NEUtils::receiveParams(itsModel,app,0);
 
-        askap::synthesis::SynthesisParamsHelper::setUpImages(itsModel,
-                                  this->itsParset.makeSubset("Images."));
+        // askap::synthesis::SynthesisParamsHelper::setUpImages(itsModel,
+        //                          this->itsParset.makeSubset("Images."));
 
-        // Now we need to instantiate and initialise the solver from the parset
-        this->itsSolver = synthesis::ImageSolverFactory::make(this->itsParset);
 
-        this->itsNe = askap::scimath::ImagingNormalEquations::ShPtr(new askap::scimath::ImagingNormalEquations());
+        synthesis::SynthesisParamsHelper::setUpImageHandler(itsParset);
 
-        NEUtils::receiveNE(itsNe, app, 1);
+        vector<string> images=itsModel->names();
 
-        std::vector<std::string> toFitParams = itsNe->unknowns();
-        std::vector<std::string>::const_iterator iter2 = toFitParams.begin();
-
-        for (; iter2 != toFitParams.end(); iter2++) {
-
-            ASKAPLOG_INFO_STR(logger,"Param name: " << *iter2);
+        for (vector<string>::const_iterator it=images.begin(); it !=images.end(); it++) {
+          std::cout << "Model contains "<< *it << std::endl;
+          if (it->find("image") == 0) {
+            const synthesis::ImageParamsHelper iph(*it);
+            synthesis::SynthesisParamsHelper::saveImageParameter(*itsModel, *it, *it);
+          }
+          if (it->find("residual") == 0) {
+            const synthesis::ImageParamsHelper iph(*it);
+            synthesis::SynthesisParamsHelper::saveImageParameter(*itsModel, *it, *it);
+          }
 
         }
 
-        // Now we need to instantiate and initialise the solver
-        itsSolver->init();
-        itsSolver->addNormalEquations(*itsNe);
-
-        ASKAPLOG_INFO_STR(logger, "Solving Normal Equations");
-        askap::scimath::Quality q;
-
-        ASKAPDEBUGASSERT(itsModel);
-        itsSolver->solveNormalEquations(*itsModel, q);
-        ASKAPLOG_INFO_STR(logger, "Solved normal equations");
-
-
-        NEUtils::sendParams(itsModel,app,0);
 
         return 0;
     }
 
 
-    void SolveNE::data_written(dlg_app_info *app, const char *uid,
+    void OutputParams::data_written(dlg_app_info *app, const char *uid,
         const char *data, size_t n) {
 
         app->running();
 
     }
 
-    void SolveNE::drop_completed(dlg_app_info *app, const char *uid,
+    void OutputParams::drop_completed(dlg_app_info *app, const char *uid,
             drop_status status) {
 
         app->done(APP_FINISHED);

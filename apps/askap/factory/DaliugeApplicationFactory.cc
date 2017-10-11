@@ -28,6 +28,7 @@
 #include <factory/LoadNE.h>
 #include <factory/SolveNE.h>
 #include <factory/CalcNE.h>
+#include <factory/OutputParams.h>
 
 //
 
@@ -99,6 +100,8 @@ DaliugeApplication::ShPtr DaliugeApplicationFactory::make(const std::string &nam
         addPreDefinedDaliugeApplication<LoadVis>();
         addPreDefinedDaliugeApplication<LoadNE>();
         addPreDefinedDaliugeApplication<SolveNE>();
+        addPreDefinedDaliugeApplication<OutputParams>();
+
 
 
 
