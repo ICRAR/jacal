@@ -153,7 +153,15 @@ namespace askap {
         ASKAPLOG_INIT("");
         ASKAP_LOGGER(logger, ".run");
         char buf[64*1024];
-        size_t n_read = app->inputs[0].read(buf, 64*1024);
+
+        int config = NEUtils::getInput(app,"Config");
+
+        // not throwing the exceptions properly fix this
+        if (config < 0) {
+          return -1;
+        }
+
+        size_t n_read = app->inputs[config].read(buf, 64*1024);
 
         to_app_data(app)->parset = new LOFAR::ParameterSet(true);
         to_app_data(app)->parset->adoptBuffer(buf);
@@ -172,17 +180,25 @@ namespace askap {
         const string colName = this->itsParset.getString("datacolumn", "DATA");
         vector<std::string> ms = NEUtils::getDatasets(this->itsParset);
 
-        // Lets look at the model
-        NEUtils::receiveParams(itsModel,app,1);
+        // Do we have a model?
+        // this differentiates between the first and subsequent cycles
+        int model = NEUtils::getInput(app,"Model");
 
-        ASKAPLOG_INFO_STR(logger, "Initializing the model images");
+        if (model >= 0) {
+          NEUtils::receiveParams(itsModel,app,model);
+        }
+        else {
+
+
+          ASKAPLOG_INFO_STR(logger, "Initializing the model images");
 
             /// Create the specified images from the definition in the
             /// parameter set. We can solve for any number of images
             /// at once (but you may/will run out of memory!)
-        askap::synthesis::SynthesisParamsHelper::setUpImages(itsModel,
+          askap::synthesis::SynthesisParamsHelper::setUpImages(itsModel,
                                   this->itsParset.makeSubset("Images."));
 
+        }
 
         ASKAPLOG_INFO_STR(logger, "Current model held by the drop: "<<*itsModel);
 
@@ -192,9 +208,6 @@ namespace askap {
 
         // NE
         askap::scimath::ImagingNormalEquations::ShPtr itsNe = askap::scimath::ImagingNormalEquations::ShPtr(new askap::scimath::ImagingNormalEquations(*itsModel));
-
-
-
 
         // I cant make the gridder smart funciton a member funtion as I cannot instantiate it until I have a parset.
 
@@ -237,7 +250,10 @@ namespace askap {
             itsEquation->calcEquations(*itsNe);
 
             // lets dump out some images
-            NEUtils::sendNE(itsNe, app);
+
+            int NEOut = NEUtils::getOutput(app,"Normal");
+            NEUtils::sendNE(itsNe, app, NEOut);
+
 
         }
 
@@ -245,7 +261,6 @@ namespace askap {
         // merging in the above loop - I should tho.
 
         // This is just to test whether this works at all.
-
 
 
         return 0;

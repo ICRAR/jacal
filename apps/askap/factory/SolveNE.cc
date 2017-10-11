@@ -150,7 +150,12 @@ namespace askap {
 
         // lets open the input and read it
         char buf[64*1024];
-        size_t n_read = app->inputs[0].read(buf, 64*1024);
+        int config = NEUtils::getInput(app,"Config");
+
+        if (config < 0)
+          return -1;
+
+        size_t n_read = app->inputs[config].read(buf, 64*1024);
 
         to_app_data(app)->parset = new LOFAR::ParameterSet(true);
         to_app_data(app)->parset->adoptBuffer(buf);
@@ -178,7 +183,13 @@ namespace askap {
 
         this->itsNe = askap::scimath::ImagingNormalEquations::ShPtr(new askap::scimath::ImagingNormalEquations());
 
-        NEUtils::receiveNE(itsNe, app, 1);
+        int normal = NEUtils::getInput(app,"Normal");
+
+        if (normal < 0) {
+          return -1;
+        }
+
+        NEUtils::receiveNE(itsNe, app, normal);
 
         std::vector<std::string> toFitParams = itsNe->unknowns();
         std::vector<std::string>::const_iterator iter2 = toFitParams.begin();
@@ -200,8 +211,9 @@ namespace askap {
         itsSolver->solveNormalEquations(*itsModel, q);
         ASKAPLOG_INFO_STR(logger, "Solved normal equations");
 
+        int modelOut = NEUtils::getOutput(app,"Model");
 
-        NEUtils::sendParams(itsModel,app,0);
+        NEUtils::sendParams(itsModel,app,modelOut);
 
         return 0;
     }

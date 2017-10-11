@@ -236,7 +236,9 @@ namespace askap {
             itsEquation->calcEquations(*itsNe);
 
             // lets dump out some images
-            NEUtils::sendNE(itsNe, app);
+
+            int NEOut = NEUtils::getOutput(app,"Normal");
+            NEUtils::sendNE(itsNe, app, NEOut);
 
         }
 

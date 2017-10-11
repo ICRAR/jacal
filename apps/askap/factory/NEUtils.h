@@ -65,6 +65,9 @@ namespace askap {
 
         static std::vector<std::string> getDatasets(const LOFAR::ParameterSet& parset);
 
+        static int getInput(dlg_app_info *app, const char * tag);
+
+        static int getOutput(dlg_app_info *app, const char * tag);
 
         private:
 

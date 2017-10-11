@@ -84,10 +84,7 @@ namespace askap {
     return it->second(name);
   }
 
-  // Make the Primary Beam object for the Primary Beam given in the parset file.
-  // Currently the standard Beams are still handled by this function.
-  // In the (near) future it should be done by putting creator functions
-  // for these Beams in the registry and use that.
+
 
 DaliugeApplication::ShPtr DaliugeApplicationFactory::make(const std::string &name) {
 
@@ -101,6 +98,7 @@ DaliugeApplication::ShPtr DaliugeApplicationFactory::make(const std::string &nam
         addPreDefinedDaliugeApplication<LoadNE>();
         addPreDefinedDaliugeApplication<SolveNE>();
         addPreDefinedDaliugeApplication<OutputParams>();
+        addPreDefinedDaliugeApplication<CalcNE>();
 
 
 

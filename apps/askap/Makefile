@@ -15,8 +15,8 @@ DLG_INCDIRS = -I`python -c "import dfms; print(dfms.get_include_dir())"`
 ASKAP_INCDIRS = -I$(ASKAP_ROOT)/3rdParty/log4cxx/log4cxx-0.10.0/install/include \
                 -I$(ASKAP_ROOT)/3rdParty/LOFAR/Common/Common-3.3/install/include \
                 -I$(ASKAP_ROOT)/3rdParty/LOFAR/Blob/Blob-1.2/install/include \
-		-I$(ASKAP_ROOT)/3rdParty/boost/boost-1.56.0/install/include \
-		-I$(ASKAP_ROOT)/3rdParty/wcslib/wcslib-4.18/install/include \
+		        -I$(ASKAP_ROOT)/3rdParty/boost/boost-1.56.0/install/include \
+		        -I$(ASKAP_ROOT)/3rdParty/wcslib/wcslib-4.18/install/include \
                 -I$(ASKAP_ROOT)/Code/Base/askap/current/ \
                 -I$(ASKAP_ROOT)/Code/Base/accessors/current/install/include \
                 -I$(ASKAP_ROOT)/Code/Base//askapparallel/current/install/include \
@@ -27,6 +27,7 @@ ASKAP_LIBDIRS = -L$(ASKAP_ROOT)/3rdParty/log4cxx/log4cxx-0.10.0/install/lib/ \
                 -L$(ASKAP_ROOT)/3rdParty/LOFAR/Common/Common-3.3/install/lib \
                 -L$(ASKAP_ROOT)/3rdParty/LOFAR/Blob/Blob-1.2/install/lib \
                 -L$(ASKAP_ROOT)/3rdParty/cfitsio/cfitsio-3.35/cfitsio/ \
+		        -L$(ASKAP_ROOT)/3rdParty/boost/boost-1.56.0/install/lib \
                 -L$(ASKAP_ROOT)/Code/Base/askap/current/install/lib \
                 -L$(ASKAP_ROOT)/Code/Base/accessors/current/install/lib \
                 -L$(ASKAP_ROOT)/Code/Base/scimath/current/install/lib \
@@ -35,7 +36,7 @@ ASKAP_LIBDIRS = -L$(ASKAP_ROOT)/3rdParty/log4cxx/log4cxx-0.10.0/install/lib/ \
 CASA_INCDIRS = -I$(ASKAP_ROOT)/3rdParty/casacore/casacore-2.0.3/install/include/
 CASA_LIBDIRS = -L$(ASKAP_ROOT)/3rdParty/casacore/casacore-2.0.3/install/lib/
 
-ASKAP_LIBS = -llog4cxx -laskap_askap -lcommon -lblob -laskap_accessors -laskap_synthesis -laskap_scimath
+ASKAP_LIBS = -llog4cxx -laskap_askap -lcommon -lblob -laskap_accessors -laskap_synthesis -laskap_scimath -lboost_regex
 CASA_LIBS = -lcasa_casa -lcasa_measures -lcfitsio
 
 # Combined flags

@@ -146,13 +146,13 @@ namespace askap {
         // lets find the inputs
         //
         // the config file is -7 and the
-        for (int i = 0; i < app->n_inputs; i++) {
-            std::cout << "Input " << i << " UID: " << app->inputs[i].uid << " OID: " << app->inputs[i].oid << std::endl;
-        }
+        int config = NEUtils::getInput(app,"Config");
+        int model = NEUtils::getInput(app,"Model");
+
 
         // lets open the input and read it
         char buf[64*1024];
-        size_t n_read = app->inputs[1].read(buf, 64*1024);
+        size_t n_read = app->inputs[config].read(buf, 64*1024);
 
         to_app_data(app)->parset = new LOFAR::ParameterSet(true);
         to_app_data(app)->parset->adoptBuffer(buf);
@@ -170,7 +170,7 @@ namespace askap {
         // Actually there should be no model on input .... it should always be empty
         // it is my job to fill it.
         this->itsModel.reset(new scimath::Params());
-        NEUtils::receiveParams(itsModel,app,0);
+        NEUtils::receiveParams(itsModel,app,model);
 
         // askap::synthesis::SynthesisParamsHelper::setUpImages(itsModel,
         //                          this->itsParset.makeSubset("Images."));

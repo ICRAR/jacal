@@ -62,6 +62,9 @@ namespace askap {
 #include <string.h>
 #include <sys/time.h>
 
+#include <boost/regex.hpp>
+
+
 
 
 
@@ -282,5 +285,40 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
       return ms;
   }
 
+  int NEUtils::getInput(dlg_app_info *app, const char* tag) {
 
+
+
+
+    boost::regex exp1(tag);
+    boost::cmatch what;
+
+    for (int i = 0; i < app->n_inputs; i++) {
+        std::cout << "Input " << i << " UID: " << app->inputs[i].uid << " OID: " << app->inputs[i].oid << std::endl;
+        std::cout << "Appname:" << app->inputs[i].name << std::endl;
+        if (boost::regex_search(app->inputs[i].name, what, exp1)) {
+           return i;
+        }
+
+    }
+    return -1;
+
+  }
+  int NEUtils::getOutput(dlg_app_info *app, const char* tag) {
+
+
+    boost::regex exp1(tag);
+    boost::cmatch what;
+
+    for (int i = 0; i < app->n_outputs; i++) {
+        std::cout << "Output " << i << " UID: " << app->inputs[i].uid << " OID: " << app->inputs[i].oid << std::endl;
+        std::cout << "Appname:" << app->outputs[i].name << std::endl;
+        if (boost::regex_search(app->outputs[i].name, what, exp1)) {
+           return i;
+        }
+
+    }
+    return -1;
+
+  }
 } // namespace
