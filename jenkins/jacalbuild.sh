@@ -4,8 +4,8 @@ if [ $# -gt 0 ]; then
     TOPDIR=$1
 else
     TOPDIR=jacal
-    ENVDIR=daliuge_env
-    ASKAP_ROOT=${WORKSPACE}/askapsoft
+    ENVDIR={WORKSPACE}/../rialto_daliuge_build/daliuge_env
+    ASKAP_ROOT=${WORKSPACE}/../rialto_askap_build_galaxy/askapsoft
 fi
 
 # we assume daliuge is built via its build script
@@ -17,9 +17,9 @@ if [[ $(hostname -s) = galaxy-? ]]; then
 fi
 
 
-cd ${WORKSPACE}/${ENVDIR}/bin
+cd ${ENVDIR}/bin
 if [ $? -ne 0 ]; then
-    echo "Error: Failed to chdir to  ${WORKSPACE}/${ENVDIR}/bin"
+    echo "Error: Failed to chdir to  ${ENVDIR}/bin"
     exit 1
 fi
 
@@ -37,7 +37,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-make ASKAP_ROOT=${ASKAP_ROOT} 
+make ASKAP_ROOT=${ASKAP_ROOT}
 
 if [ $? -ne 0 ]; then
     echo "Error: make failed"
