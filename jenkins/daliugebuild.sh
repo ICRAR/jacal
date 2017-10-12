@@ -14,6 +14,7 @@ fi
 cd $WORKSPACE
 
 if [[ $(hostname -s) = galaxy-? ]]; then
+    module load python/2.7.10
     module load virtualenv
 fi
 
