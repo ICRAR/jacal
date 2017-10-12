@@ -32,7 +32,7 @@ source ./activate
 
 ${WORKSPACE}/${ENVDIR}/bin/pip install --trusted-host pypi.python.org python-daemon
 
-cd $WORKSPACE/${TOPDIR}
+cd ${WORKSPACE}/${TOPDIR}
 if [ $? -ne 0 ]; then
     echo "Error: Failed to chdir to  ${WORKSPACE}/${TOPDIR}"
     exit -1
@@ -40,7 +40,7 @@ fi
 
 #
 #
-pip install --trusted-host pypi.python.org .
+pip install --trusted-host pypi.python.org ${WORKSPACE}/${TOPDIR}
 
 if [ $? -ne 0 ]; then
     echo "Error: installation failed"
