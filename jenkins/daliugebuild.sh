@@ -9,7 +9,7 @@ fi
 #
 # first we need to build daliuge
 # via a virtualenv
-# 
+#
 # test are we on galaxy
 cd $WORKSPACE
 
@@ -22,10 +22,12 @@ virtualenv -p python2.7 ${WORKSPACE}/${ENVDIR}
 cd ${WORKSPACE}/${ENVDIR}/bin
 if [ $? -ne 0 ]; then
     echo "Error: Failed to chdir to  ${WORKSPACE}/${ENVDIR}/bin"
+    exit -1
 fi
 
 source ./activate
-pip install --trusted-host pypi.python.org python-daemon
+
+${WORKSPACE}/${ENVDIR}/bin/pip install --trusted-host pypi.python.org python-daemon
 
 
 cd $WORKSPACE/${TOPDIR}
@@ -46,4 +48,3 @@ fi
 
 cd ${WORKSPACE}/${ENVDIR}/bin
 deactivate
-
