@@ -3,8 +3,8 @@
 if [ $# -gt 0 ]; then
     TOPDIR=$1
 else
-    TOPDIR=jacal
-    ENVDIR={WORKSPACE}/../rialto_daliuge_build/daliuge_env
+    TOPDIR=${WORKSPACE}/jacal
+    ENVDIR=${WORKSPACE}/daliuge_env
     ASKAP_ROOT=${WORKSPACE}/../rialto_askap_build_galaxy/askapsoft
 fi
 
@@ -31,7 +31,7 @@ source ./activate
 #v
 #
 #
-cd $WORKSPACE/${TOPDIR}
+cd ${TOPDIR}
 if [ $? -ne 0 ]; then
     echo "Error: Failed to chdir to  ${WORKSPACE}/${TOPDIR}"
     exit 1
