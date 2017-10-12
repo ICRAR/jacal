@@ -19,6 +19,7 @@ if [[ $(hostname -s) = galaxy-? ]]; then
 fi
 
 mkdir ${WORKSPACE}/${ENVDIR}
+virtualenv --version
 virtualenv -p python2.7 ${WORKSPACE}/${ENVDIR}
 cd ${WORKSPACE}/${ENVDIR}/bin
 if [ $? -ne 0 ]; then
@@ -27,8 +28,7 @@ if [ $? -ne 0 ]; then
 fi
 
 source ./activate
-which pip
-${WORKSPACE}/${ENVDIR}/bin/pip -h
+
 
 ${WORKSPACE}/${ENVDIR}/bin/pip install --trusted-host pypi.python.org python-daemon
 
