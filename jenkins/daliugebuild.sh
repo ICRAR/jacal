@@ -27,6 +27,8 @@ if [ $? -ne 0 ]; then
 fi
 
 source ./activate
+which pip
+${WORKSPACE}/${ENVDIR}/bin/pip -h
 
 ${WORKSPACE}/${ENVDIR}/bin/pip install --trusted-host pypi.python.org python-daemon
 
