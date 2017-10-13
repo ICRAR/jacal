@@ -1,0 +1,8 @@
+This test just 
+
+1) Reads a config file
+2) Grids a data set with an empty model as initial conditions
+3) runs a solver
+4) generates a updated model
+
+This is encapsultated in the logica graph test_basic
