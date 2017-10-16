@@ -31,6 +31,8 @@ source ./activate
 
 
 ${WORKSPACE}/${ENVDIR}/bin/pip install --trusted-host pypi.python.org python-daemon
+${WORKSPACE}/${ENVDIR}/bin/pip install pyzmq --install-option="--zmq=bundled"
+
 
 cd ${WORKSPACE}/${TOPDIR}
 if [ $? -ne 0 ]; then
