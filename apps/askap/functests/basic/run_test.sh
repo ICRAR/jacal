@@ -29,12 +29,10 @@ else
   echo "$JACAL_LIB not found"
   exit -1
 fi
-    
+
 if [ -e /tmp/single.in ]; then
     rm /tmp/single.in
 fi
-
-if [ -e
 
 
 cd $RUNDIR

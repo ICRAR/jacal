@@ -1,5 +1,9 @@
+#cleanup
+
+killall dlg
+
 if [ $# -gt 0 ]; then
-    cd $1 
+    cd $1
     source activate daliuge
     cd $WORKSPACE
 else
