@@ -5,7 +5,6 @@ if [ $# -gt 0 ]; then
 else
     TOPDIR=${WORKSPACE}/jacal
     ENVDIR=${WORKSPACE}/daliuge_env
-    ASKAP_ROOT=${WORKSPACE}/../rialto_askap_build_galaxy/askapsoft
 fi
 
 # we assume daliuge is built via its build script
