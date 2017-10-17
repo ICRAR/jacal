@@ -29,9 +29,9 @@ fi
 
 source ./activate
 
-
+${WORKSPACE}/${ENVDIR}/bin/pip install --trusted-host pypi.python.org --upgrade pip
 ${WORKSPACE}/${ENVDIR}/bin/pip install --trusted-host pypi.python.org python-daemon
-${WORKSPACE}/${ENVDIR}/bin/pip install pyzmq --install-option="--zmq=bundled"
+${WORKSPACE}/${ENVDIR}/bin/pip install --trusted-host pypi.python.org pyzmq
 
 
 cd ${WORKSPACE}/${TOPDIR}
