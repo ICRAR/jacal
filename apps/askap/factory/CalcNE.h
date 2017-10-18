@@ -26,6 +26,10 @@
 
 namespace askap {
 
+    /// @brief Calculates the Normal Equations
+    /// @details This class encorporates all the tasks to read from a measurement set;
+    /// subtract a model; grid residual visibilities and FFT the grid
+
     class CalcNE : public DaliugeApplication
 
     {
@@ -58,21 +62,23 @@ namespace askap {
 
         private:
 
-            /// The model
+            //! @brief The model
+            //! @details contains a set of parameters - essentially the solution of the NE
             askap::scimath::Params::ShPtr itsModel;
 
-            // Parameter set
+            //! @brief Parameter set
+            //! @details key value list of configuration options
             LOFAR::ParameterSet itsParset;
 
             // Its channel of data
 
-            casa::IPosition freqInterval;
+            casa::IPosition freqInterval; ///< which channel range of the measurement set we are interested in
 
 
-            casa::IPosition timeInterval;
+            casa::IPosition timeInterval;  ///< the time range we are interested in
 
             // Its tangent point
-            std::vector<casa::MVDirection> itsTangent;
+            std::vector<casa::MVDirection> itsTangent; ///< the tangent point of the current grid
 
 
             // utility to build an Imaging Normal Equation from a parset

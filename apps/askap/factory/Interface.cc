@@ -10,6 +10,11 @@
 
 #include<string.h>
 
+//! @file The actual interface functions
+//! @details These are the C functions that are exposed to the Daliuge pipeline. Everytime the Dynlib is unsigned
+//! it has a name which is one of the Daliuge applications supported by the factory.
+//! the process is simple. It checks the app->name for the name of the application then instantiates
+//! the class for that name - then runs its method.
 
 int init(dlg_app_info *app, const char ***arguments) {
     // this means we have to instantiate an application

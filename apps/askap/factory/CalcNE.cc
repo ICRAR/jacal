@@ -149,6 +149,7 @@ namespace askap {
 
     int CalcNE::run(dlg_app_info *app) {
 
+      
         // Lets get the key-value-parset
         ASKAPLOG_INIT("");
         ASKAP_LOGGER(logger, ".run");
@@ -192,9 +193,9 @@ namespace askap {
 
           ASKAPLOG_INFO_STR(logger, "Initializing the model images");
 
-            /// Create the specified images from the definition in the
-            /// parameter set. We can solve for any number of images
-            /// at once (but you may/will run out of memory!)
+            // Create the specified images from the definition in the
+            // parameter set. We can solve for any number of images
+            // at once (but you may/will run out of memory!)
           askap::synthesis::SynthesisParamsHelper::setUpImages(itsModel,
                                   this->itsParset.makeSubset("Images."));
 

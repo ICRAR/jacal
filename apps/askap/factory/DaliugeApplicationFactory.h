@@ -21,7 +21,9 @@
 namespace askap
 {
 
-    /// @brief Factory class for Daliuge Applications
+    //! @brief Factory class for Daliuge Applications
+    //! @details Contains a list of all applications and creates/instantiates the correct one
+    //! based upon the "name" of the Daliuge DynLib drop
 
 
     class DaliugeApplicationFactory
@@ -47,12 +49,10 @@ namespace askap
       /// (in lowercase) is loaded and it executes its register<name>
       /// function which must register its creator function in the registry
       /// using function registerPrimaryBeam.
-      /// @param name The name of the gridder.
-      /// @param parset ParameterSet containing description of
-      /// gridder to be constructed
-      static DaliugeApplication::ShPtr createDaliugeApplication (const std::string& name);
+      /// @param name The name function
+      ///
 
-      /// @brief Factory class
+      static DaliugeApplication::ShPtr createDaliugeApplication (const std::string& name);
 
       static DaliugeApplication::ShPtr make(const std::string &name);
 

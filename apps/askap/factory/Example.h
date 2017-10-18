@@ -16,7 +16,7 @@
 #include <casacore/casa/Arrays/IPosition.h>
 
 namespace askap {
-
+    //! @brief Example class for reference
     class Example : public DaliugeApplication
 
     {

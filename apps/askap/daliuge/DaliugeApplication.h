@@ -1,5 +1,7 @@
 /// @file DaliugeApplication.h
 /// @brief Base class for Daliuge applications
+/// @details All jacal functions inherit from this base class. It exposes the methods that the Daliuge
+///         pipeline is expecting
 ///
 /// @copyright (c) 2017 CSIRO
 /// Australia Telescope National Facility (ATNF)
@@ -38,7 +40,7 @@
 namespace askap {
 
     /// @brief Daliuge application class.
-    /// This class encapsulates the functions required of a daliuge application
+    /// @details This class encapsulates the functions required of a daliuge application
     /// as specified in dlg_app.h then exposes them as C functions
 
 
