@@ -9,14 +9,14 @@ $(error ASKAP_ROOT is not set)
 endif
 
 # DALiuGE include dir
-DLG_INCDIRS = -I`python -c "import dfms; print(dfms.get_include_dir())"`
+DLG_INCDIRS = -I`python -c "import dlg; print(dlg.get_include_dir())"`
 
 # ASKAPSoft dependencies
 ASKAP_INCDIRS = -I$(ASKAP_ROOT)/3rdParty/log4cxx/log4cxx-0.10.0/install/include \
                 -I$(ASKAP_ROOT)/3rdParty/LOFAR/Common/Common-3.3/install/include \
                 -I$(ASKAP_ROOT)/3rdParty/LOFAR/Blob/Blob-1.2/install/include \
-		        -I$(ASKAP_ROOT)/3rdParty/boost/boost-1.56.0/install/include \
-		        -I$(ASKAP_ROOT)/3rdParty/wcslib/wcslib-4.18/install/include \
+                -I$(ASKAP_ROOT)/3rdParty/boost/boost-1.56.0/install/include \
+                -I$(ASKAP_ROOT)/3rdParty/wcslib/wcslib-4.18/install/include \
                 -I$(ASKAP_ROOT)/Code/Base/askap/current/ \
                 -I$(ASKAP_ROOT)/Code/Base/accessors/current/install/include \
                 -I$(ASKAP_ROOT)/Code/Base//askapparallel/current/install/include \
@@ -27,7 +27,7 @@ ASKAP_LIBDIRS = -L$(ASKAP_ROOT)/3rdParty/log4cxx/log4cxx-0.10.0/install/lib/ \
                 -L$(ASKAP_ROOT)/3rdParty/LOFAR/Common/Common-3.3/install/lib \
                 -L$(ASKAP_ROOT)/3rdParty/LOFAR/Blob/Blob-1.2/install/lib \
                 -L$(ASKAP_ROOT)/3rdParty/cfitsio/cfitsio-3.35/cfitsio/ \
-		        -L$(ASKAP_ROOT)/3rdParty/boost/boost-1.56.0/install/lib \
+                -L$(ASKAP_ROOT)/3rdParty/boost/boost-1.56.0/install/lib \
                 -L$(ASKAP_ROOT)/Code/Base/askap/current/install/lib \
                 -L$(ASKAP_ROOT)/Code/Base/accessors/current/install/lib \
                 -L$(ASKAP_ROOT)/Code/Base/scimath/current/install/lib \
@@ -53,7 +53,7 @@ OBJS = daliuge/DaliugeApplication.o \
        factory/Interface.o \
        factory/LoadParset.o \
        factory/LoadVis.o \
-	   factory/LoadNE.o \
+       factory/LoadNE.o \
        factory/NEUtils.o \
        factory/SolveNE.o \
        factory/CalcNE.o \
