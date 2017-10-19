@@ -223,7 +223,7 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
           }
           param = "Images."+imageNames[img]+".nchan";
           if ( !parset.isDefined(param)) {
-              std::cerr << "Param not found: " << param << std::cerr;
+              std::cerr << "Param not found: " << param << std::endl;
           }
       }
 
