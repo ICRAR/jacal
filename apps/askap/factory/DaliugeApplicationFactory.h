@@ -56,6 +56,8 @@ namespace askap
 
       static DaliugeApplication::ShPtr make(const std::string &name);
 
+      static void initial_population();
+
       DaliugeApplicationFactory();
 
     protected:

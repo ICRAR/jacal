@@ -65,6 +65,7 @@ namespace askap {
 #include <fitting/Params.h>
 
 
+#include <mutex>
 #include <string.h>
 #include <sys/time.h>
 
@@ -73,7 +74,13 @@ namespace askap {
 
 namespace askap {
 
+	static std::once_flag init_logging_flag;
+	void init_logging() {
+		ASKAPLOG_INIT("");
+	}
+
     LoadVis::LoadVis() {
+        std::call_once(init_logging_flag, init_logging);
         //ASKAP_LOGGER(locallogger,"\t LoadVis -  default contructor\n");
         std::cout << "LoadVis -  default constructor" << std::endl;
         this->itsModel.reset(new scimath::Params());
@@ -150,7 +157,6 @@ namespace askap {
     int LoadVis::run(dlg_app_info *app) {
 
         // Lets get the key-value-parset
-        ASKAPLOG_INIT("");
         ASKAP_LOGGER(logger, ".run");
         char buf[64*1024];
         size_t n_read = app->inputs[0].read(buf, 64*1024);

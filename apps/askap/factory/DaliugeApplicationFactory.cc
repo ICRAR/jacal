@@ -32,7 +32,8 @@
 
 //
 
-#include<string>
+#include <mutex>
+#include <string>
 
 namespace askap {
 
@@ -85,25 +86,25 @@ namespace askap {
   }
 
 
+static std::once_flag initial_population_called;
+void DaliugeApplicationFactory::initial_population() {
+	if (theirRegistry.size() == 0) {
+		// this is the first call of the method, we need to fill the registry with
+		// all pre-defined applications
+		std::cout << "factory - Filling the registry with predefined applications" << std::endl;
+		addPreDefinedDaliugeApplication<Example>();
+		addPreDefinedDaliugeApplication<LoadParset>();
+		addPreDefinedDaliugeApplication<LoadVis>();
+		addPreDefinedDaliugeApplication<LoadNE>();
+		addPreDefinedDaliugeApplication<SolveNE>();
+		addPreDefinedDaliugeApplication<OutputParams>();
+		addPreDefinedDaliugeApplication<CalcNE>();
+	}
+}
 
 DaliugeApplication::ShPtr DaliugeApplicationFactory::make(const std::string &name) {
 
-    if (theirRegistry.size() == 0) {
-        // this is the first call of the method, we need to fill the registry with
-        // all pre-defined applications
-        std::cout << "factory - Filling the registry with predefined applications" << std::endl;
-        addPreDefinedDaliugeApplication<Example>();
-        addPreDefinedDaliugeApplication<LoadParset>();
-        addPreDefinedDaliugeApplication<LoadVis>();
-        addPreDefinedDaliugeApplication<LoadNE>();
-        addPreDefinedDaliugeApplication<SolveNE>();
-        addPreDefinedDaliugeApplication<OutputParams>();
-        addPreDefinedDaliugeApplication<CalcNE>();
-
-
-
-
-    }
+	std::call_once(initial_population_called, initial_population);
 
     // buffer for the result
     DaliugeApplication::ShPtr App;
