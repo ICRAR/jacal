@@ -244,6 +244,10 @@ namespace askap {
             // lets dump out some images
 
             int NEOut = NEUtils::getOutput(app,"Normal");
+            if (NEOut == -1) {
+                ASKAPLOG_ERROR_STR(logger, "No 'Normal' output found in graph, cannot write NE");
+                return 1;
+            }
             NEUtils::sendNE(itsNe, app, NEOut);
 
         }
