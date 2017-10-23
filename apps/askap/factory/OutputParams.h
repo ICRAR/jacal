@@ -25,7 +25,9 @@
 #include <measurementequation/ImageParamsHelper.h>
 
 namespace askap {
-
+  /// @brief Outputs the Params class as images
+  /// @details This drop actually generates the output images based upon the contents of the Params object
+  
     class OutputParams : public DaliugeApplication
 
     {

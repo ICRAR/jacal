@@ -36,7 +36,8 @@ namespace askap {
     {
       return (end->tv_sec - start->tv_sec) * 1000000 + (end->tv_usec - start->tv_usec);
     }
-
+    /// @brief A set of static utilities
+    /// @details These are just a set of static functions I use more than once
     class NEUtils
 
     {

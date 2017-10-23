@@ -26,6 +26,10 @@
 
 namespace askap {
 
+  /// @brief Implements an ASKAP Solver
+  /// @details This takes a configuration and a set of normal equations and uses the Solver requested in
+  /// in the ParameterSet to produce an ouput model.
+
     class SolveNE : public DaliugeApplication
 
     {

@@ -1,8 +1,8 @@
-/// @file LoadVis.h
-
+/// @file CalcNE.h
 /// @brief Load a CASA Measurement Set in the DaliugeApplication Framework
 /// @details We will build on the LoadParset structure - but use the contents
-/// of the parset to load a measurement set.
+/// of the parset to load a measurement set. This also understands the concept of
+/// a model and can form residual images
 
 
 

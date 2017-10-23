@@ -23,7 +23,8 @@
 
 
 namespace askap {
-
+    /// @brief Example calss that simply loads Normal Equations from a drop
+    /// @details Just accepts the drop
     class LoadNE : public DaliugeApplication
 
     {
@@ -54,7 +55,7 @@ namespace askap {
 
         private:
 
-            
+
 
             // utility to build an Imaging Normal Equation from a parset
             // void buildNE();

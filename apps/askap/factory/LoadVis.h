@@ -25,7 +25,8 @@
 
 
 namespace askap {
-
+  /// @brief Loads visibility set
+  /// @details Loads a configuration from a file drop and a visibility set from a CASA::Measurement Set
     class LoadVis : public DaliugeApplication
 
     {

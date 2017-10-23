@@ -15,7 +15,8 @@
 
 
 namespace askap {
-
+    /// @brief Loads a configuration
+    /// @details Loads a configuration from a file drop and generates a LOFAR::ParameterSet
     class LoadParset : public DaliugeApplication
 
     {

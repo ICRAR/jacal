@@ -1,7 +1,5 @@
-/// @file PrimaryBeamFactory.h
-///
-/// @details
-/// PrimaryBeamFactory: Factory class for Primary Beam Responses
+/// @file DaliugeApplicationFactory.h
+/// @brief A Factory class for Daliuge Applications
 
 
 #ifndef ASKAP_DALIUGE_APPLICATION_FACTORY_H_
@@ -45,10 +43,10 @@ namespace askap
 
       /// @brief Try to create a non-standard DaliugeApplication.
       /// Its name is looked up in the creator function registry.
-      /// If the gridder name is unknown, a shared library with that name
+      /// If the drop name is unknown, a shared library with that name
       /// (in lowercase) is loaded and it executes its register<name>
       /// function which must register its creator function in the registry
-      /// using function registerPrimaryBeam.
+      /// using function registerDaliugeApplication.
       /// @param name The name function
       ///
 
