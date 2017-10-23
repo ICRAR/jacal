@@ -14,8 +14,10 @@ fi
 cd $WORKSPACE
 
 if [[ $(hostname -s) = galaxy-? ]]; then
+    module load gcc/4.8.2
     module load python/2.7.10
     module load virtualenv
+
 fi
 
 mkdir ${WORKSPACE}/${ENVDIR}
