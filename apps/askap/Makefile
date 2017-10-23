@@ -40,7 +40,7 @@ ASKAP_LIBS = -llog4cxx -laskap_askap -lcommon -lblob -laskap_accessors -laskap_s
 CASA_LIBS = -lcasa_casa -lcasa_measures -lcfitsio
 
 # Combined flags
-CXXFLAGS += -fPIC -I. -g -DDEBUG $(ASKAP_INCDIRS) $(CASA_INCDIRS) $(DLG_INCDIRS)
+CXXFLAGS += -std=c++11 -fPIC -I. -g -DDEBUG $(ASKAP_INCDIRS) $(CASA_INCDIRS) $(DLG_INCDIRS)
 LDFLAGS += $(ASKAP_LIBDIRS) $(ASKAP_LIBS) $(CASA_LIBDIRS) $(CASA_LIBS)
 
 
