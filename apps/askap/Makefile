@@ -61,7 +61,7 @@ OBJS = daliuge/DaliugeApplication.o \
 
 .PHONY: all clean
 
-all: libaskapsoft_dlg.so docs
+all: libaskapsoft_dlg.so 
 
 clean:
 	rm -f factory/*.o daliuge/*.o libaskapsoft_dlg.so
@@ -69,5 +69,3 @@ clean:
 libaskapsoft_dlg.so: $(OBJS)
 	$(CXX) -shared -o $@ $(OBJS) $(LDFLAGS)
 
-docs:
-	doxygen doxy.conf
