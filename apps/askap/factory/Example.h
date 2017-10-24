@@ -25,25 +25,26 @@ namespace askap {
 
         typedef boost::shared_ptr<Example> ShPtr;
 
-        Example();
+        Example(dlg_app_info *raw_app);
 
         static inline std::string ApplicationName() { return "Example";}
 
         virtual ~Example();
 
-        static DaliugeApplication::ShPtr createDaliugeApplication(const std::string &name);
+        static DaliugeApplication::ShPtr createDaliugeApplication(dlg_app_info *raw_app);
 
-        virtual int init(dlg_app_info *app, const char ***arguments);
+        virtual int init(const char ***arguments) override;
 
-        virtual int run(dlg_app_info *app);
+        virtual int run() override;
 
-        virtual void data_written(dlg_app_info *app, const char *uid,
-            const char *data, size_t n);
+        virtual void data_written(const char *uid, const char *data, size_t n) override;
 
-        virtual void drop_completed(dlg_app_info *app, const char *uid,
-            drop_status status);
+        virtual void drop_completed(const char *uid, drop_status status) override;
 
-        private:
+    private:
+        bool print_stats;
+        unsigned long total;
+        unsigned long write_duration;
 
     };
 

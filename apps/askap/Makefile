@@ -47,8 +47,7 @@ LDFLAGS += $(ASKAP_LIBDIRS) $(ASKAP_LIBS) $(CASA_LIBDIRS) $(CASA_LIBS)
 #
 # These are the ones we need to build
 #
-OBJS = daliuge/DaliugeApplication.o \
-       factory/DaliugeApplicationFactory.o \
+OBJS = factory/DaliugeApplicationFactory.o \
        factory/Example.o \
        factory/Interface.o \
        factory/LoadParset.o \

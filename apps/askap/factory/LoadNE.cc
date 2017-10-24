@@ -77,9 +77,11 @@ namespace askap {
 
   
 
-    LoadNE::LoadNE() {
+    LoadNE::LoadNE(dlg_app_info *raw_app) :
+        DaliugeApplication(raw_app)
+    {
         //ASKAP_LOGGER(locallogger,"\t LoadNE -  default contructor\n");
-        std::cout << "LoadNE -  default constructor" << std::endl;
+        std::cout << "LoadNE -  constructor" << std::endl;
 
     }
 
@@ -89,7 +91,7 @@ namespace askap {
         std::cout << "LoadNE -  default destructor" << std::endl;
     }
 
-    DaliugeApplication::ShPtr LoadNE::createDaliugeApplication(const std::string &name)
+    DaliugeApplication::ShPtr LoadNE::createDaliugeApplication(dlg_app_info *raw_app)
     {
         // ASKAP_LOGGER(locallogger, ".create");
         std::cout << "createDaliugeApplication - Instantiating LoadNE" << std::endl;
@@ -100,15 +102,14 @@ namespace askap {
         // all the private variables required to define the beam
 
 
-        ptr.reset( new LoadNE());
+        ptr.reset( new LoadNE(raw_app));
 
         std::cout << "createDaliugeApplication - Created LoadNE DaliugeApplication instance " << std::endl;
         return ptr;
 
     }
-    int LoadNE::init(dlg_app_info *app, const char ***arguments) {
 
-
+    int LoadNE::init(const char ***arguments) {
 
         while (1) {
 
@@ -122,16 +123,10 @@ namespace askap {
             arguments++;
         }
 
-        app->data = malloc(sizeof(struct app_data));
-        if (!app->data) {
-            return 1;
-        }
-
-
         return 0;
     }
 
-    int LoadNE::run(dlg_app_info *app) {
+    int LoadNE::run() {
 
         // Lets get the key-value-parset
         ASKAPLOG_INIT("");
@@ -139,7 +134,7 @@ namespace askap {
 
         askap::scimath::ImagingNormalEquations::ShPtr itsNe = askap::scimath::ImagingNormalEquations::ShPtr(new askap::scimath::ImagingNormalEquations());
 
-        NEUtils::receiveNE(itsNe, app);
+        NEUtils::receiveNE(itsNe, input(0));
 
         std::vector<std::string> toFitParams = itsNe->unknowns();
         std::vector<std::string>::const_iterator iter2 = toFitParams.begin();
@@ -152,18 +147,12 @@ namespace askap {
     }
 
 
-    void LoadNE::data_written(dlg_app_info *app, const char *uid,
-        const char *data, size_t n) {
-
-        app->running();
-
+    void LoadNE::data_written(const char *uid, const char *data, size_t n) {
+        dlg_app_running();
     }
 
-    void LoadNE::drop_completed(dlg_app_info *app, const char *uid,
-            drop_status status) {
-
-        app->done(APP_FINISHED);
-        delete(to_app_data(app)->parset);
+    void LoadNE::drop_completed(const char *uid, drop_status status) {
+        dlg_app_done(APP_FINISHED);
     }
 
 

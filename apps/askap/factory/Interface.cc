@@ -10,6 +10,15 @@
 
 #include<string.h>
 
+struct DaliugeApplicationWrapper {
+	askap::DaliugeApplication::ShPtr daliuge_app;
+};
+
+static inline
+askap::DaliugeApplication::ShPtr unpack(dlg_app_info *app) {
+	return static_cast<DaliugeApplicationWrapper *>(app->data)->daliuge_app;
+}
+
 //! @file The actual interface functions
 //! @details These are the C functions that are exposed to the Daliuge pipeline. Everytime the Dynlib is unsigned
 //! it has a name which is one of the Daliuge applications supported by the factory.
@@ -40,20 +49,24 @@ int init(dlg_app_info *app, const char ***arguments) {
         app->appname = strdup("LoadParset");
     }
     // need to set the app->appname here .... from the arguments ....
-    askap::DaliugeApplication::ShPtr thisApp = askap::DaliugeApplicationFactory::make(app->appname);
-    return thisApp->init(app, arguments);
+    askap::DaliugeApplication::ShPtr thisApp = askap::DaliugeApplicationFactory::make(app);
+
+    // Save the pointer in the raw dlg_app_info for later retrieval
+    auto wrapper = new DaliugeApplicationWrapper();
+    wrapper->daliuge_app = thisApp;
+    app->data = wrapper;
+
+    return thisApp->init(arguments);
 }
+
 int run(dlg_app_info *app) {
-    askap::DaliugeApplication::ShPtr thisApp = askap::DaliugeApplicationFactory::make(app->appname);
-    return thisApp->run(app);
+	unpack(app)->run();
 }
-void data_written(dlg_app_info *app, const char *uid,
-    const char *data, size_t n) {
-        askap::DaliugeApplication::ShPtr thisApp = askap::DaliugeApplicationFactory::make(app->appname);
-        thisApp->data_written(app, uid, data, n);
-    }
-    void drop_completed(dlg_app_info *app, const char *uid,
-        drop_status status) {
-            askap::DaliugeApplication::ShPtr thisApp = askap::DaliugeApplicationFactory::make(app->appname);
-            thisApp->drop_completed(app, uid, status);
-        }
+
+void data_written(dlg_app_info *app, const char *uid, const char *data, size_t n) {
+	unpack(app)->data_written(uid, data, n);
+}
+
+void drop_completed(dlg_app_info *app, const char *uid, drop_status status) {
+	unpack(app)->drop_completed(uid, status);
+}
