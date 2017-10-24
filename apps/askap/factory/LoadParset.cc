@@ -52,6 +52,7 @@ namespace askap {
 
     int LoadParset::init(const char ***arguments) {
         // no-op
+        return 1;
     }
 
     int LoadParset::run() {

@@ -48,7 +48,6 @@ LDFLAGS += $(ASKAP_LIBDIRS) $(ASKAP_LIBS) $(CASA_LIBDIRS) $(CASA_LIBS)
 # These are the ones we need to build
 #
 OBJS = factory/DaliugeApplicationFactory.o \
-       factory/Example.o \
        factory/Interface.o \
        factory/LoadParset.o \
        factory/LoadVis.o \
@@ -60,11 +59,10 @@ OBJS = factory/DaliugeApplicationFactory.o \
 
 .PHONY: all clean
 
-all: libaskapsoft_dlg.so 
+all: libaskapsoft_dlg.so
 
 clean:
 	rm -f factory/*.o daliuge/*.o libaskapsoft_dlg.so
 
 libaskapsoft_dlg.so: $(OBJS)
 	$(CXX) -shared -o $@ $(OBJS) $(LDFLAGS)
-

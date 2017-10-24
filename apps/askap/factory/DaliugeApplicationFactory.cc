@@ -22,7 +22,7 @@
 #include <factory/DaliugeApplicationFactory.h>
 
 // Apps need to be here - or can we register them from Somewhere else
-#include <factory/Example.h>
+
 #include <factory/LoadParset.h>
 #include <factory/LoadVis.h>
 #include <factory/LoadNE.h>
@@ -95,7 +95,6 @@ void DaliugeApplicationFactory::initial_population() {
 		// this is the first call of the method, we need to fill the registry with
 		// all pre-defined applications
 		std::cout << "factory - Filling the registry with predefined applications" << std::endl;
-		addPreDefinedDaliugeApplication<Example>();
 		addPreDefinedDaliugeApplication<LoadParset>();
 		addPreDefinedDaliugeApplication<LoadVis>();
 		addPreDefinedDaliugeApplication<LoadNE>();

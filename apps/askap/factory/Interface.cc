@@ -60,7 +60,7 @@ int init(dlg_app_info *app, const char ***arguments) {
 }
 
 int run(dlg_app_info *app) {
-	unpack(app)->run();
+	return unpack(app)->run();
 }
 
 void data_written(dlg_app_info *app, const char *uid, const char *data, size_t n) {
