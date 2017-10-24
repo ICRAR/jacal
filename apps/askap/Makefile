@@ -66,3 +66,6 @@ clean:
 
 libaskapsoft_dlg.so: $(OBJS)
 	$(CXX) -shared -o $@ $(OBJS) $(LDFLAGS)
+
+standalone: standalone.o libaskapsoft_dlg.so
+	$(CXX) -o $@ standalone.o -pthread -L. $(LDFLAGS) -laskapsoft_dlg
