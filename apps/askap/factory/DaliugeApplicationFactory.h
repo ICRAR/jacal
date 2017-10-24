@@ -33,7 +33,7 @@ namespace askap
       /// a shared_pointer to a DaliugeApplication and they take
       /// an Application Name
 
-      typedef DaliugeApplication::ShPtr DaliugeApplicationCreator(const std::string& name);
+      typedef DaliugeApplication::ShPtr DaliugeApplicationCreator(dlg_app_info *dlg_app);
 
       /// @brief Register a function creating a DaliugeApplication object.
       /// @param name The name of the DaliugeApplication.
@@ -50,9 +50,9 @@ namespace askap
       /// @param name The name function
       ///
 
-      static DaliugeApplication::ShPtr createDaliugeApplication (const std::string& name);
+      static DaliugeApplication::ShPtr createDaliugeApplication (dlg_app_info *dlg_app);
 
-      static DaliugeApplication::ShPtr make(const std::string &name);
+      static DaliugeApplication::ShPtr make(dlg_app_info *dlg_app);
 
       static void initial_population();
 

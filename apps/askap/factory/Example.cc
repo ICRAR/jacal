@@ -20,18 +20,6 @@
 namespace askap {
 
 
-    struct app_data {
-        short print_stats;
-        unsigned long total;
-        unsigned long write_duration;
-    };
-
-    static inline
-    struct app_data *to_app_data(dlg_app_info *app)
-    {
-        return (struct app_data *)app->data;
-    }
-
     static inline
     unsigned long usecs(struct timeval *start, struct timeval *end)
     {
@@ -39,8 +27,12 @@ namespace askap {
     }
 
 
-    Example::Example() {
-        fprintf(stdout,"Example default contructor");
+    Example::Example(dlg_app_info *raw_app) :
+        DaliugeApplication(raw_app),
+        print_stats(false),
+        total(0), write_duration(0)
+    {
+        fprintf(stdout,"Example contructor");
     }
 
 
@@ -48,7 +40,7 @@ namespace askap {
 
     }
 
-    DaliugeApplication::ShPtr Example::createDaliugeApplication(const std::string &name)
+    DaliugeApplication::ShPtr Example::createDaliugeApplication(dlg_app_info *raw_app)
     {
         fprintf(stdout, "createDaliugeApplication for Example ");
 
@@ -58,15 +50,14 @@ namespace askap {
         // all the private variables required to define the beam
 
 
-        ptr.reset( new Example());
+        ptr.reset( new Example(raw_app));
 
         fprintf(stdout,"Created Example DaliugeApplication instance");
         return ptr;
 
     }
-    int Example::init(dlg_app_info *app, const char ***arguments) {
 
-        short print_stats = 0;
+    int Example::init(const char ***arguments) {
 
         while (1) {
 
@@ -78,39 +69,27 @@ namespace askap {
             }
 
             if (strcmp(param[0], "print_stats") == 0) {
-                print_stats = strcmp(param[1], "1") == 0 ||
-                strcmp(param[1], "true") == 0;
+            	print_stats = strcmp(param[1], "1") == 0 || strcmp(param[1], "true") == 0;
                 break;
             }
 
             arguments++;
         }
 
-        app->data = malloc(sizeof(struct app_data));
-        if (!app->data) {
-            return 1;
-        }
-        to_app_data(app)->print_stats = print_stats;
-        to_app_data(app)->total = 0;
-        to_app_data(app)->write_duration = 0;
         return 0;
     }
 
-    int Example::run(dlg_app_info *app) {
+    int Example::run() {
 
         char buf[64*1024];
         unsigned int total = 0, i;
         unsigned long read_duration = 0, write_duration = 0;
         struct timeval start, end;
 
-        if (to_app_data(app)->print_stats) {
-            printf("running / done methods addresses are %p / %p\n", app->running, app->done);
-        }
-
         while (1) {
 
             gettimeofday(&start, NULL);
-            size_t n_read = app->inputs[0].read(buf, 64*1024);
+            size_t n_read = input(0).read(buf, 64*1024);
             gettimeofday(&end, NULL);
             read_duration += usecs(&start, &end);
             if (!n_read) {
@@ -118,8 +97,8 @@ namespace askap {
             }
 
             gettimeofday(&start, NULL);
-            for (i = 0; i < app->n_outputs; i++) {
-                app->outputs[i].write(buf, n_read);
+            for (i = 0; i < n_outputs(); i++) {
+                output(i).write(buf, n_read);
             }
             gettimeofday(&end, NULL);
             write_duration += usecs(&start, &end);
@@ -129,7 +108,7 @@ namespace askap {
         double duration = (read_duration + write_duration) / 1000000.;
         double total_mb = total / 1024. / 1024.;
 
-        if (to_app_data(app)->print_stats) {
+        if (print_stats) {
             printf("Read %.3f [MB] of data at %.3f [MB/s]\n", total_mb, total_mb / (read_duration / 1000000.));
             printf("Wrote %.3f [MB] of data at %.3f [MB/s]\n", total_mb, total_mb / (write_duration / 1000000.));
             printf("Copied %.3f [MB] of data at %.3f [MB/s]\n", total_mb, total_mb / duration);
@@ -138,34 +117,31 @@ namespace askap {
         return 0;
     }
 
-    void Example::data_written(dlg_app_info *app, const char *uid,
-        const char *data, size_t n) {
+    void Example::data_written(const char *uid, const char *data, size_t n) {
             unsigned int i;
             struct timeval start, end;
 
-            app->running();
+            dlg_app_running();
             gettimeofday(&start, NULL);
-            for (i = 0; i < app->n_outputs; i++) {
-                app->outputs[i].write(data, n);
+            for (i = 0; i < n_outputs(); i++) {
+                output(i).write(data, n);
             }
             gettimeofday(&end, NULL);
 
-            to_app_data(app)->total += n;
-            to_app_data(app)->write_duration += usecs(&start, &end);
+            total += n;
+            write_duration += usecs(&start, &end);
     }
 
-    void Example::drop_completed(dlg_app_info *app, const char *uid,
-            drop_status status) {
+    void Example::drop_completed(const char *uid, drop_status status) {
                 /* We only have one output so we're finished */
-                double total_mb = (to_app_data(app)->total / 1024. / 1024.);
-                if (to_app_data(app)->print_stats) {
+                double total_mb = (total / 1024. / 1024.);
+                if (print_stats) {
                     printf("Wrote %.3f [MB] of data to %u outputs in %.3f [ms] at %.3f [MB/s]\n",
-                    total_mb, app->n_outputs,
-                    to_app_data(app)->write_duration / 1000.,
-                    total_mb / (to_app_data(app)->write_duration / 1000000.));
+                    total_mb, n_outputs(),
+                    write_duration / 1000.,
+                    total_mb / (write_duration / 1000000.));
                 }
-                app->done(APP_FINISHED);
-                free(app->data);
+                dlg_app_done(APP_FINISHED);
     }
 
 

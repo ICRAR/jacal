@@ -73,9 +73,11 @@ namespace askap {
 
 namespace askap {
 
-    CalcNE::CalcNE() {
+    CalcNE::CalcNE(dlg_app_info *raw_app) :
+        DaliugeApplication(raw_app)
+    {
         //ASKAP_LOGGER(locallogger,"\t CalcNE -  default contructor\n");
-        std::cout << "CalcNE -  default constructor" << std::endl;
+        std::cout << "CalcNE -  constructor" << std::endl;
         this->itsModel.reset(new scimath::Params());
     }
 
@@ -85,7 +87,7 @@ namespace askap {
         std::cout << "CalcNE -  default destructor" << std::endl;
     }
 
-    DaliugeApplication::ShPtr CalcNE::createDaliugeApplication(const std::string &name)
+    DaliugeApplication::ShPtr CalcNE::createDaliugeApplication(dlg_app_info *raw_app)
     {
         // ASKAP_LOGGER(locallogger, ".create");
         fprintf(stdout, "\tcreateDaliugeApplication - Instantiating CalcNE\n");
@@ -96,13 +98,14 @@ namespace askap {
         // all the private variables required to define the beam
 
 
-        ptr.reset( new CalcNE());
+        ptr.reset( new CalcNE(raw_app));
 
         fprintf(stdout,"\t createDaliugeApplication - Created CalcNE DaliugeApplication instance\n");
         return ptr;
 
     }
-    int CalcNE::init(dlg_app_info *app, const char ***arguments) {
+
+    int CalcNE::init(const char ***arguments) {
 
         // std::cerr << "Hello World from init method" << std::endl;
 
@@ -127,10 +130,6 @@ namespace askap {
             arguments++;
         }
 
-        app->data = malloc(sizeof(struct app_data));
-        if (!app->data) {
-            return 1;
-        }
         //  FIXME:
         //    This should be here but I could not get a boost smart pointer to work
         //    to_app_data(app)->parset.reset( new LOFAR::ParameterSet(parset_filename));
@@ -147,7 +146,7 @@ namespace askap {
         return 0;
     }
 
-    int CalcNE::run(dlg_app_info *app) {
+    int CalcNE::run() {
 
       
         // Lets get the key-value-parset
@@ -155,19 +154,12 @@ namespace askap {
         ASKAP_LOGGER(logger, ".run");
         char buf[64*1024];
 
-        int config = NEUtils::getInput(app,"Config");
+        size_t n_read = input("Config").read(buf, 64*1024);
 
-        // not throwing the exceptions properly fix this
-        if (config < 0) {
-          return -1;
-        }
+        LOFAR::ParameterSet parset(true);
+        parset.adoptBuffer(buf);
 
-        size_t n_read = app->inputs[config].read(buf, 64*1024);
-
-        to_app_data(app)->parset = new LOFAR::ParameterSet(true);
-        to_app_data(app)->parset->adoptBuffer(buf);
-
-        this->itsParset = to_app_data(app)->parset->makeSubset("Cimager.");
+        this->itsParset = parset.makeSubset("Cimager.");
 
         // we need to fill the local parset with parameters that maybe missing
         //
@@ -183,10 +175,10 @@ namespace askap {
 
         // Do we have a model?
         // this differentiates between the first and subsequent cycles
-        int model = NEUtils::getInput(app,"Model");
+        auto has_model = has_input("Model");
 
-        if (model >= 0) {
-          NEUtils::receiveParams(itsModel,app,model);
+        if (has_model) {
+          NEUtils::receiveParams(itsModel, input("Model"));
         }
         else {
 
@@ -252,8 +244,7 @@ namespace askap {
 
             // lets dump out some images
 
-            int NEOut = NEUtils::getOutput(app,"Normal");
-            NEUtils::sendNE(itsNe, app, NEOut);
+            NEUtils::sendNE(itsNe, output("Normal"));
 
 
         }
@@ -268,18 +259,12 @@ namespace askap {
     }
 
 
-    void CalcNE::data_written(dlg_app_info *app, const char *uid,
-        const char *data, size_t n) {
-
-        app->running();
-
+    void CalcNE::data_written(const char *uid, const char *data, size_t n) {
+        dlg_app_running();
     }
 
-    void CalcNE::drop_completed(dlg_app_info *app, const char *uid,
-            drop_status status) {
-
-        app->done(APP_FINISHED);
-        delete(to_app_data(app)->parset);
+    void CalcNE::drop_completed(const char *uid, drop_status status) {
+        dlg_app_done(APP_FINISHED);
     }
 
 

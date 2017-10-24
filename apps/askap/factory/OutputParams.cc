@@ -81,9 +81,11 @@ namespace askap {
 
 
 
-    OutputParams::OutputParams() {
+    OutputParams::OutputParams(dlg_app_info *raw_app) :
+        DaliugeApplication(raw_app)
+    {
         //ASKAP_LOGGER(locallogger,"\t OutputParams -  default contructor\n");
-        std::cout << "OutputParams -  default constructor" << std::endl;
+        std::cout << "OutputParams -  constructor" << std::endl;
 
     }
 
@@ -93,7 +95,7 @@ namespace askap {
         std::cout << "OutputParams -  default destructor" << std::endl;
     }
 
-    DaliugeApplication::ShPtr OutputParams::createDaliugeApplication(const std::string &name)
+    DaliugeApplication::ShPtr OutputParams::createDaliugeApplication(dlg_app_info *raw_app)
     {
         // ASKAP_LOGGER(locallogger, ".create");
         std::cout << "createDaliugeApplication - Instantiating OutputParams" << std::endl;
@@ -104,13 +106,13 @@ namespace askap {
         // all the private variables required to define the beam
 
 
-        ptr.reset( new OutputParams());
+        ptr.reset( new OutputParams(raw_app));
 
         std::cout << "createDaliugeApplication - Created OutputParams DaliugeApplication instance " << std::endl;
         return ptr;
 
     }
-    int OutputParams::init(dlg_app_info *app, const char ***arguments) {
+    int OutputParams::init(const char ***arguments) {
 
 
 
@@ -128,36 +130,23 @@ namespace askap {
             // arguments++;
         }
 
-        app->data = malloc(sizeof(struct app_data));
-        if (!app->data) {
-            return 1;
-        }
-
-
         return 0;
     }
 
-    int OutputParams::run(dlg_app_info *app) {
+    int OutputParams::run() {
 
         // Lets get the key-value-parset
         // ASKAPLOG_INIT("");
         ASKAP_LOGGER(logger, ".run");
 
-        // lets find the inputs
-        //
-        // the config file is -7 and the
-        int config = NEUtils::getInput(app,"Config");
-        int model = NEUtils::getInput(app,"Model");
-
-
         // lets open the input and read it
         char buf[64*1024];
-        size_t n_read = app->inputs[config].read(buf, 64*1024);
+        size_t n_read = input("Config").read(buf, 64*1024);
 
-        to_app_data(app)->parset = new LOFAR::ParameterSet(true);
-        to_app_data(app)->parset->adoptBuffer(buf);
+        LOFAR::ParameterSet parset(true);
+        parset.adoptBuffer(buf);
 
-        this->itsParset = to_app_data(app)->parset->makeSubset("Cimager.");
+        this->itsParset = parset.makeSubset("Cimager.");
 
         try {
             this->itsParset = NEUtils::addMissingParameters(this->itsParset);
@@ -170,7 +159,7 @@ namespace askap {
         // Actually there should be no model on input .... it should always be empty
         // it is my job to fill it.
         this->itsModel.reset(new scimath::Params());
-        NEUtils::receiveParams(itsModel,app,model);
+        NEUtils::receiveParams(itsModel, input("Model"));
 
         // askap::synthesis::SynthesisParamsHelper::setUpImages(itsModel,
         //                          this->itsParset.makeSubset("Images."));
@@ -198,18 +187,12 @@ namespace askap {
     }
 
 
-    void OutputParams::data_written(dlg_app_info *app, const char *uid,
-        const char *data, size_t n) {
-
-        app->running();
-
+    void OutputParams::data_written(const char *uid, const char *data, size_t n) {
+        dlg_app_running();
     }
 
-    void OutputParams::drop_completed(dlg_app_info *app, const char *uid,
-            drop_status status) {
-
-        app->done(APP_FINISHED);
-        delete(to_app_data(app)->parset);
+    void OutputParams::drop_completed(const char *uid, drop_status status) {
+        dlg_app_done(APP_FINISHED);
     }
 
 

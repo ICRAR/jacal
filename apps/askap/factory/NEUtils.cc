@@ -71,13 +71,13 @@ namespace askap {
 namespace askap {
 
 
-void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg_app_info *app, int input) {
+void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg_input_info &input) {
     ASKAPCHECK(itsNE, "NormalEquations not defined");
     size_t itsNESize;
-    size_t n_read = app->inputs[input].read((char *) &itsNESize, sizeof(itsNESize));
+    size_t n_read = input.read((char *) &itsNESize, sizeof(itsNESize));
     LOFAR::BlobString b1;
     b1.resize(itsNESize);
-    n_read = app->inputs[input].read(b1.data(), itsNESize);
+    n_read = input.read(b1.data(), itsNESize);
 
     ASKAPCHECK(n_read == itsNESize, "Unable to read NE of expected size");
 
@@ -86,7 +86,7 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
     bis >> *itsNE;
 
   }
-  void NEUtils::sendNE(askap::scimath::ImagingNormalEquations::ShPtr itsNe, dlg_app_info *app, int output ) {
+  void NEUtils::sendNE(askap::scimath::ImagingNormalEquations::ShPtr itsNe, dlg_output_info &output) {
 
       ASKAPCHECK(itsNe, "NormalEquations not defined");
 
@@ -97,11 +97,11 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
       size_t itsNeSize = b1.size();
       ASKAPCHECK(itsNeSize > 0,"Zero size NE");
       // first the size
-      app->outputs[output].write((char *) &itsNeSize,sizeof(itsNeSize));
+      output.write((char *) &itsNeSize,sizeof(itsNeSize));
       // then the actual data
-      app->outputs[output].write(b1.data(), b1.size());
+      output.write(b1.data(), b1.size());
   }
-  void NEUtils::sendParams(askap::scimath::Params::ShPtr Params,dlg_app_info *app, int output) {
+  void NEUtils::sendParams(askap::scimath::Params::ShPtr Params, dlg_output_info &output) {
 
     LOFAR::BlobString b1;
     LOFAR::BlobOBufString bob(b1);
@@ -112,18 +112,18 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
     size_t ParamsSize = b1.size();
     ASKAPCHECK(ParamsSize > 0,"Zero size NE");
     // first the size
-    app->outputs[output].write((char *) &ParamsSize,sizeof(ParamsSize));
+    output.write((char *) &ParamsSize,sizeof(ParamsSize));
     // then the actual data
-    app->outputs[output].write(b1.data(), b1.size());
+    output.write(b1.data(), b1.size());
 
   }
-  void NEUtils::receiveParams(askap::scimath::Params::ShPtr Params, dlg_app_info *app, int input) {
+  void NEUtils::receiveParams(askap::scimath::Params::ShPtr Params, dlg_input_info &input) {
       ASKAPCHECK(Params, "Params not defined");
       size_t ParamsSize;
-      size_t n_read = app->inputs[input].read((char *) &ParamsSize, sizeof(ParamsSize));
+      size_t n_read = input.read((char *) &ParamsSize, sizeof(ParamsSize));
       LOFAR::BlobString b1;
       b1.resize(ParamsSize);
-      n_read = app->inputs[input].read(b1.data(), ParamsSize);
+      n_read = input.read(b1.data(), ParamsSize);
 
       ASKAPCHECK(n_read == ParamsSize, "Unable to read Params of expected size");
 

@@ -53,9 +53,12 @@ namespace askap {
     theirRegistry[name] = creatorFunc;
   }
 
-  DaliugeApplication::ShPtr DaliugeApplicationFactory::createDaliugeApplication (const std::string& name)
+  DaliugeApplication::ShPtr DaliugeApplicationFactory::createDaliugeApplication (dlg_app_info *dlg_app)
   {
-    std::cout << "factory - Attempting to find " <<  name.c_str() << " in the registry" << std::endl;
+
+	const std::string name = dlg_app->appname;
+
+    std::cout << "factory - Attempting to find " <<  name << " in the registry" << std::endl;
     std::map<std::string,DaliugeApplicationCreator*>::const_iterator it = theirRegistry.find (name);
     if (it == theirRegistry.end()) {
       // Unknown Application. Try to load from a dynamic library
@@ -82,7 +85,7 @@ namespace askap {
       ASKAPTHROW(AskapError, "factory - Unknown Application " << name);
     }
     // Execute the registered function.
-    return it->second(name);
+    return it->second(dlg_app);
   }
 
 
@@ -102,15 +105,12 @@ void DaliugeApplicationFactory::initial_population() {
 	}
 }
 
-DaliugeApplication::ShPtr DaliugeApplicationFactory::make(const std::string &name) {
+DaliugeApplication::ShPtr DaliugeApplicationFactory::make(dlg_app_info *dlg_app) {
 
 	std::call_once(initial_population_called, initial_population);
 
     // buffer for the result
-    DaliugeApplication::ShPtr App;
-
-    App = createDaliugeApplication (name);
-
+    DaliugeApplication::ShPtr App = createDaliugeApplication(dlg_app);
     ASKAPASSERT(App); // if a App of that name is in the registry it will be here
 
     return App;

@@ -21,16 +21,6 @@
 
 namespace askap {
 
-    struct app_data {
-      LOFAR::ParameterSet *parset;
-    };
-
-    static inline
-    struct app_data *to_app_data(dlg_app_info *app)
-    {
-      return (struct app_data *)app->data;
-    }
-
     static inline
     unsigned long usecs(struct timeval *start, struct timeval *end)
     {
@@ -52,14 +42,14 @@ namespace askap {
                               << std::endl;};
 
         // gets an NE from an app input and puts it into the ShPtr
-        static void receiveNE(askap::scimath::ImagingNormalEquations::ShPtr, dlg_app_info *app, int input=0);
+        static void receiveNE(askap::scimath::ImagingNormalEquations::ShPtr, dlg_input_info &input);
         // Same for Params
-        static void receiveParams(askap::scimath::Params::ShPtr, dlg_app_info *app, int input=0);
+        static void receiveParams(askap::scimath::Params::ShPtr, dlg_input_info &input);
         // Needs a sendNE
 
-        static void sendNE(askap::scimath::ImagingNormalEquations::ShPtr itsNe, dlg_app_info *app, int output=0);
+        static void sendNE(askap::scimath::ImagingNormalEquations::ShPtr itsNe, dlg_output_info &output);
 
-        static void sendParams(askap::scimath::Params::ShPtr params,dlg_app_info *app, int output=0);
+        static void sendParams(askap::scimath::Params::ShPtr params, dlg_output_info &output);
 
         // add parameters that may be missing from a configuration file
         static LOFAR::ParameterSet addMissingParameters(LOFAR::ParameterSet& parset);
