@@ -15,5 +15,5 @@ else
     fi
 fi
 cd $RUNDIR
-dlg nm -v --no-dlm &
-dlg dim -N localhost &
+${WORKSPACE}/daliuge_env/bin/dlg nm -v --no-dlm &
+${WORKSPACE}/daliuge_env/bin/dlg dim -N localhost &
