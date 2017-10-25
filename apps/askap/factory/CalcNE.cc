@@ -21,7 +21,7 @@ namespace askap {
 #define ASKAP_PACKAGE_VERSION askap::getAskapPackageVersion_CalcNE()
 
 #include <vector>
-
+#include <mutex>
 
 
 #include <daliuge/DaliugeApplication.h>
@@ -128,7 +128,9 @@ namespace askap {
 
     int CalcNE::run() {
 
-      
+
+        static std::mutex safety;
+
         // Lets get the key-value-parset
         ASKAP_LOGGER(logger, ".run");
         char buf[64*1024];
@@ -143,7 +145,10 @@ namespace askap {
         // we need to fill the local parset with parameters that maybe missing
         //
         try {
+
+            safety.lock();
             this->itsParset = NEUtils::addMissingParameters(this->itsParset);
+            safety.unlock();
         }
         catch (std::runtime_error)
         {
@@ -161,14 +166,16 @@ namespace askap {
         }
         else {
 
-
+          safety.lock();
           ASKAPLOG_INFO_STR(logger, "Initializing the model images");
 
             // Create the specified images from the definition in the
             // parameter set. We can solve for any number of images
             // at once (but you may/will run out of memory!)
+
           askap::synthesis::SynthesisParamsHelper::setUpImages(itsModel,
                                   this->itsParset.makeSubset("Images."));
+          safety.unlock();
 
         }
 
@@ -176,17 +183,24 @@ namespace askap {
 
         // lets build a gridder
 
+        safety.lock();
         askap::synthesis::IVisGridder::ShPtr itsGridder = askap::synthesis::VisGridderFactory::make(this->itsParset);
 
+
+
         // NE
+
         askap::scimath::ImagingNormalEquations::ShPtr itsNe = askap::scimath::ImagingNormalEquations::ShPtr(new askap::scimath::ImagingNormalEquations(*itsModel));
+        safety.unlock();
 
         // I cant make the gridder smart funciton a member funtion as I cannot instantiate it until I have a parset.
 
         std::vector<std::string>::const_iterator iter = ms.begin();
 
-        for (; iter != ms.end(); iter++) {
 
+
+        for (; iter != ms.end(); iter++) {
+            safety.lock();
             ASKAPLOG_INFO_STR(logger, "Processing " << *iter);
 
             accessors::TableDataSource ds(*iter, accessors::TableDataSource::DEFAULT, colName);
@@ -225,6 +239,7 @@ namespace askap {
 
             NEUtils::sendNE(itsNe, output("Normal"));
 
+            safety.unlock();
 
         }
 

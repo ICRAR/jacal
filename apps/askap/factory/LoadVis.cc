@@ -21,6 +21,7 @@ namespace askap {
 #define ASKAP_PACKAGE_VERSION askap::getAskapPackageVersion_LoadVis()
 
 #include <vector>
+#include <mutex>
 
 
 
@@ -128,6 +129,8 @@ namespace askap {
 
     int LoadVis::run() {
 
+        static std::mutex safety;
+
         // Lets get the key-value-parset
         ASKAP_LOGGER(logger, ".run");
         char buf[64*1024];
@@ -156,6 +159,8 @@ namespace askap {
 
         // Lets look at the model
 
+        safety.lock();
+
         ASKAPLOG_INFO_STR(logger, "Initializing the model images");
 
             /// Create the specified images from the definition in the
@@ -175,14 +180,14 @@ namespace askap {
         askap::scimath::ImagingNormalEquations::ShPtr itsNe = askap::scimath::ImagingNormalEquations::ShPtr(new askap::scimath::ImagingNormalEquations(*itsModel));
 
 
-
+        safety.unlock();
 
         // I cant make the gridder smart funciton a member funtion as I cannot instantiate it until I have a parset.
 
         std::vector<std::string>::const_iterator iter = ms.begin();
 
         for (; iter != ms.end(); iter++) {
-
+            safety.lock();
             ASKAPLOG_INFO_STR(logger, "Processing " << *iter);
 
             accessors::TableDataSource ds(*iter, accessors::TableDataSource::DEFAULT, colName);
@@ -219,7 +224,7 @@ namespace askap {
 
             // lets dump out some images
             NEUtils::sendNE(itsNe, output("Normal"));
-
+            safety.unlock();
         }
 
         // I am going to assume a single Ne output - even though I am not

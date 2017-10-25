@@ -23,6 +23,8 @@ namespace askap {
 #define ASKAP_PACKAGE_VERSION askap::getAskapPackageVersion_LoadNE()
 
 #include <vector>
+#include <mutex>
+
 
 
 
@@ -74,7 +76,7 @@ namespace askap {
 namespace askap {
 
 
-  
+
 
     LoadNE::LoadNE(dlg_app_info *raw_app) :
         DaliugeApplication(raw_app)
@@ -109,6 +111,8 @@ namespace askap {
 
     int LoadNE::run() {
 
+        static std::mutex safety;
+        safety.lock();
         // Lets get the key-value-parset
         ASKAP_LOGGER(logger, ".run");
 
@@ -122,7 +126,7 @@ namespace askap {
 
             ASKAPLOG_INFO_STR(logger,"Param name: " << *iter2);
         }
-
+        safety.unlock();
         return 0;
     }
 

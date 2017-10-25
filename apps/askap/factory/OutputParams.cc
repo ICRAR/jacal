@@ -23,6 +23,7 @@ namespace askap {
 #define ASKAP_PACKAGE_VERSION askap::getAskapPackageVersion_OutputParams()
 
 #include <vector>
+#include <mutex>
 
 
 
@@ -117,6 +118,9 @@ namespace askap {
 
     int OutputParams::run() {
 
+        static std::mutex safety;
+
+        safety.lock();
         // Lets get the key-value-parset
         ASKAP_LOGGER(logger, ".run");
 
@@ -163,6 +167,7 @@ namespace askap {
 
         }
 
+        safety.unlock();
 
         return 0;
     }

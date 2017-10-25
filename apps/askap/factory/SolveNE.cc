@@ -23,6 +23,7 @@ namespace askap {
 #define ASKAP_PACKAGE_VERSION askap::getAskapPackageVersion_SolveNE()
 
 #include <vector>
+#include <mutex>
 
 
 
@@ -113,6 +114,8 @@ namespace askap {
 
     int SolveNE::run() {
 
+        static std::mutex safety;
+
         // Lets get the key-value-parset
         ASKAP_LOGGER(logger, ".run");
 
@@ -137,7 +140,7 @@ namespace askap {
         // it is my job to fill it.
 
         this->itsModel.reset(new scimath::Params());
-
+        safety.lock();
         askap::synthesis::SynthesisParamsHelper::setUpImages(itsModel,
                                   this->itsParset.makeSubset("Images."));
 
@@ -145,6 +148,8 @@ namespace askap {
         this->itsSolver = synthesis::ImageSolverFactory::make(this->itsParset);
 
         this->itsNe = askap::scimath::ImagingNormalEquations::ShPtr(new askap::scimath::ImagingNormalEquations());
+
+        safety.unlock();
 
         NEUtils::receiveNE(itsNe, input("Normal"));
 
@@ -158,6 +163,7 @@ namespace askap {
         }
 
         // Now we need to instantiate and initialise the solver
+        safety.lock();
         itsSolver->init();
         itsSolver->addNormalEquations(*itsNe);
 
@@ -169,6 +175,7 @@ namespace askap {
         ASKAPLOG_INFO_STR(logger, "Solved normal equations");
 
         NEUtils::sendParams(itsModel, output("Model"));
+        safety.unlock();
 
         return 0;
     }
