@@ -42,6 +42,8 @@ namespace askap {
   std::map<std::string, DaliugeApplicationFactory::DaliugeApplicationCreator*>
   DaliugeApplicationFactory::theirRegistry;
 
+  // Define the registry lock
+  std::recursive_mutex DaliugeApplicationFactory::registry_lock;
 
   DaliugeApplicationFactory::DaliugeApplicationFactory() {
   }
@@ -50,7 +52,10 @@ namespace askap {
                                            DaliugeApplicationFactory::DaliugeApplicationCreator* creatorFunc)
   {
     std::cout << "factory - Adding " << name.c_str() << " to the application registry" << std::endl;
-    theirRegistry[name] = creatorFunc;
+    {
+        std::lock_guard<std::recursive_mutex> _(registry_lock);
+        theirRegistry[name] = creatorFunc;
+    }
   }
 
   DaliugeApplication::ShPtr DaliugeApplicationFactory::createDaliugeApplication (dlg_app_info *dlg_app)
@@ -59,6 +64,11 @@ namespace askap {
 	const std::string name = dlg_app->appname;
 
     std::cout << "factory - Attempting to find " <<  name << " in the registry" << std::endl;
+
+    // It's a kind-of-long operation, but who cares, let's try at least to be
+    // thread-safe
+    std::lock_guard<std::recursive_mutex> _(registry_lock);
+
     std::map<std::string,DaliugeApplicationCreator*>::const_iterator it = theirRegistry.find (name);
     if (it == theirRegistry.end()) {
       // Unknown Application. Try to load from a dynamic library
@@ -91,6 +101,8 @@ namespace askap {
 
 static std::once_flag initial_population_called;
 void DaliugeApplicationFactory::initial_population() {
+	std::lock_guard<std::recursive_mutex> _(registry_lock);
+
 	if (theirRegistry.size() == 0) {
 		// this is the first call of the method, we need to fill the registry with
 		// all pre-defined applications
