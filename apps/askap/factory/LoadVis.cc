@@ -159,6 +159,10 @@ namespace askap {
         ASKAP_LOGGER(logger, ".run");
         char buf[64*1024];
         size_t n_read = input(0).read(buf, 64*1024);
+        if (n_read == 64*1024) {
+            n_read--;
+        }
+        buf[n_read] = 0;
 
         LOFAR::ParameterSet parset(true);
         parset.adoptBuffer(buf);
