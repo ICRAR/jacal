@@ -69,3 +69,6 @@ libaskapsoft_dlg.so: $(OBJS)
 
 standalone: standalone.o libaskapsoft_dlg.so
 	$(CXX) -o $@ standalone.o -pthread -L. $(LDFLAGS) -laskapsoft_dlg
+
+factory/%.s: factory/%.cc
+	$(CXX) -S $< $(CXXFLAGS) -o $@
