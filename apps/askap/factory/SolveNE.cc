@@ -22,7 +22,6 @@ namespace askap {
 /// The version of the package
 #define ASKAP_PACKAGE_VERSION askap::getAskapPackageVersion_SolveNE()
 
-#include <iostream>
 #include <vector>
 
 
@@ -84,34 +83,17 @@ namespace askap {
     SolveNE::SolveNE(dlg_app_info *raw_app) :
         DaliugeApplication(raw_app)
     {
-        //ASKAP_LOGGER(locallogger,"\t SolveNE -  default contructor\n");
-        std::cout << "SolveNE -  constructor" << std::endl;
-
     }
 
 
     SolveNE::~SolveNE() {
-        //ASKAP_LOGGER(locallogger,"\t SolveNE -  default destructor\n");
-        std::cout << "SolveNE -  default destructor" << std::endl;
     }
 
     DaliugeApplication::ShPtr SolveNE::createDaliugeApplication(dlg_app_info *raw_app)
     {
-        // ASKAP_LOGGER(locallogger, ".create");
-        std::cout << "createDaliugeApplication - Instantiating SolveNE" << std::endl;
-        // ASKAPLOG_INFO_STR(locallogger,"createDaliugeApplication - Instantiating SolveNE");
-        SolveNE::ShPtr ptr;
-
-        // We need to pull all the parameters out of the parset - and set
-        // all the private variables required to define the beam
-
-
-        ptr.reset( new SolveNE(raw_app));
-
-        std::cout << "createDaliugeApplication - Created SolveNE DaliugeApplication instance " << std::endl;
-        return ptr;
-
+        return SolveNE::ShPtr(new SolveNE(raw_app));
     }
+
     int SolveNE::init(const char ***arguments) {
 
         while (1) {
@@ -132,7 +114,6 @@ namespace askap {
     int SolveNE::run() {
 
         // Lets get the key-value-parset
-        // ASKAPLOG_INIT("");
         ASKAP_LOGGER(logger, ".run");
 
         // lets open the input and read it

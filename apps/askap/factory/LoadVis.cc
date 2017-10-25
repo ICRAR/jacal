@@ -20,7 +20,6 @@ namespace askap {
 /// The version of the package
 #define ASKAP_PACKAGE_VERSION askap::getAskapPackageVersion_LoadVis()
 
-#include <iostream>
 #include <vector>
 
 
@@ -74,47 +73,21 @@ namespace askap {
 
 namespace askap {
 
-	static std::once_flag init_logging_flag;
-	void init_logging() {
-		ASKAPLOG_INIT("");
-	}
-
     LoadVis::LoadVis(dlg_app_info *raw_app) :
         DaliugeApplication(raw_app)
     {
-        std::call_once(init_logging_flag, init_logging);
-        //ASKAP_LOGGER(locallogger,"\t LoadVis -  default contructor\n");
-        std::cout << "LoadVis -  constructor" << std::endl;
         this->itsModel.reset(new scimath::Params());
     }
 
-
     LoadVis::~LoadVis() {
-        //ASKAP_LOGGER(locallogger,"\t LoadVis -  default destructor\n");
-        std::cout << "LoadVis -  default destructor" << std::endl;
     }
 
     DaliugeApplication::ShPtr LoadVis::createDaliugeApplication(dlg_app_info *raw_app)
     {
-        // ASKAP_LOGGER(locallogger, ".create");
-        fprintf(stdout, "\tcreateDaliugeApplication - Instantiating LoadVis\n");
-        // ASKAPLOG_INFO_STR(locallogger,"createDaliugeApplication - Instantiating LoadVis");
-        LoadVis::ShPtr ptr;
-
-        // We need to pull all the parameters out of the parset - and set
-        // all the private variables required to define the beam
-
-
-        ptr.reset( new LoadVis(raw_app));
-
-        fprintf(stdout,"\t createDaliugeApplication - Created LoadVis DaliugeApplication instance\n");
-        return ptr;
-
+        return LoadVis::ShPtr(new LoadVis(raw_app));
     }
 
     int LoadVis::init(const char ***arguments) {
-
-        // std::cerr << "Hello World from init method" << std::endl;
 
         // Argument parsing is not working as yet
 
@@ -210,7 +183,7 @@ namespace askap {
 
         for (; iter != ms.end(); iter++) {
 
-            std::cout << "Processing " << *iter << std::endl;
+            ASKAPLOG_INFO_STR(logger, "Processing " << *iter);
 
             accessors::TableDataSource ds(*iter, accessors::TableDataSource::DEFAULT, colName);
 

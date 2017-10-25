@@ -22,7 +22,6 @@ namespace askap {
 /// The version of the package
 #define ASKAP_PACKAGE_VERSION askap::getAskapPackageVersion_OutputParams()
 
-#include <iostream>
 #include <vector>
 
 
@@ -84,34 +83,17 @@ namespace askap {
     OutputParams::OutputParams(dlg_app_info *raw_app) :
         DaliugeApplication(raw_app)
     {
-        //ASKAP_LOGGER(locallogger,"\t OutputParams -  default contructor\n");
-        std::cout << "OutputParams -  constructor" << std::endl;
-
     }
 
 
     OutputParams::~OutputParams() {
-        //ASKAP_LOGGER(locallogger,"\t OutputParams -  default destructor\n");
-        std::cout << "OutputParams -  default destructor" << std::endl;
     }
 
     DaliugeApplication::ShPtr OutputParams::createDaliugeApplication(dlg_app_info *raw_app)
     {
-        // ASKAP_LOGGER(locallogger, ".create");
-        std::cout << "createDaliugeApplication - Instantiating OutputParams" << std::endl;
-        // ASKAPLOG_INFO_STR(locallogger,"createDaliugeApplication - Instantiating OutputParams");
-        OutputParams::ShPtr ptr;
-
-        // We need to pull all the parameters out of the parset - and set
-        // all the private variables required to define the beam
-
-
-        ptr.reset( new OutputParams(raw_app));
-
-        std::cout << "createDaliugeApplication - Created OutputParams DaliugeApplication instance " << std::endl;
-        return ptr;
-
+        return OutputParams::ShPtr(new OutputParams(raw_app));
     }
+
     int OutputParams::init(const char ***arguments) {
 
 
@@ -136,7 +118,6 @@ namespace askap {
     int OutputParams::run() {
 
         // Lets get the key-value-parset
-        // ASKAPLOG_INIT("");
         ASKAP_LOGGER(logger, ".run");
 
         // lets open the input and read it
@@ -170,7 +151,7 @@ namespace askap {
         vector<string> images=itsModel->names();
 
         for (vector<string>::const_iterator it=images.begin(); it !=images.end(); it++) {
-          std::cout << "Model contains "<< *it << std::endl;
+          ASKAPLOG_INFO_STR(logger, "Model contains "<< *it);
           if (it->find("image") == 0) {
             const synthesis::ImageParamsHelper iph(*it);
             synthesis::SynthesisParamsHelper::saveImageParameter(*itsModel, *it, *it);

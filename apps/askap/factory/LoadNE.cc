@@ -22,7 +22,6 @@ namespace askap {
 /// The version of the package
 #define ASKAP_PACKAGE_VERSION askap::getAskapPackageVersion_LoadNE()
 
-#include <iostream>
 #include <vector>
 
 
@@ -80,33 +79,15 @@ namespace askap {
     LoadNE::LoadNE(dlg_app_info *raw_app) :
         DaliugeApplication(raw_app)
     {
-        //ASKAP_LOGGER(locallogger,"\t LoadNE -  default contructor\n");
-        std::cout << "LoadNE -  constructor" << std::endl;
-
     }
 
 
     LoadNE::~LoadNE() {
-        //ASKAP_LOGGER(locallogger,"\t LoadNE -  default destructor\n");
-        std::cout << "LoadNE -  default destructor" << std::endl;
     }
 
     DaliugeApplication::ShPtr LoadNE::createDaliugeApplication(dlg_app_info *raw_app)
     {
-        // ASKAP_LOGGER(locallogger, ".create");
-        std::cout << "createDaliugeApplication - Instantiating LoadNE" << std::endl;
-        // ASKAPLOG_INFO_STR(locallogger,"createDaliugeApplication - Instantiating LoadNE");
-        LoadNE::ShPtr ptr;
-
-        // We need to pull all the parameters out of the parset - and set
-        // all the private variables required to define the beam
-
-
-        ptr.reset( new LoadNE(raw_app));
-
-        std::cout << "createDaliugeApplication - Created LoadNE DaliugeApplication instance " << std::endl;
-        return ptr;
-
+        return LoadNE::ShPtr(new LoadNE(raw_app));
     }
 
     int LoadNE::init(const char ***arguments) {
@@ -129,7 +110,6 @@ namespace askap {
     int LoadNE::run() {
 
         // Lets get the key-value-parset
-        ASKAPLOG_INIT("");
         ASKAP_LOGGER(logger, ".run");
 
         askap::scimath::ImagingNormalEquations::ShPtr itsNe = askap::scimath::ImagingNormalEquations::ShPtr(new askap::scimath::ImagingNormalEquations());

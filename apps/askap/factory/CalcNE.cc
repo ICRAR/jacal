@@ -20,7 +20,6 @@ namespace askap {
 /// The version of the package
 #define ASKAP_PACKAGE_VERSION askap::getAskapPackageVersion_CalcNE()
 
-#include <iostream>
 #include <vector>
 
 
@@ -76,38 +75,19 @@ namespace askap {
     CalcNE::CalcNE(dlg_app_info *raw_app) :
         DaliugeApplication(raw_app)
     {
-        //ASKAP_LOGGER(locallogger,"\t CalcNE -  default contructor\n");
-        std::cout << "CalcNE -  constructor" << std::endl;
         this->itsModel.reset(new scimath::Params());
     }
 
 
     CalcNE::~CalcNE() {
-        //ASKAP_LOGGER(locallogger,"\t CalcNE -  default destructor\n");
-        std::cout << "CalcNE -  default destructor" << std::endl;
     }
 
     DaliugeApplication::ShPtr CalcNE::createDaliugeApplication(dlg_app_info *raw_app)
     {
-        // ASKAP_LOGGER(locallogger, ".create");
-        fprintf(stdout, "\tcreateDaliugeApplication - Instantiating CalcNE\n");
-        // ASKAPLOG_INFO_STR(locallogger,"createDaliugeApplication - Instantiating CalcNE");
-        CalcNE::ShPtr ptr;
-
-        // We need to pull all the parameters out of the parset - and set
-        // all the private variables required to define the beam
-
-
-        ptr.reset( new CalcNE(raw_app));
-
-        fprintf(stdout,"\t createDaliugeApplication - Created CalcNE DaliugeApplication instance\n");
-        return ptr;
-
+        return CalcNE::ShPtr(new CalcNE(raw_app));
     }
 
     int CalcNE::init(const char ***arguments) {
-
-        // std::cerr << "Hello World from init method" << std::endl;
 
         // Argument parsing is not working as yet
 
@@ -150,7 +130,6 @@ namespace askap {
 
       
         // Lets get the key-value-parset
-        ASKAPLOG_INIT("");
         ASKAP_LOGGER(logger, ".run");
         char buf[64*1024];
 
@@ -208,7 +187,7 @@ namespace askap {
 
         for (; iter != ms.end(); iter++) {
 
-            std::cout << "Processing " << *iter << std::endl;
+            ASKAPLOG_INFO_STR(logger, "Processing " << *iter);
 
             accessors::TableDataSource ds(*iter, accessors::TableDataSource::DEFAULT, colName);
 
