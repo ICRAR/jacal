@@ -44,7 +44,7 @@ fi
 
 #
 #
-pip install --trusted-host pypi.python.org ${WORKSPACE}/${TOPDIR}
+pip install --process-dependency-links --trusted-host pypi.python.org ${WORKSPACE}/${TOPDIR}
 
 if [ $? -ne 0 ]; then
     echo "Error: installation failed"
