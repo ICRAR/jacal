@@ -129,7 +129,9 @@ namespace askap {
     int CalcNE::run() {
 
 
+#ifndef ASKAP_PATCHED
         static std::mutex safety;
+#endif // ASKAP_PATCHED
 
         // Lets get the key-value-parset
         ASKAP_LOGGER(logger, ".run");
@@ -145,10 +147,10 @@ namespace askap {
         // we need to fill the local parset with parameters that maybe missing
         //
         try {
-
-            safety.lock();
+#ifndef ASKAP_PATCHED
+            std::lock_guard<std::mutex> guard(safety);
+#endif // ASKAP_PATCHED
             this->itsParset = NEUtils::addMissingParameters(this->itsParset);
-            safety.unlock();
         }
         catch (std::runtime_error)
         {
@@ -166,7 +168,9 @@ namespace askap {
         }
         else {
 
-          safety.lock();
+#ifndef ASKAP_PATCHED
+          std::lock_guard<std::mutex> guard(safety);
+#endif // ASKAP_PATCHED
           ASKAPLOG_INFO_STR(logger, "Initializing the model images");
 
             // Create the specified images from the definition in the
@@ -175,23 +179,22 @@ namespace askap {
 
           askap::synthesis::SynthesisParamsHelper::setUpImages(itsModel,
                                   this->itsParset.makeSubset("Images."));
-          safety.unlock();
-
         }
 
         ASKAPLOG_INFO_STR(logger, "Current model held by the drop: "<<*itsModel);
 
         // lets build a gridder
+        askap::synthesis::IVisGridder::ShPtr itsGridder;
+        askap::scimath::ImagingNormalEquations::ShPtr itsNe;
+        {
+#ifndef ASKAP_PATCHED
+          std::lock_guard<std::mutex> guard(safety);
+#endif // ASKAP_PATCHED
+          itsGridder = askap::synthesis::VisGridderFactory::make(this->itsParset);
 
-        safety.lock();
-        askap::synthesis::IVisGridder::ShPtr itsGridder = askap::synthesis::VisGridderFactory::make(this->itsParset);
-
-
-
-        // NE
-
-        askap::scimath::ImagingNormalEquations::ShPtr itsNe = askap::scimath::ImagingNormalEquations::ShPtr(new askap::scimath::ImagingNormalEquations(*itsModel));
-        safety.unlock();
+          // NE
+          itsNe = askap::scimath::ImagingNormalEquations::ShPtr(new askap::scimath::ImagingNormalEquations(*itsModel));
+        }
 
         // I cant make the gridder smart funciton a member funtion as I cannot instantiate it until I have a parset.
 
@@ -200,7 +203,9 @@ namespace askap {
 
 
         for (; iter != ms.end(); iter++) {
-            safety.lock();
+#ifndef ASKAP_PATCHED
+            std::lock_guard<std::mutex> guard(safety);
+#endif // ASKAP_PATCHED
             ASKAPLOG_INFO_STR(logger, "Processing " << *iter);
 
             accessors::TableDataSource ds(*iter, accessors::TableDataSource::DEFAULT, colName);
@@ -238,8 +243,6 @@ namespace askap {
             // lets dump out some images
 
             NEUtils::sendNE(itsNe, output("Normal"));
-
-            safety.unlock();
 
         }
 

@@ -129,7 +129,9 @@ namespace askap {
 
     int LoadVis::run() {
 
+#ifndef ASKAP_PATCHED
         static std::mutex safety;
+#endif // ASKAP_PATCHED
 
         // Lets get the key-value-parset
         ASKAP_LOGGER(logger, ".run");
@@ -158,36 +160,42 @@ namespace askap {
         vector<std::string> ms = this->getDatasets(this->itsParset);
 
         // Lets look at the model
+        askap::scimath::ImagingNormalEquations::ShPtr itsNe;
+        askap::synthesis::IVisGridder::ShPtr itsGridder;
+        {
+#ifndef ASKAP_PATCHED
+            std::lock_guard<std::mutex> guard(safety);
+#endif // ASKAP_PATCHED
 
-        safety.lock();
-
-        ASKAPLOG_INFO_STR(logger, "Initializing the model images");
+            ASKAPLOG_INFO_STR(logger, "Initializing the model images");
 
             /// Create the specified images from the definition in the
             /// parameter set. We can solve for any number of images
             /// at once (but you may/will run out of memory!)
-        askap::synthesis::SynthesisParamsHelper::setUpImages(itsModel,
-                                  this->itsParset.makeSubset("Images."));
+            askap::synthesis::SynthesisParamsHelper::setUpImages(itsModel,
+                                      this->itsParset.makeSubset("Images."));
 
 
-        ASKAPLOG_INFO_STR(logger, "Current model held by the drop: "<<*itsModel);
+            ASKAPLOG_INFO_STR(logger, "Current model held by the drop: "<<*itsModel);
 
-        // lets build a gridder
+            // lets build a gridder
+            itsGridder = askap::synthesis::VisGridderFactory::make(this->itsParset);
 
-        askap::synthesis::IVisGridder::ShPtr itsGridder = askap::synthesis::VisGridderFactory::make(this->itsParset);
+            // NE
+            itsNe = askap::scimath::ImagingNormalEquations::ShPtr(new askap::scimath::ImagingNormalEquations(*itsModel));
 
-        // NE
-        askap::scimath::ImagingNormalEquations::ShPtr itsNe = askap::scimath::ImagingNormalEquations::ShPtr(new askap::scimath::ImagingNormalEquations(*itsModel));
-
-
-        safety.unlock();
+        }
 
         // I cant make the gridder smart funciton a member funtion as I cannot instantiate it until I have a parset.
 
         std::vector<std::string>::const_iterator iter = ms.begin();
 
         for (; iter != ms.end(); iter++) {
-            safety.lock();
+
+#ifndef ASKAP_PATCHED
+            std::lock_guard<std::mutex> guard(safety);
+#endif // ASKAP_PATCHED
+
             ASKAPLOG_INFO_STR(logger, "Processing " << *iter);
 
             accessors::TableDataSource ds(*iter, accessors::TableDataSource::DEFAULT, colName);
@@ -224,7 +232,6 @@ namespace askap {
 
             // lets dump out some images
             NEUtils::sendNE(itsNe, output("Normal"));
-            safety.unlock();
         }
 
         // I am going to assume a single Ne output - even though I am not

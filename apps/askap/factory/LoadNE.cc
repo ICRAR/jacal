@@ -111,8 +111,11 @@ namespace askap {
 
     int LoadNE::run() {
 
+#ifndef ASKAP_PATCHED
         static std::mutex safety;
-        safety.lock();
+        std::lock_guard<std::mutex> guard(safety);
+#endif // ASKAP_PATCHED
+
         // Lets get the key-value-parset
         ASKAP_LOGGER(logger, ".run");
 
@@ -126,7 +129,6 @@ namespace askap {
 
             ASKAPLOG_INFO_STR(logger,"Param name: " << *iter2);
         }
-        safety.unlock();
         return 0;
     }
 

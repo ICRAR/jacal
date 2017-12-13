@@ -114,7 +114,9 @@ namespace askap {
 
     int SolveNE::run() {
 
+#ifndef ASKAP_PATCHED
         static std::mutex safety;
+#endif // ASKAP_PATCHED
 
         // Lets get the key-value-parset
         ASKAP_LOGGER(logger, ".run");
@@ -140,16 +142,21 @@ namespace askap {
         // it is my job to fill it.
 
         this->itsModel.reset(new scimath::Params());
-        safety.lock();
-        askap::synthesis::SynthesisParamsHelper::setUpImages(itsModel,
+        {
+
+#ifndef ASKAP_PATCHED
+            std::lock_guard<std::mutex> guard(safety);
+#endif // ASKAP_PATCHED
+
+            askap::synthesis::SynthesisParamsHelper::setUpImages(itsModel,
                                   this->itsParset.makeSubset("Images."));
 
-        // Now we need to instantiate and initialise the solver from the parset
-        this->itsSolver = synthesis::ImageSolverFactory::make(this->itsParset);
+            // Now we need to instantiate and initialise the solver from the parset
+            this->itsSolver = synthesis::ImageSolverFactory::make(this->itsParset);
 
-        this->itsNe = askap::scimath::ImagingNormalEquations::ShPtr(new askap::scimath::ImagingNormalEquations());
+            this->itsNe = askap::scimath::ImagingNormalEquations::ShPtr(new askap::scimath::ImagingNormalEquations());
+        }
 
-        safety.unlock();
 
         NEUtils::receiveNE(itsNe, input("Normal"));
 
@@ -163,19 +170,23 @@ namespace askap {
         }
 
         // Now we need to instantiate and initialise the solver
-        safety.lock();
-        itsSolver->init();
-        itsSolver->addNormalEquations(*itsNe);
+        {
+#ifndef ASKAP_PATCHED
+            std::lock_guard<std::mutex> guard(safety);
+#endif // ASKAP_PATCHED
 
-        ASKAPLOG_INFO_STR(logger, "Solving Normal Equations");
-        askap::scimath::Quality q;
+            itsSolver->init();
+            itsSolver->addNormalEquations(*itsNe);
 
-        ASKAPDEBUGASSERT(itsModel);
-        itsSolver->solveNormalEquations(*itsModel, q);
-        ASKAPLOG_INFO_STR(logger, "Solved normal equations");
+            ASKAPLOG_INFO_STR(logger, "Solving Normal Equations");
+            askap::scimath::Quality q;
 
-        NEUtils::sendParams(itsModel, output("Model"));
-        safety.unlock();
+            ASKAPDEBUGASSERT(itsModel);
+            itsSolver->solveNormalEquations(*itsModel, q);
+            ASKAPLOG_INFO_STR(logger, "Solved normal equations");
+
+            NEUtils::sendParams(itsModel, output("Model"));
+        }
 
         return 0;
     }
