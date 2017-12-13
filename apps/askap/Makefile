@@ -59,10 +59,10 @@ OBJS = factory/DaliugeApplicationFactory.o \
 
 .PHONY: all clean
 
-all: libaskapsoft_dlg.so
+all: libaskapsoft_dlg.so standalone
 
 clean:
-	rm -f factory/*.o daliuge/*.o libaskapsoft_dlg.so
+	rm -f factory/*.o daliuge/*.o *.o *.so standalone
 
 libaskapsoft_dlg.so: $(OBJS)
 	$(CXX) -shared -o $@ $(OBJS) $(LDFLAGS)
