@@ -49,13 +49,24 @@ dlg_app_info *dummy_dlg_app(const std::string &input_file) {
 		return n;
 	};
 
+	// write method that writes nothing
+	auto _write = [](const char *buf, size_t n) -> size_t {
+		return n;
+	};
+
 	dlg_input_info *input = new dlg_input_info();
 	input->read = _read;
 	input->name = new char[7];
 	strcpy(input->name, "Parset");
+	dlg_output_info *output = new dlg_output_info();
+	output->write = _write;
+	output->name = new char[7];
+	strcpy(output->name, "Normal");
 	dlg_app_info *app = new dlg_app_info();
 	app->inputs = input;
 	app->n_inputs = 1;
+	app->outputs = output;
+	app->n_outputs = 1;
 	app->uid = new char[4];
 	app->oid = new char[4];
 	app->appname = new char[8];
