@@ -7,6 +7,7 @@
 
 // System includes
 #include<map>
+#include<mutex>
 
 // ASKAPsoft includes
 
@@ -66,6 +67,7 @@ namespace askap
 
 
     private:
+      static std::recursive_mutex registry_lock;
       static std::map<std::string, DaliugeApplicationCreator*> theirRegistry;
   }; // class
 

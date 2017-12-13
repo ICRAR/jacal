@@ -1,2 +1,4 @@
 *.o
 *.so
+factory/*.s
+standalone

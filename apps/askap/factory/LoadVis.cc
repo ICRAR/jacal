@@ -20,8 +20,8 @@ namespace askap {
 /// The version of the package
 #define ASKAP_PACKAGE_VERSION askap::getAskapPackageVersion_LoadVis()
 
-#include <iostream>
 #include <vector>
+#include <mutex>
 
 
 
@@ -74,47 +74,21 @@ namespace askap {
 
 namespace askap {
 
-	static std::once_flag init_logging_flag;
-	void init_logging() {
-		ASKAPLOG_INIT("");
-	}
-
     LoadVis::LoadVis(dlg_app_info *raw_app) :
         DaliugeApplication(raw_app)
     {
-        std::call_once(init_logging_flag, init_logging);
-        //ASKAP_LOGGER(locallogger,"\t LoadVis -  default contructor\n");
-        std::cout << "LoadVis -  constructor" << std::endl;
         this->itsModel.reset(new scimath::Params());
     }
 
-
     LoadVis::~LoadVis() {
-        //ASKAP_LOGGER(locallogger,"\t LoadVis -  default destructor\n");
-        std::cout << "LoadVis -  default destructor" << std::endl;
     }
 
     DaliugeApplication::ShPtr LoadVis::createDaliugeApplication(dlg_app_info *raw_app)
     {
-        // ASKAP_LOGGER(locallogger, ".create");
-        fprintf(stdout, "\tcreateDaliugeApplication - Instantiating LoadVis\n");
-        // ASKAPLOG_INFO_STR(locallogger,"createDaliugeApplication - Instantiating LoadVis");
-        LoadVis::ShPtr ptr;
-
-        // We need to pull all the parameters out of the parset - and set
-        // all the private variables required to define the beam
-
-
-        ptr.reset( new LoadVis(raw_app));
-
-        fprintf(stdout,"\t createDaliugeApplication - Created LoadVis DaliugeApplication instance\n");
-        return ptr;
-
+        return LoadVis::ShPtr(new LoadVis(raw_app));
     }
 
     int LoadVis::init(const char ***arguments) {
-
-        // std::cerr << "Hello World from init method" << std::endl;
 
         // Argument parsing is not working as yet
 
@@ -155,10 +129,18 @@ namespace askap {
 
     int LoadVis::run() {
 
+#ifndef ASKAP_PATCHED
+        static std::mutex safety;
+#endif // ASKAP_PATCHED
+
         // Lets get the key-value-parset
         ASKAP_LOGGER(logger, ".run");
         char buf[64*1024];
         size_t n_read = input(0).read(buf, 64*1024);
+        if (n_read == 64*1024) {
+            n_read--;
+        }
+        buf[n_read] = 0;
 
         LOFAR::ParameterSet parset(true);
         parset.adoptBuffer(buf);
@@ -178,27 +160,31 @@ namespace askap {
         vector<std::string> ms = this->getDatasets(this->itsParset);
 
         // Lets look at the model
+        askap::scimath::ImagingNormalEquations::ShPtr itsNe;
+        askap::synthesis::IVisGridder::ShPtr itsGridder;
+        {
+#ifndef ASKAP_PATCHED
+            std::lock_guard<std::mutex> guard(safety);
+#endif // ASKAP_PATCHED
 
-        ASKAPLOG_INFO_STR(logger, "Initializing the model images");
+            ASKAPLOG_INFO_STR(logger, "Initializing the model images");
 
             /// Create the specified images from the definition in the
             /// parameter set. We can solve for any number of images
             /// at once (but you may/will run out of memory!)
-        askap::synthesis::SynthesisParamsHelper::setUpImages(itsModel,
-                                  this->itsParset.makeSubset("Images."));
+            askap::synthesis::SynthesisParamsHelper::setUpImages(itsModel,
+                                      this->itsParset.makeSubset("Images."));
 
 
-        ASKAPLOG_INFO_STR(logger, "Current model held by the drop: "<<*itsModel);
+            ASKAPLOG_INFO_STR(logger, "Current model held by the drop: "<<*itsModel);
 
-        // lets build a gridder
+            // lets build a gridder
+            itsGridder = askap::synthesis::VisGridderFactory::make(this->itsParset);
 
-        askap::synthesis::IVisGridder::ShPtr itsGridder = askap::synthesis::VisGridderFactory::make(this->itsParset);
+            // NE
+            itsNe = askap::scimath::ImagingNormalEquations::ShPtr(new askap::scimath::ImagingNormalEquations(*itsModel));
 
-        // NE
-        askap::scimath::ImagingNormalEquations::ShPtr itsNe = askap::scimath::ImagingNormalEquations::ShPtr(new askap::scimath::ImagingNormalEquations(*itsModel));
-
-
-
+        }
 
         // I cant make the gridder smart funciton a member funtion as I cannot instantiate it until I have a parset.
 
@@ -206,7 +192,11 @@ namespace askap {
 
         for (; iter != ms.end(); iter++) {
 
-            std::cout << "Processing " << *iter << std::endl;
+#ifndef ASKAP_PATCHED
+            std::lock_guard<std::mutex> guard(safety);
+#endif // ASKAP_PATCHED
+
+            ASKAPLOG_INFO_STR(logger, "Processing " << *iter);
 
             accessors::TableDataSource ds(*iter, accessors::TableDataSource::DEFAULT, colName);
 
@@ -242,7 +232,6 @@ namespace askap {
 
             // lets dump out some images
             NEUtils::sendNE(itsNe, output("Normal"));
-
         }
 
         // I am going to assume a single Ne output - even though I am not

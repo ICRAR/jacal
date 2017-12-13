@@ -22,7 +22,6 @@ namespace askap {
 /// The version of the package
 #define ASKAP_PACKAGE_VERSION askap::getAskapPackageVersion_NEUtils()
 
-#include <iostream>
 #include <vector>
 
 
@@ -145,6 +144,8 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
 
       // these parameters can be set globally or individually
 
+      ASKAP_LOGGER(logger, ".addMissingParameters")
+
       bool cellsizeNeeded = false;
       bool shapeNeeded = false;
       bool directionNeeded = true;
@@ -217,13 +218,13 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
           param = "Images."+imageNames[img]+".nterms"; // if nterms is set, store it for later
           if (parset.isDefined(param)) {
               if ((nTerms>1) && (nTerms!=parset.getInt(param))) {
-                std::cerr << "Imaging with different nterms may not work" << std::endl;
+                ASKAPLOG_WARN_STR(logger, "Imaging with different nterms may not work");
               }
               nTerms = parset.getInt(param);
           }
           param = "Images."+imageNames[img]+".nchan";
           if ( !parset.isDefined(param)) {
-              std::cerr << "Param not found: " << param << std::endl;
+              ASKAPLOG_WARN_STR(logger, "Param not found: " << param);
           }
       }
 
@@ -231,8 +232,8 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
           param = "visweights"; // set to "MFS" if unset and nTerms > 1
           if (!parset.isDefined(param)) {
               std::ostringstream pstr;
-              pstr<<"MFS";
-              std::cout <<  "  Advising on parameter " << param <<": " << pstr.str().c_str() << std::endl;
+              pstr << "MFS";
+              ASKAPLOG_INFO_STR(logger, "Advising on parameter " << param <<": " << pstr.str().c_str());
               parset.add(param, pstr.str().c_str());
           }
 
@@ -253,7 +254,8 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
       } else if ( shapeNeeded && !parset.isDefined("Images.shape") ) {
 
       }
-      std::cout << "Done adding missing params " << std::endl;
+
+      ASKAPLOG_DEBUG_STR(logger, "Done adding missing params");
 
       return parset;
   }
@@ -294,8 +296,6 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
     boost::cmatch what;
 
     for (int i = 0; i < app->n_inputs; i++) {
-        std::cout << "Input " << i << " UID: " << app->inputs[i].uid << " OID: " << app->inputs[i].oid << std::endl;
-        std::cout << "Appname:" << app->inputs[i].name << std::endl;
         if (boost::regex_search(app->inputs[i].name, what, exp1)) {
            return i;
         }
@@ -311,8 +311,6 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
     boost::cmatch what;
 
     for (int i = 0; i < app->n_outputs; i++) {
-        std::cout << "Output " << i << " UID: " << app->inputs[i].uid << " OID: " << app->inputs[i].oid << std::endl;
-        std::cout << "Appname:" << app->outputs[i].name << std::endl;
         if (boost::regex_search(app->outputs[i].name, what, exp1)) {
            return i;
         }

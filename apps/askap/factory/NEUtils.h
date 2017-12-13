@@ -36,10 +36,8 @@ namespace askap {
 
 
 
-        NEUtils() { std::cout << "NEUtils default constructor - not expecting this to ever be called"
-                              << std::endl;} ;
-        ~NEUtils() { std::cout << "NEUtils default destructor - not expecting this to ever be called"
-                              << std::endl;};
+        NEUtils() = delete;
+        ~NEUtils() = delete;
 
         // gets an NE from an app input and puts it into the ShPtr
         static void receiveNE(askap::scimath::ImagingNormalEquations::ShPtr, dlg_input_info &input);

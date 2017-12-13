@@ -22,8 +22,8 @@ namespace askap {
 /// The version of the package
 #define ASKAP_PACKAGE_VERSION askap::getAskapPackageVersion_SolveNE()
 
-#include <iostream>
 #include <vector>
+#include <mutex>
 
 
 
@@ -84,34 +84,17 @@ namespace askap {
     SolveNE::SolveNE(dlg_app_info *raw_app) :
         DaliugeApplication(raw_app)
     {
-        //ASKAP_LOGGER(locallogger,"\t SolveNE -  default contructor\n");
-        std::cout << "SolveNE -  constructor" << std::endl;
-
     }
 
 
     SolveNE::~SolveNE() {
-        //ASKAP_LOGGER(locallogger,"\t SolveNE -  default destructor\n");
-        std::cout << "SolveNE -  default destructor" << std::endl;
     }
 
     DaliugeApplication::ShPtr SolveNE::createDaliugeApplication(dlg_app_info *raw_app)
     {
-        // ASKAP_LOGGER(locallogger, ".create");
-        std::cout << "createDaliugeApplication - Instantiating SolveNE" << std::endl;
-        // ASKAPLOG_INFO_STR(locallogger,"createDaliugeApplication - Instantiating SolveNE");
-        SolveNE::ShPtr ptr;
-
-        // We need to pull all the parameters out of the parset - and set
-        // all the private variables required to define the beam
-
-
-        ptr.reset( new SolveNE(raw_app));
-
-        std::cout << "createDaliugeApplication - Created SolveNE DaliugeApplication instance " << std::endl;
-        return ptr;
-
+        return SolveNE::ShPtr(new SolveNE(raw_app));
     }
+
     int SolveNE::init(const char ***arguments) {
 
         while (1) {
@@ -131,8 +114,11 @@ namespace askap {
 
     int SolveNE::run() {
 
+#ifndef ASKAP_PATCHED
+        static std::mutex safety;
+#endif // ASKAP_PATCHED
+
         // Lets get the key-value-parset
-        // ASKAPLOG_INIT("");
         ASKAP_LOGGER(logger, ".run");
 
         // lets open the input and read it
@@ -156,14 +142,21 @@ namespace askap {
         // it is my job to fill it.
 
         this->itsModel.reset(new scimath::Params());
+        {
 
-        askap::synthesis::SynthesisParamsHelper::setUpImages(itsModel,
+#ifndef ASKAP_PATCHED
+            std::lock_guard<std::mutex> guard(safety);
+#endif // ASKAP_PATCHED
+
+            askap::synthesis::SynthesisParamsHelper::setUpImages(itsModel,
                                   this->itsParset.makeSubset("Images."));
 
-        // Now we need to instantiate and initialise the solver from the parset
-        this->itsSolver = synthesis::ImageSolverFactory::make(this->itsParset);
+            // Now we need to instantiate and initialise the solver from the parset
+            this->itsSolver = synthesis::ImageSolverFactory::make(this->itsParset);
 
-        this->itsNe = askap::scimath::ImagingNormalEquations::ShPtr(new askap::scimath::ImagingNormalEquations());
+            this->itsNe = askap::scimath::ImagingNormalEquations::ShPtr(new askap::scimath::ImagingNormalEquations());
+        }
+
 
         NEUtils::receiveNE(itsNe, input("Normal"));
 
@@ -177,17 +170,23 @@ namespace askap {
         }
 
         // Now we need to instantiate and initialise the solver
-        itsSolver->init();
-        itsSolver->addNormalEquations(*itsNe);
+        {
+#ifndef ASKAP_PATCHED
+            std::lock_guard<std::mutex> guard(safety);
+#endif // ASKAP_PATCHED
 
-        ASKAPLOG_INFO_STR(logger, "Solving Normal Equations");
-        askap::scimath::Quality q;
+            itsSolver->init();
+            itsSolver->addNormalEquations(*itsNe);
 
-        ASKAPDEBUGASSERT(itsModel);
-        itsSolver->solveNormalEquations(*itsModel, q);
-        ASKAPLOG_INFO_STR(logger, "Solved normal equations");
+            ASKAPLOG_INFO_STR(logger, "Solving Normal Equations");
+            askap::scimath::Quality q;
 
-        NEUtils::sendParams(itsModel, output("Model"));
+            ASKAPDEBUGASSERT(itsModel);
+            itsSolver->solveNormalEquations(*itsModel, q);
+            ASKAPLOG_INFO_STR(logger, "Solved normal equations");
+
+            NEUtils::sendParams(itsModel, output("Model"));
+        }
 
         return 0;
     }

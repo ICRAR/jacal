@@ -25,29 +25,15 @@ namespace askap {
     LoadParset::LoadParset(dlg_app_info *raw_app) :
         DaliugeApplication(raw_app)
     {
-        std::cout << "LoadParset -  contructor" << std::endl;
     }
 
 
     LoadParset::~LoadParset() {
-        std::cout << "LoadParset -  default destructor" << std::endl;
     }
 
     DaliugeApplication::ShPtr LoadParset::createDaliugeApplication(dlg_app_info *raw_app)
     {
-        std::cout << "createDaliugeApplication - Instantiating LoadParset" << std::endl;
-
-        LoadParset::ShPtr ptr;
-
-        // We need to pull all the parameters out of the parset - and set
-        // all the private variables required to define the beam
-
-
-        ptr.reset( new LoadParset(raw_app));
-
-        std::cout << "createDaliugeApplication - Created LoadParset DaliugeApplication instance" << std::endl;
-        return ptr;
-
+        return LoadParset::ShPtr(new LoadParset(raw_app));
     }
 
     int LoadParset::init(const char ***arguments) {
@@ -57,11 +43,7 @@ namespace askap {
 
     int LoadParset::run() {
 
-        // load the parset and print it out to the screen
-        // std::cerr << "Hello World from run method" << std::endl;
-    //    std::cout << *to_app_data(app)->parset << std::endl;
-
-    // lets open the input and read it
+        // lets open the input and read it
         char buf[64*1024];
         size_t n_read = input(0).read(buf, 64*1024);
 
@@ -69,8 +51,6 @@ namespace askap {
         parset.adoptBuffer(buf);
 
         // write it to the outputs
-        std::cout << parset << std::endl;
-
         for (int i = 0; i < n_outputs(); i++) {
             output(i).write(buf, n_read);
         }

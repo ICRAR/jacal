@@ -31,7 +31,6 @@
 #define ASKAP_DALIUGE_APPLICATION_H
 
 // System includes
-#include <iostream>
 #include <string>
 #include <sstream>
 #include <stdexcept>
@@ -66,9 +65,7 @@ namespace askap {
                 raw_dlg_app(app) {}
 
             /// Destructor
-            virtual ~DaliugeApplication() {
-                std::cout << "DaliugeApplication - default destructor" << std::endl;
-            }
+            virtual ~DaliugeApplication() {};
 
             /// This has to be static as we need to access it in the register even
             /// if there is not instantiated class.
