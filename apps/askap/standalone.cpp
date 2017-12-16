@@ -36,7 +36,7 @@ namespace askap {
 dlg_app_info *dummy_dlg_app(const std::string &input_file) {
 
 	std::ifstream in(input_file);
-	auto ss = std::ostringstream{};
+	std::ostringstream ss;
 	ss << in.rdbuf();
 	static thread_local auto contents = ss.str();
 
