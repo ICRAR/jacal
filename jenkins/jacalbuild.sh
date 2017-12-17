@@ -38,6 +38,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+source ${ASKAP_ROOT}/Code/Systems/rialto/init_package_env.sh
 make ASKAP_ROOT=${ASKAP_ROOT}
 
 if [ $? -ne 0 ]; then
