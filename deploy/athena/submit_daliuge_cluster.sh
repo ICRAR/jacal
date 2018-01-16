@@ -37,7 +37,6 @@ export LD_LIBRARY_PATH=$JACAL_LIB_PATH:$LD_LIBRARY_PATH
 #echo $LD_LIBRARY_PATH
 
 DALIUGE_SRC=/group/pawsey0245/cwu/daliuge
-JACAL_HOME=/group/pawsey0245/software/jacal
 LOG_ROOT=/group/pawsey0245/jacal_logs
 
 MYPYTHON=/group/pawsey0245/software/daliuge/bin/python
@@ -52,5 +51,6 @@ mkdir $LOG_DIR
 
 module load knl intel mvapich
 echo $LD_LIBRARY_PATH
+ulimit -c unlimited
 srun -n 3 -N 3 $MYPYTHON $MYCLUSTER -l $LOG_DIR -L $LG_GRAPH
 #dlg nm -v --no-dlm
