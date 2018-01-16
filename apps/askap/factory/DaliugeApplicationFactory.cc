@@ -8,8 +8,25 @@
 /// which one will be instantiated.
 ///
 
-// ASKAPsoft includes
+#include <string>
+#define ASKAP_PACKAGE_NAME "DaliugeApplicationFactory"
+/// askap namespace
+namespace askap {
+	/// @return version of the package
+    std::string getAskapPackageVersion_DaliugeApplicationFactory() {
+        return std::string("DaliugeApplicationFactory");
+    }
 
+} // namespace askap
+
+/// The version of the package
+#define ASKAP_PACKAGE_VERSION askap::getAskapPackageVersion_DaliugeApplicationFactory()
+#include <askap/AskapLogging.h>
+#include <askap/AskapError.h>
+
+
+
+// ASKAPsoft includes
 
 #include <askap/AskapError.h>
 #include <casacore/casa/OS/DynLib.h>        // for dynamic library loading
@@ -22,7 +39,7 @@
 #include <factory/DaliugeApplicationFactory.h>
 
 // Apps need to be here - or can we register them from Somewhere else
-#include <factory/Example.h>
+
 #include <factory/LoadParset.h>
 #include <factory/LoadVis.h>
 #include <factory/LoadNE.h>
@@ -35,6 +52,7 @@
 #include <mutex>
 #include <string>
 
+
 namespace askap {
 
 
@@ -42,6 +60,8 @@ namespace askap {
   std::map<std::string, DaliugeApplicationFactory::DaliugeApplicationCreator*>
   DaliugeApplicationFactory::theirRegistry;
 
+  // Define the registry lock
+  std::recursive_mutex DaliugeApplicationFactory::registry_lock;
 
   DaliugeApplicationFactory::DaliugeApplicationFactory() {
   }
@@ -49,13 +69,26 @@ namespace askap {
   void DaliugeApplicationFactory::registerDaliugeApplication (const std::string& name,
                                            DaliugeApplicationFactory::DaliugeApplicationCreator* creatorFunc)
   {
-    std::cout << "factory - Adding " << name.c_str() << " to the application registry" << std::endl;
-    theirRegistry[name] = creatorFunc;
+    ASKAP_LOGGER(logger, ".registerDaliugeApplication");
+    ASKAPLOG_INFO_STR(logger, "Adding " << name.c_str() << " to the application registry");
+    {
+        std::lock_guard<std::recursive_mutex> _(registry_lock);
+        theirRegistry[name] = creatorFunc;
+    }
   }
 
-  DaliugeApplication::ShPtr DaliugeApplicationFactory::createDaliugeApplication (const std::string& name)
+  DaliugeApplication::ShPtr DaliugeApplicationFactory::createDaliugeApplication (dlg_app_info *dlg_app)
   {
-    std::cout << "factory - Attempting to find " <<  name.c_str() << " in the registry" << std::endl;
+
+	ASKAP_LOGGER(logger, ".registerDaliugeApplication");
+	const std::string name = dlg_app->appname;
+
+	ASKAPLOG_INFO_STR(logger, "Attempting to find " <<  name << " in the registry");
+
+    // It's a kind-of-long operation, but who cares, let's try at least to be
+    // thread-safe
+    std::lock_guard<std::recursive_mutex> _(registry_lock);
+
     std::map<std::string,DaliugeApplicationCreator*>::const_iterator it = theirRegistry.find (name);
     if (it == theirRegistry.end()) {
       // Unknown Application. Try to load from a dynamic library
@@ -67,12 +100,12 @@ namespace askap {
       }
       // Try to load the dynamic library and execute its register function.
       // Do not dlclose the library.
-      std::cout << "factory - Application " << name.c_str() << " is not in the Daliuge Application registry, attempting to load it dynamically" << std::endl;
+      ASKAPLOG_INFO_STR(logger, "Application " << name.c_str() << " is not in the Daliuge Application registry, attempting to load it dynamically");
 
       casa::DynLib dl(libname, string("libaskap_"), "register_"+libname, false);
       if (dl.getHandle()) {
         // Successfully loaded. Get the creator function.
-        std::cout << "factory - Dynamically loaded ASKAP/Daliuge Application " << name.c_str() << std::endl;
+        ASKAPLOG_INFO_STR(logger, "Dynamically loaded ASKAP/Daliuge Application " << name.c_str());
         // the first thing the Application in the shared library is supposed to do is to
         // register itself. Therefore, its name will appear in the registry.
         it = theirRegistry.find (name);
@@ -82,17 +115,21 @@ namespace askap {
       ASKAPTHROW(AskapError, "factory - Unknown Application " << name);
     }
     // Execute the registered function.
-    return it->second(name);
+    return it->second(dlg_app);
   }
 
 
 static std::once_flag initial_population_called;
 void DaliugeApplicationFactory::initial_population() {
+
+	ASKAP_LOGGER(logger, ".initial_population");
+
+	std::lock_guard<std::recursive_mutex> _(registry_lock);
+
 	if (theirRegistry.size() == 0) {
 		// this is the first call of the method, we need to fill the registry with
 		// all pre-defined applications
-		std::cout << "factory - Filling the registry with predefined applications" << std::endl;
-		addPreDefinedDaliugeApplication<Example>();
+		ASKAPLOG_INFO_STR(logger, "Filling the registry with predefined applications");
 		addPreDefinedDaliugeApplication<LoadParset>();
 		addPreDefinedDaliugeApplication<LoadVis>();
 		addPreDefinedDaliugeApplication<LoadNE>();
@@ -102,15 +139,18 @@ void DaliugeApplicationFactory::initial_population() {
 	}
 }
 
-DaliugeApplication::ShPtr DaliugeApplicationFactory::make(const std::string &name) {
+static std::once_flag init_logging_flag;
+void init_logging() {
+	ASKAPLOG_INIT("");
+}
 
+DaliugeApplication::ShPtr DaliugeApplicationFactory::make(dlg_app_info *dlg_app) {
+
+	std::call_once(init_logging_flag, init_logging);
 	std::call_once(initial_population_called, initial_population);
 
     // buffer for the result
-    DaliugeApplication::ShPtr App;
-
-    App = createDaliugeApplication (name);
-
+    DaliugeApplication::ShPtr App = createDaliugeApplication(dlg_app);
     ASKAPASSERT(App); // if a App of that name is in the registry it will be here
 
     return App;

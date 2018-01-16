@@ -22,8 +22,9 @@ namespace askap {
 /// The version of the package
 #define ASKAP_PACKAGE_VERSION askap::getAskapPackageVersion_LoadNE()
 
-#include <iostream>
 #include <vector>
+#include <mutex>
+
 
 
 
@@ -75,40 +76,23 @@ namespace askap {
 namespace askap {
 
 
-  
 
-    LoadNE::LoadNE() {
-        //ASKAP_LOGGER(locallogger,"\t LoadNE -  default contructor\n");
-        std::cout << "LoadNE -  default constructor" << std::endl;
 
+    LoadNE::LoadNE(dlg_app_info *raw_app) :
+        DaliugeApplication(raw_app)
+    {
     }
 
 
     LoadNE::~LoadNE() {
-        //ASKAP_LOGGER(locallogger,"\t LoadNE -  default destructor\n");
-        std::cout << "LoadNE -  default destructor" << std::endl;
     }
 
-    DaliugeApplication::ShPtr LoadNE::createDaliugeApplication(const std::string &name)
+    DaliugeApplication::ShPtr LoadNE::createDaliugeApplication(dlg_app_info *raw_app)
     {
-        // ASKAP_LOGGER(locallogger, ".create");
-        std::cout << "createDaliugeApplication - Instantiating LoadNE" << std::endl;
-        // ASKAPLOG_INFO_STR(locallogger,"createDaliugeApplication - Instantiating LoadNE");
-        LoadNE::ShPtr ptr;
-
-        // We need to pull all the parameters out of the parset - and set
-        // all the private variables required to define the beam
-
-
-        ptr.reset( new LoadNE());
-
-        std::cout << "createDaliugeApplication - Created LoadNE DaliugeApplication instance " << std::endl;
-        return ptr;
-
+        return LoadNE::ShPtr(new LoadNE(raw_app));
     }
-    int LoadNE::init(dlg_app_info *app, const char ***arguments) {
 
-
+    int LoadNE::init(const char ***arguments) {
 
         while (1) {
 
@@ -122,24 +106,22 @@ namespace askap {
             arguments++;
         }
 
-        app->data = malloc(sizeof(struct app_data));
-        if (!app->data) {
-            return 1;
-        }
-
-
         return 0;
     }
 
-    int LoadNE::run(dlg_app_info *app) {
+    int LoadNE::run() {
+
+#ifndef ASKAP_PATCHED
+        static std::mutex safety;
+        std::lock_guard<std::mutex> guard(safety);
+#endif // ASKAP_PATCHED
 
         // Lets get the key-value-parset
-        ASKAPLOG_INIT("");
         ASKAP_LOGGER(logger, ".run");
 
         askap::scimath::ImagingNormalEquations::ShPtr itsNe = askap::scimath::ImagingNormalEquations::ShPtr(new askap::scimath::ImagingNormalEquations());
 
-        NEUtils::receiveNE(itsNe, app);
+        NEUtils::receiveNE(itsNe, input(0));
 
         std::vector<std::string> toFitParams = itsNe->unknowns();
         std::vector<std::string>::const_iterator iter2 = toFitParams.begin();
@@ -147,23 +129,16 @@ namespace askap {
 
             ASKAPLOG_INFO_STR(logger,"Param name: " << *iter2);
         }
-
         return 0;
     }
 
 
-    void LoadNE::data_written(dlg_app_info *app, const char *uid,
-        const char *data, size_t n) {
-
-        app->running();
-
+    void LoadNE::data_written(const char *uid, const char *data, size_t n) {
+        dlg_app_running();
     }
 
-    void LoadNE::drop_completed(dlg_app_info *app, const char *uid,
-            drop_status status) {
-
-        app->done(APP_FINISHED);
-        delete(to_app_data(app)->parset);
+    void LoadNE::drop_completed(const char *uid, drop_status status) {
+        dlg_app_done(APP_FINISHED);
     }
 
 

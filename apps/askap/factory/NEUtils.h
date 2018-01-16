@@ -21,22 +21,13 @@
 
 namespace askap {
 
-    struct app_data {
-      LOFAR::ParameterSet *parset;
-    };
-
-    static inline
-    struct app_data *to_app_data(dlg_app_info *app)
-    {
-      return (struct app_data *)app->data;
-    }
-
     static inline
     unsigned long usecs(struct timeval *start, struct timeval *end)
     {
       return (end->tv_sec - start->tv_sec) * 1000000 + (end->tv_usec - start->tv_usec);
     }
-
+    /// @brief A set of static utilities
+    /// @details These are just a set of static functions I use more than once
     class NEUtils
 
     {
@@ -45,20 +36,18 @@ namespace askap {
 
 
 
-        NEUtils() { std::cout << "NEUtils default constructor - not expecting this to ever be called"
-                              << std::endl;} ;
-        ~NEUtils() { std::cout << "NEUtils default destructor - not expecting this to ever be called"
-                              << std::endl;};
+        NEUtils() = delete;
+        ~NEUtils() = delete;
 
         // gets an NE from an app input and puts it into the ShPtr
-        static void receiveNE(askap::scimath::ImagingNormalEquations::ShPtr, dlg_app_info *app, int input=0);
+        static void receiveNE(askap::scimath::ImagingNormalEquations::ShPtr, dlg_input_info &input);
         // Same for Params
-        static void receiveParams(askap::scimath::Params::ShPtr, dlg_app_info *app, int input=0);
+        static void receiveParams(askap::scimath::Params::ShPtr, dlg_input_info &input);
         // Needs a sendNE
 
-        static void sendNE(askap::scimath::ImagingNormalEquations::ShPtr itsNe, dlg_app_info *app, int output=0);
+        static void sendNE(askap::scimath::ImagingNormalEquations::ShPtr itsNe, dlg_output_info &output);
 
-        static void sendParams(askap::scimath::Params::ShPtr params,dlg_app_info *app, int output=0);
+        static void sendParams(askap::scimath::Params::ShPtr params, dlg_output_info &output);
 
         // add parameters that may be missing from a configuration file
         static LOFAR::ParameterSet addMissingParameters(LOFAR::ParameterSet& parset);

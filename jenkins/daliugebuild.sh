@@ -14,8 +14,10 @@ fi
 cd $WORKSPACE
 
 if [[ $(hostname -s) = galaxy-? ]]; then
+    module load gcc/4.9.0
     module load python/2.7.10
     module load virtualenv
+
 fi
 
 mkdir ${WORKSPACE}/${ENVDIR}
@@ -42,7 +44,7 @@ fi
 
 #
 #
-pip install --trusted-host pypi.python.org ${WORKSPACE}/${TOPDIR}
+pip install --process-dependency-links --trusted-host pypi.python.org ${WORKSPACE}/${TOPDIR}
 
 if [ $? -ne 0 ]; then
     echo "Error: installation failed"

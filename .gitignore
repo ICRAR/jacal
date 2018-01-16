@@ -1,4 +1,4 @@
 .project
 apps/askap/.clang_complete
-
+docs
 *.swp

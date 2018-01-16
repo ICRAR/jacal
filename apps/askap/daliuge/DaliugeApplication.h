@@ -32,8 +32,12 @@
 
 // System includes
 #include <string>
+#include <sstream>
+#include <stdexcept>
+
 //ASKAPSoft includes
 #include <boost/shared_ptr.hpp>
+#include <boost/regex.hpp>
 // daliugue includes
 #include "dlg_app.h"
 
@@ -57,31 +61,120 @@ namespace askap {
             typedef boost::shared_ptr<DaliugeApplication> ShPtr;
 
             /// Constructor
-            DaliugeApplication();
+            DaliugeApplication(dlg_app_info *app) :
+                raw_dlg_app(app) {}
 
             /// Destructor
-            virtual ~DaliugeApplication();
+            virtual ~DaliugeApplication() {};
 
             /// This has to be static as we need to access it in the register even
             /// if there is not instantiated class.
 
-            static ShPtr createDaliugeApplication(const std::string& theAppName);
+            static ShPtr createDaliugeApplication(dlg_app_info *app);
 
+            // To be implemented by sub-classes
             /// This function is implemented by sub-classes. i.e. The users of
             /// this class.
 
+            virtual int init(const char ***arguments) = 0;
 
-            virtual int init(dlg_app_info *app, const char ***arguments) = 0;
+            virtual int run() = 0;
 
-            virtual int run(dlg_app_info *app) = 0;
+            virtual void data_written(const char *uid, const char *data, size_t n) = 0;
 
-            virtual void data_written(dlg_app_info *app, const char *uid,
-                const char *data, size_t n) = 0;
+            virtual void drop_completed(const char *uid, drop_status status) = 0;
 
-            virtual void drop_completed(dlg_app_info *app, const char *uid,
-                drop_status status) = 0 ;
+        protected:
 
+            void dlg_app_running() {
+                raw_dlg_app->running();
+            }
+
+            void dlg_app_done(app_status status) {
+                raw_dlg_app->done(status);
+            }
+
+            dlg_output_info &output(size_t i) {
+                return raw_dlg_app->outputs[i];
+            }
+
+            dlg_output_info &output(const std::string &tag) {
+
+                boost::regex exp1(tag);
+                boost::cmatch what;
+
+                for (auto i = 0; i < raw_dlg_app->n_outputs; i++) {
+                    if (boost::regex_search(raw_dlg_app->outputs[i].name, what, exp1)) {
+                        return raw_dlg_app->outputs[i];
+                    }
+                }
+
+                std::ostringstream os;
+                os << "No such output: " << tag;
+                throw std::runtime_error(os.str());
+            }
+
+            bool has_output(const std::string &tag) {
+
+                boost::regex exp1(tag);
+                boost::cmatch what;
+
+                for (auto i = 0; i < raw_dlg_app->n_outputs; i++) {
+                    if (boost::regex_search(raw_dlg_app->outputs[i].name, what, exp1)) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            dlg_input_info &input(size_t i) {
+                return raw_dlg_app->inputs[i];
+            }
+
+            dlg_input_info &input(const std::string &tag) {
+
+                boost::regex exp1(tag);
+                boost::cmatch what;
+
+                for (auto i = 0; i < raw_dlg_app->n_inputs; i++) {
+                    if (boost::regex_search(raw_dlg_app->inputs[i].name, what, exp1)) {
+                        return raw_dlg_app->inputs[i];
+                    }
+                }
+
+                std::ostringstream os;
+                os << "No such input: " << tag;
+                throw std::runtime_error(os.str());
+            }
+
+            bool has_input(const std::string &tag) {
+
+                boost::regex exp1(tag);
+                boost::cmatch what;
+
+                for (auto i = 0; i < raw_dlg_app->n_inputs; i++) {
+                    if (boost::regex_search(raw_dlg_app->inputs[i].name, what, exp1)) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            unsigned int n_outputs() {
+                return raw_dlg_app->n_outputs;
+            }
+
+            unsigned int n_inputs() {
+                return raw_dlg_app->n_inputs;
+            }
+
+        private:
+            dlg_app_info *raw_dlg_app;
     };
+
+
 
 } // End namespace askap
 

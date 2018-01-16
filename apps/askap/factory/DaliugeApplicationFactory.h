@@ -1,7 +1,5 @@
-/// @file PrimaryBeamFactory.h
-///
-/// @details
-/// PrimaryBeamFactory: Factory class for Primary Beam Responses
+/// @file DaliugeApplicationFactory.h
+/// @brief A Factory class for Daliuge Applications
 
 
 #ifndef ASKAP_DALIUGE_APPLICATION_FACTORY_H_
@@ -9,6 +7,7 @@
 
 // System includes
 #include<map>
+#include<mutex>
 
 // ASKAPsoft includes
 
@@ -35,7 +34,7 @@ namespace askap
       /// a shared_pointer to a DaliugeApplication and they take
       /// an Application Name
 
-      typedef DaliugeApplication::ShPtr DaliugeApplicationCreator(const std::string& name);
+      typedef DaliugeApplication::ShPtr DaliugeApplicationCreator(dlg_app_info *dlg_app);
 
       /// @brief Register a function creating a DaliugeApplication object.
       /// @param name The name of the DaliugeApplication.
@@ -45,16 +44,16 @@ namespace askap
 
       /// @brief Try to create a non-standard DaliugeApplication.
       /// Its name is looked up in the creator function registry.
-      /// If the gridder name is unknown, a shared library with that name
+      /// If the drop name is unknown, a shared library with that name
       /// (in lowercase) is loaded and it executes its register<name>
       /// function which must register its creator function in the registry
-      /// using function registerPrimaryBeam.
+      /// using function registerDaliugeApplication.
       /// @param name The name function
       ///
 
-      static DaliugeApplication::ShPtr createDaliugeApplication (const std::string& name);
+      static DaliugeApplication::ShPtr createDaliugeApplication (dlg_app_info *dlg_app);
 
-      static DaliugeApplication::ShPtr make(const std::string &name);
+      static DaliugeApplication::ShPtr make(dlg_app_info *dlg_app);
 
       static void initial_population();
 
@@ -68,6 +67,7 @@ namespace askap
 
 
     private:
+      static std::recursive_mutex registry_lock;
       static std::map<std::string, DaliugeApplicationCreator*> theirRegistry;
   }; // class
 

@@ -20,9 +20,8 @@ namespace askap {
 /// The version of the package
 #define ASKAP_PACKAGE_VERSION askap::getAskapPackageVersion_CalcNE()
 
-#include <iostream>
 #include <vector>
-
+#include <mutex>
 
 
 #include <daliuge/DaliugeApplication.h>
@@ -73,38 +72,22 @@ namespace askap {
 
 namespace askap {
 
-    CalcNE::CalcNE() {
-        //ASKAP_LOGGER(locallogger,"\t CalcNE -  default contructor\n");
-        std::cout << "CalcNE -  default constructor" << std::endl;
+    CalcNE::CalcNE(dlg_app_info *raw_app) :
+        DaliugeApplication(raw_app)
+    {
         this->itsModel.reset(new scimath::Params());
     }
 
 
     CalcNE::~CalcNE() {
-        //ASKAP_LOGGER(locallogger,"\t CalcNE -  default destructor\n");
-        std::cout << "CalcNE -  default destructor" << std::endl;
     }
 
-    DaliugeApplication::ShPtr CalcNE::createDaliugeApplication(const std::string &name)
+    DaliugeApplication::ShPtr CalcNE::createDaliugeApplication(dlg_app_info *raw_app)
     {
-        // ASKAP_LOGGER(locallogger, ".create");
-        fprintf(stdout, "\tcreateDaliugeApplication - Instantiating CalcNE\n");
-        // ASKAPLOG_INFO_STR(locallogger,"createDaliugeApplication - Instantiating CalcNE");
-        CalcNE::ShPtr ptr;
-
-        // We need to pull all the parameters out of the parset - and set
-        // all the private variables required to define the beam
-
-
-        ptr.reset( new CalcNE());
-
-        fprintf(stdout,"\t createDaliugeApplication - Created CalcNE DaliugeApplication instance\n");
-        return ptr;
-
+        return CalcNE::ShPtr(new CalcNE(raw_app));
     }
-    int CalcNE::init(dlg_app_info *app, const char ***arguments) {
 
-        // std::cerr << "Hello World from init method" << std::endl;
+    int CalcNE::init(const char ***arguments) {
 
         // Argument parsing is not working as yet
 
@@ -127,10 +110,6 @@ namespace askap {
             arguments++;
         }
 
-        app->data = malloc(sizeof(struct app_data));
-        if (!app->data) {
-            return 1;
-        }
         //  FIXME:
         //    This should be here but I could not get a boost smart pointer to work
         //    to_app_data(app)->parset.reset( new LOFAR::ParameterSet(parset_filename));
@@ -147,31 +126,30 @@ namespace askap {
         return 0;
     }
 
-    int CalcNE::run(dlg_app_info *app) {
+    int CalcNE::run() {
 
-      
+
+#ifndef ASKAP_PATCHED
+        static std::mutex safety;
+#endif // ASKAP_PATCHED
+
         // Lets get the key-value-parset
-        ASKAPLOG_INIT("");
         ASKAP_LOGGER(logger, ".run");
         char buf[64*1024];
 
-        int config = NEUtils::getInput(app,"Config");
+        size_t n_read = input("Config").read(buf, 64*1024);
 
-        // not throwing the exceptions properly fix this
-        if (config < 0) {
-          return -1;
-        }
+        LOFAR::ParameterSet parset(true);
+        parset.adoptBuffer(buf);
 
-        size_t n_read = app->inputs[config].read(buf, 64*1024);
-
-        to_app_data(app)->parset = new LOFAR::ParameterSet(true);
-        to_app_data(app)->parset->adoptBuffer(buf);
-
-        this->itsParset = to_app_data(app)->parset->makeSubset("Cimager.");
+        this->itsParset = parset.makeSubset("Cimager.");
 
         // we need to fill the local parset with parameters that maybe missing
         //
         try {
+#ifndef ASKAP_PATCHED
+            std::lock_guard<std::mutex> guard(safety);
+#endif // ASKAP_PATCHED
             this->itsParset = NEUtils::addMissingParameters(this->itsParset);
         }
         catch (std::runtime_error)
@@ -183,40 +161,52 @@ namespace askap {
 
         // Do we have a model?
         // this differentiates between the first and subsequent cycles
-        int model = NEUtils::getInput(app,"Model");
+        auto has_model = has_input("Model");
 
-        if (model >= 0) {
-          NEUtils::receiveParams(itsModel,app,model);
+        if (has_model) {
+          NEUtils::receiveParams(itsModel, input("Model"));
         }
         else {
 
-
+#ifndef ASKAP_PATCHED
+          std::lock_guard<std::mutex> guard(safety);
+#endif // ASKAP_PATCHED
           ASKAPLOG_INFO_STR(logger, "Initializing the model images");
 
             // Create the specified images from the definition in the
             // parameter set. We can solve for any number of images
             // at once (but you may/will run out of memory!)
+
           askap::synthesis::SynthesisParamsHelper::setUpImages(itsModel,
                                   this->itsParset.makeSubset("Images."));
-
         }
 
         ASKAPLOG_INFO_STR(logger, "Current model held by the drop: "<<*itsModel);
 
         // lets build a gridder
+        askap::synthesis::IVisGridder::ShPtr itsGridder;
+        askap::scimath::ImagingNormalEquations::ShPtr itsNe;
+        {
+#ifndef ASKAP_PATCHED
+          std::lock_guard<std::mutex> guard(safety);
+#endif // ASKAP_PATCHED
+          itsGridder = askap::synthesis::VisGridderFactory::make(this->itsParset);
 
-        askap::synthesis::IVisGridder::ShPtr itsGridder = askap::synthesis::VisGridderFactory::make(this->itsParset);
-
-        // NE
-        askap::scimath::ImagingNormalEquations::ShPtr itsNe = askap::scimath::ImagingNormalEquations::ShPtr(new askap::scimath::ImagingNormalEquations(*itsModel));
+          // NE
+          itsNe = askap::scimath::ImagingNormalEquations::ShPtr(new askap::scimath::ImagingNormalEquations(*itsModel));
+        }
 
         // I cant make the gridder smart funciton a member funtion as I cannot instantiate it until I have a parset.
 
         std::vector<std::string>::const_iterator iter = ms.begin();
 
-        for (; iter != ms.end(); iter++) {
 
-            std::cout << "Processing " << *iter << std::endl;
+
+        for (; iter != ms.end(); iter++) {
+#ifndef ASKAP_PATCHED
+            std::lock_guard<std::mutex> guard(safety);
+#endif // ASKAP_PATCHED
+            ASKAPLOG_INFO_STR(logger, "Processing " << *iter);
 
             accessors::TableDataSource ds(*iter, accessors::TableDataSource::DEFAULT, colName);
 
@@ -252,9 +242,7 @@ namespace askap {
 
             // lets dump out some images
 
-            int NEOut = NEUtils::getOutput(app,"Normal");
-            NEUtils::sendNE(itsNe, app, NEOut);
-
+            NEUtils::sendNE(itsNe, output("Normal"));
 
         }
 
@@ -268,18 +256,12 @@ namespace askap {
     }
 
 
-    void CalcNE::data_written(dlg_app_info *app, const char *uid,
-        const char *data, size_t n) {
-
-        app->running();
-
+    void CalcNE::data_written(const char *uid, const char *data, size_t n) {
+        dlg_app_running();
     }
 
-    void CalcNE::drop_completed(dlg_app_info *app, const char *uid,
-            drop_status status) {
-
-        app->done(APP_FINISHED);
-        delete(to_app_data(app)->parset);
+    void CalcNE::drop_completed(const char *uid, drop_status status) {
+        dlg_app_done(APP_FINISHED);
     }
 
 

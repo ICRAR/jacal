@@ -20,8 +20,8 @@ namespace askap {
 /// The version of the package
 #define ASKAP_PACKAGE_VERSION askap::getAskapPackageVersion_LoadVis()
 
-#include <iostream>
 #include <vector>
+#include <mutex>
 
 
 
@@ -74,44 +74,21 @@ namespace askap {
 
 namespace askap {
 
-	static std::once_flag init_logging_flag;
-	void init_logging() {
-		ASKAPLOG_INIT("");
-	}
-
-    LoadVis::LoadVis() {
-        std::call_once(init_logging_flag, init_logging);
-        //ASKAP_LOGGER(locallogger,"\t LoadVis -  default contructor\n");
-        std::cout << "LoadVis -  default constructor" << std::endl;
+    LoadVis::LoadVis(dlg_app_info *raw_app) :
+        DaliugeApplication(raw_app)
+    {
         this->itsModel.reset(new scimath::Params());
     }
 
-
     LoadVis::~LoadVis() {
-        //ASKAP_LOGGER(locallogger,"\t LoadVis -  default destructor\n");
-        std::cout << "LoadVis -  default destructor" << std::endl;
     }
 
-    DaliugeApplication::ShPtr LoadVis::createDaliugeApplication(const std::string &name)
+    DaliugeApplication::ShPtr LoadVis::createDaliugeApplication(dlg_app_info *raw_app)
     {
-        // ASKAP_LOGGER(locallogger, ".create");
-        fprintf(stdout, "\tcreateDaliugeApplication - Instantiating LoadVis\n");
-        // ASKAPLOG_INFO_STR(locallogger,"createDaliugeApplication - Instantiating LoadVis");
-        LoadVis::ShPtr ptr;
-
-        // We need to pull all the parameters out of the parset - and set
-        // all the private variables required to define the beam
-
-
-        ptr.reset( new LoadVis());
-
-        fprintf(stdout,"\t createDaliugeApplication - Created LoadVis DaliugeApplication instance\n");
-        return ptr;
-
+        return LoadVis::ShPtr(new LoadVis(raw_app));
     }
-    int LoadVis::init(dlg_app_info *app, const char ***arguments) {
 
-        // std::cerr << "Hello World from init method" << std::endl;
+    int LoadVis::init(const char ***arguments) {
 
         // Argument parsing is not working as yet
 
@@ -134,10 +111,6 @@ namespace askap {
             arguments++;
         }
 
-        app->data = malloc(sizeof(struct app_data));
-        if (!app->data) {
-            return 1;
-        }
         //  FIXME:
         //    This should be here but I could not get a boost smart pointer to work
         //    to_app_data(app)->parset.reset( new LOFAR::ParameterSet(parset_filename));
@@ -154,17 +127,25 @@ namespace askap {
         return 0;
     }
 
-    int LoadVis::run(dlg_app_info *app) {
+    int LoadVis::run() {
+
+#ifndef ASKAP_PATCHED
+        static std::mutex safety;
+#endif // ASKAP_PATCHED
 
         // Lets get the key-value-parset
         ASKAP_LOGGER(logger, ".run");
         char buf[64*1024];
-        size_t n_read = app->inputs[0].read(buf, 64*1024);
+        size_t n_read = input(0).read(buf, 64*1024);
+        if (n_read == 64*1024) {
+            n_read--;
+        }
+        buf[n_read] = 0;
 
-        to_app_data(app)->parset = new LOFAR::ParameterSet(true);
-        to_app_data(app)->parset->adoptBuffer(buf);
+        LOFAR::ParameterSet parset(true);
+        parset.adoptBuffer(buf);
 
-        this->itsParset = to_app_data(app)->parset->makeSubset("Cimager.");
+        this->itsParset = parset.makeSubset("Cimager.");
 
         // we need to fill the local parset with parameters that maybe missing
         //
@@ -179,27 +160,31 @@ namespace askap {
         vector<std::string> ms = this->getDatasets(this->itsParset);
 
         // Lets look at the model
+        askap::scimath::ImagingNormalEquations::ShPtr itsNe;
+        askap::synthesis::IVisGridder::ShPtr itsGridder;
+        {
+#ifndef ASKAP_PATCHED
+            std::lock_guard<std::mutex> guard(safety);
+#endif // ASKAP_PATCHED
 
-        ASKAPLOG_INFO_STR(logger, "Initializing the model images");
+            ASKAPLOG_INFO_STR(logger, "Initializing the model images");
 
             /// Create the specified images from the definition in the
             /// parameter set. We can solve for any number of images
             /// at once (but you may/will run out of memory!)
-        askap::synthesis::SynthesisParamsHelper::setUpImages(itsModel,
-                                  this->itsParset.makeSubset("Images."));
+            askap::synthesis::SynthesisParamsHelper::setUpImages(itsModel,
+                                      this->itsParset.makeSubset("Images."));
 
 
-        ASKAPLOG_INFO_STR(logger, "Current model held by the drop: "<<*itsModel);
+            ASKAPLOG_INFO_STR(logger, "Current model held by the drop: "<<*itsModel);
 
-        // lets build a gridder
+            // lets build a gridder
+            itsGridder = askap::synthesis::VisGridderFactory::make(this->itsParset);
 
-        askap::synthesis::IVisGridder::ShPtr itsGridder = askap::synthesis::VisGridderFactory::make(this->itsParset);
+            // NE
+            itsNe = askap::scimath::ImagingNormalEquations::ShPtr(new askap::scimath::ImagingNormalEquations(*itsModel));
 
-        // NE
-        askap::scimath::ImagingNormalEquations::ShPtr itsNe = askap::scimath::ImagingNormalEquations::ShPtr(new askap::scimath::ImagingNormalEquations(*itsModel));
-
-
-
+        }
 
         // I cant make the gridder smart funciton a member funtion as I cannot instantiate it until I have a parset.
 
@@ -207,7 +192,11 @@ namespace askap {
 
         for (; iter != ms.end(); iter++) {
 
-            std::cout << "Processing " << *iter << std::endl;
+#ifndef ASKAP_PATCHED
+            std::lock_guard<std::mutex> guard(safety);
+#endif // ASKAP_PATCHED
+
+            ASKAPLOG_INFO_STR(logger, "Processing " << *iter);
 
             accessors::TableDataSource ds(*iter, accessors::TableDataSource::DEFAULT, colName);
 
@@ -242,14 +231,7 @@ namespace askap {
             itsEquation->calcEquations(*itsNe);
 
             // lets dump out some images
-
-            int NEOut = NEUtils::getOutput(app,"Normal");
-            if (NEOut == -1) {
-                ASKAPLOG_ERROR_STR(logger, "No 'Normal' output found in graph, cannot write NE");
-                return 1;
-            }
-            NEUtils::sendNE(itsNe, app, NEOut);
-
+            NEUtils::sendNE(itsNe, output("Normal"));
         }
 
         // I am going to assume a single Ne output - even though I am not
@@ -263,19 +245,15 @@ namespace askap {
     }
 
 
-    void LoadVis::data_written(dlg_app_info *app, const char *uid,
-        const char *data, size_t n) {
-
-        app->running();
-
+    void LoadVis::data_written(const char *uid, const char *data, size_t n) {
+        dlg_app_running();
     }
 
-    void LoadVis::drop_completed(dlg_app_info *app, const char *uid,
-            drop_status status) {
+    void LoadVis::drop_completed(const char *uid, drop_status status) {
 
-        app->done(APP_FINISHED);
-        delete(to_app_data(app)->parset);
+        dlg_app_done(APP_FINISHED);
     }
+
     std::vector<std::string> LoadVis::getDatasets(const LOFAR::ParameterSet& parset)
     {
         if (parset.isDefined("dataset") && parset.isDefined("dataset0")) {

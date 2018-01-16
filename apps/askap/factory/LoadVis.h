@@ -25,7 +25,8 @@
 
 
 namespace askap {
-
+  /// @brief Loads visibility set
+  /// @details Loads a configuration from a file drop and a visibility set from a CASA::Measurement Set
     class LoadVis : public DaliugeApplication
 
     {
@@ -34,23 +35,21 @@ namespace askap {
 
         typedef boost::shared_ptr<LoadVis> ShPtr;
 
-        LoadVis();
+        LoadVis(dlg_app_info *raw_app);
 
         static inline std::string ApplicationName() { return "LoadVis";}
 
         virtual ~LoadVis();
 
-        static DaliugeApplication::ShPtr createDaliugeApplication(const std::string &name);
+        static DaliugeApplication::ShPtr createDaliugeApplication(dlg_app_info *raw_app);
 
-        virtual int init(dlg_app_info *app, const char ***arguments);
+        virtual int init(const char ***arguments);
 
-        virtual int run(dlg_app_info *app);
+        virtual int run();
 
-        virtual void data_written(dlg_app_info *app, const char *uid,
-            const char *data, size_t n);
+        virtual void data_written(const char *uid, const char *data, size_t n);
 
-        virtual void drop_completed(dlg_app_info *app, const char *uid,
-            drop_status status);
+        virtual void drop_completed(const char *uid, drop_status status);
 
         static std::vector<std::string> getDatasets(const LOFAR::ParameterSet& parset);
 

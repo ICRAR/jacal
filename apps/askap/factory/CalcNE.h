@@ -1,8 +1,8 @@
-/// @file LoadVis.h
-
+/// @file CalcNE.h
 /// @brief Load a CASA Measurement Set in the DaliugeApplication Framework
 /// @details We will build on the LoadParset structure - but use the contents
-/// of the parset to load a measurement set.
+/// of the parset to load a measurement set. This also understands the concept of
+/// a model and can form residual images
 
 
 
@@ -38,23 +38,21 @@ namespace askap {
 
         typedef boost::shared_ptr<CalcNE> ShPtr;
 
-        CalcNE();
+        CalcNE(dlg_app_info *raw_app);
 
         static inline std::string ApplicationName() { return "CalcNE";}
 
         virtual ~CalcNE();
 
-        static DaliugeApplication::ShPtr createDaliugeApplication(const std::string &name);
+        static DaliugeApplication::ShPtr createDaliugeApplication(dlg_app_info *raw_app);
 
-        virtual int init(dlg_app_info *app, const char ***arguments);
+        virtual int init(const char ***arguments);
 
-        virtual int run(dlg_app_info *app);
+        virtual int run();
 
-        virtual void data_written(dlg_app_info *app, const char *uid,
-            const char *data, size_t n);
+        virtual void data_written(const char *uid, const char *data, size_t n);
 
-        virtual void drop_completed(dlg_app_info *app, const char *uid,
-            drop_status status);
+        virtual void drop_completed(const char *uid, drop_status status);
 
 
 

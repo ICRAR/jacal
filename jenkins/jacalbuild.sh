@@ -12,6 +12,7 @@ fi
 # test are we on galaxy
 
 if [[ $(hostname -s) = galaxy-? ]]; then
+    module load gcc/4.9.0
     module load python/2.7.10
     module load virtualenv
 fi
@@ -37,6 +38,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+source ${ASKAP_ROOT}/Code/Systems/rialto/init_package_env.sh
 make ASKAP_ROOT=${ASKAP_ROOT}
 
 if [ $? -ne 0 ]; then
