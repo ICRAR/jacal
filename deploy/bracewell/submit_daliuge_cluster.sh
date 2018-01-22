@@ -1,11 +1,9 @@
-#!/bin/bash --login
-#SBATCH   --partition=knlq
+#!/bin/bash
 #SBATCH   --job-name=Daliuge-Jacal-Test
 #SBATCH   --nodes=3
 #SBATCH   --ntasks-per-node=1
 #SBATCH   --time=01:00:00
-#SBATCH   --account=pawsey0245
-
+#SBATCH   --mem=100g
 
 # run this for the first time
 #pip install mpi4py
@@ -50,6 +48,6 @@ mkdir $LOG_DIR
 
 module load openmpi
 echo $LD_LIBRARY_PATH
-ulimit -c unlimited
-mpirun -n 3 -N 3 $MYPYTHON $MYCLUSTER -l $LOG_DIR -L $LG_GRAPH
+#ulimit -c unlimited
+mpirun -np 3 $MYPYTHON $MYCLUSTER -l $LOG_DIR -L $LG_GRAPH
 #dlg nm -v --no-dlm
