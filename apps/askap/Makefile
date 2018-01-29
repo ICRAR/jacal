@@ -30,7 +30,8 @@ ASKAP_INCDIRS = -I$(ASKAP_ROOT)/3rdParty/log4cxx/log4cxx-0.10.0/install/include 
                 -I$(ASKAP_ROOT)/Code/Base/accessors/current/install/include \
                 -I$(ASKAP_ROOT)/Code/Base/askapparallel/current/install/include \
                 -I$(ASKAP_ROOT)/Code/Base/scimath/current/install/include \
-                -I$(ASKAP_ROOT)/Code/Components/Synthesis/synthesis/current/install/include
+                -I$(ASKAP_ROOT)/Code/Components/Synthesis/synthesis/current/install/include \
+                -I$(ASKAP_ROOT)/Code/Components/CP/askap_imager/current/install/include
 
 ASKAP_DEFS = -DDEBUG
 ifeq ($(ASKAP_PATCHED), 1)
@@ -45,12 +46,13 @@ ASKAP_LIBDIRS = -L$(ASKAP_ROOT)/3rdParty/log4cxx/log4cxx-0.10.0/install/lib/ \
                 -L$(ASKAP_ROOT)/Code/Base/askap/current/install/lib \
                 -L$(ASKAP_ROOT)/Code/Base/accessors/current/install/lib \
                 -L$(ASKAP_ROOT)/Code/Base/scimath/current/install/lib \
-                -L$(ASKAP_ROOT)/Code/Components/Synthesis/synthesis/current/install/lib
+                -L$(ASKAP_ROOT)/Code/Components/Synthesis/synthesis/current/install/lib \
+                -L$(ASKAP_ROOT)/Code/Components/CP/askap_imager/current/install/lib
 
 CASA_INCDIRS = -I$(ASKAP_ROOT)/3rdParty/casacore/casacore-$(CASACORE_VERSION)/install/include/
 CASA_LIBDIRS = -L$(ASKAP_ROOT)/3rdParty/casacore/casacore-$(CASACORE_VERSION)/install/lib/
 
-ASKAP_LIBS = -llog4cxx -laskap_askap -lcommon -lblob -laskap_accessors -laskap_synthesis -laskap_scimath -lboost_regex
+ASKAP_LIBS = -llog4cxx -laskap_askap -lcommon -lblob -laskap_accessors -laskap_synthesis -laskap_scimath -laskap_imager -lboost_regex
 CASA_LIBS = -lcasa_casa -lcasa_measures -lcasa_coordinates -lcfitsio
 
 # Combined flags
@@ -70,7 +72,7 @@ OBJS = factory/DaliugeApplicationFactory.o \
        factory/SolveNE.o \
        factory/CalcNE.o \
        factory/OutputParams.o \
-       factory/CubeBuilder.o
+       factory/SpectralCube.o
 .PHONY: all clean
 
 all: libaskapsoft_dlg.so standalone
