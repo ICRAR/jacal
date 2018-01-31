@@ -101,7 +101,18 @@ namespace askap {
     {
       ASKAPLOG_INFO_STR(logger, "Initialised cube builder - UID is " << raw_app->uid);
 
+      char *token, *string, *tofree;
 
+      tofree = string = strdup(raw_app->uid);
+      assert(string != NULL);
+
+      char * sessionID = strsep(&string, "_");
+      char * logicalGraphID = strsep(&string, "_");
+      char * contextID = strsep(&string, "_");
+
+      ASKAPLOG_INFO_STR(logger, sessionID << logicalGraphID << contextID);
+
+      itsChan = 0;
 
     }
 
@@ -172,12 +183,27 @@ namespace askap {
             return -1;
         }
 
+        // Actually there should be no model on input .... it should always be empty
+        // it is my job to fill it.
+        this->itsModel.reset(new scimath::Params());
+        NEUtils::receiveParams(itsModel, input("Model"));
+        //
+        vector<string> images=itsModel->names();
+
+        for (vector<string>::const_iterator it=images.begin(); it !=images.end(); it++) {
+          ASKAPLOG_INFO_STR(logger, "Model contains "<< *it);
+
+
+        }
         // sort out the cube ....
         // get this from the parset?
         casa::Double baseFrequency = 1E9;
         casa::Double chanWidth = 1E5;
         casa::Int nchanCube = 8;
-        // The above are all fake until I find a way to get them.
+
+        casa::Double channelFrequency = baseFrequency + itsChan*chanWidth;
+
+
 
         casa::Quantity f0(baseFrequency,"Hz");
     /// The width of a channel. THis does <NOT> take account of the variable width
@@ -202,7 +228,7 @@ namespace askap {
         itsWeightsCube.reset(new cp::CubeBuilder(itsParset, nchanCube, f0, freqinc, weights_name));
 
 
-
+        handleImageParams();
 
         return 0;
     }
@@ -214,6 +240,86 @@ namespace askap {
 
     void SpectralCube::drop_completed(const char *uid, drop_status status) {
         dlg_app_done(APP_FINISHED);
+    }
+
+    void SpectralCube::handleImageParams()
+    {
+
+
+        // Pre-conditions
+        ASKAPCHECK(itsModel->has("image.cont"), "Params are missing model parameter");
+        ASKAPCHECK(itsModel->has("psf.cont"), "Params are missing psf parameter");
+        ASKAPCHECK(itsModel->has("residual.cont"), "Params are missing residual parameter");
+        ASKAPCHECK(itsModel->has("weights.cont"), "Params are missing weights parameter");
+
+/*
+        if (itsParset.getBool("restore", false)) {
+            // Record the restoring beam
+            const askap::scimath::Axes &axes = params->axes("image.slice");
+            recordBeam(axes, chan);
+            storeBeam(chan);
+        }
+*/
+        // Write image
+        {
+            ASKAPLOG_INFO_STR(logger,"Writing model for (local) channel " << itsChan);
+            const casa::Array<double> imagePixels(itsModel->value("image.cont"));
+            casa::Array<float> floatImagePixels(imagePixels.shape());
+            casa::convertArray<float, double>(floatImagePixels, imagePixels);
+            itsImageCube->writeSlice(floatImagePixels, itsChan);
+        }
+
+        // Write PSF
+        {
+            ASKAPLOG_INFO_STR(logger,"Writing PSF");
+            const casa::Array<double> imagePixels(itsModel->value("psf.cont"));
+            casa::Array<float> floatImagePixels(imagePixels.shape());
+            casa::convertArray<float, double>(floatImagePixels, imagePixels);
+            itsPSFCube->writeSlice(floatImagePixels, itsChan);
+        }
+
+        // Write residual
+        {
+            ASKAPLOG_INFO_STR(logger,"Writing Residual");
+            const casa::Array<double> imagePixels(itsModel->value("residual.cont"));
+            casa::Array<float> floatImagePixels(imagePixels.shape());
+            casa::convertArray<float, double>(floatImagePixels, imagePixels);
+            itsResidualCube->writeSlice(floatImagePixels, itsChan);
+        }
+
+        // Write weights
+        {
+            ASKAPLOG_INFO_STR(logger,"Writing Weights");
+            const casa::Array<double> imagePixels(itsModel->value("weights.cont"));
+            casa::Array<float> floatImagePixels(imagePixels.shape());
+            casa::convertArray<float, double>(floatImagePixels, imagePixels);
+            itsWeightsCube->writeSlice(floatImagePixels, itsChan);
+        }
+
+/*
+        if (itsParset.getBool("restore", false)) {
+
+            if (itsDoingPreconditioning) {
+                // Write preconditioned PSF image
+                {
+                    ASKAPLOG_INFO_STR(logger,"Writing preconditioned PSF");
+                    const casa::Array<double> imagePixels(params->value("psf.image.slice"));
+                    casa::Array<float> floatImagePixels(imagePixels.shape());
+                    casa::convertArray<float, double>(floatImagePixels, imagePixels);
+                    itsPSFimageCube->writeSlice(floatImagePixels, chan);
+                }
+            // Write Restored image
+            {
+                ASKAPLOG_INFO_STR(logger,"Writing Restored Image");
+                const casa::Array<double> imagePixels(itsModel->value("image.slice"));
+                casa::Array<float> floatImagePixels(imagePixels.shape());
+                casa::convertArray<float, double>(floatImagePixels, imagePixels);
+                itsRestoredCube->writeSlice(floatImagePixels, itsChan);
+            }
+        }
+
+*/
+
     }
 
 

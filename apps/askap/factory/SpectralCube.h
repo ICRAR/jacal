@@ -26,7 +26,7 @@
 #include <casacore/casa/Arrays/Array.h>
 #include <casacore/coordinates/Coordinates/CoordinateSystem.h>
 #include <casacore/casa/Quanta.h>
-
+#include <fitting/Params.h>
 
 
 namespace askap {
@@ -60,10 +60,11 @@ namespace askap {
 
         virtual void drop_completed(const char *uid, drop_status status);
 
-
+        void handleImageParams();
 
         private:
-
+            /// The model
+            scimath::Params::ShPtr itsModel;
 
             //! @brief Parameter set
             //! @details key value list of configuration options
@@ -76,7 +77,7 @@ namespace askap {
             boost::shared_ptr<cp::CubeBuilder> itsPSFimageCube;
             boost::shared_ptr<cp::CubeBuilder> itsRestoredCube;
 
-            
+            int itsChan;
 
     };
 
