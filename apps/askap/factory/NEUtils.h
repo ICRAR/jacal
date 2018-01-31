@@ -58,6 +58,8 @@ namespace askap {
 
         static int getOutput(dlg_app_info *app, const char * tag);
 
+        static int getChan(char *uid);
+
         private:
 
 

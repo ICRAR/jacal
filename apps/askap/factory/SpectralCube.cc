@@ -101,18 +101,8 @@ namespace askap {
     {
       ASKAPLOG_INFO_STR(logger, "Initialised cube builder - UID is " << raw_app->uid);
 
-      char *token, *string, *tofree;
+      itsChan = NEUtils::getChan(raw_app->uid);
 
-      tofree = string = strdup(raw_app->uid);
-      assert(string != NULL);
-
-      char * sessionID = strsep(&string, "_");
-      char * logicalGraphID = strsep(&string, "_");
-      char * contextID = strsep(&string, "_");
-
-      ASKAPLOG_INFO_STR(logger, sessionID << logicalGraphID << contextID);
-
-      itsChan = 0;
 
     }
 
@@ -217,18 +207,25 @@ namespace askap {
         std::string residual_name = "residual";
         std::string weights_name = "weights";
 
+        if (itsChan == 0)  { // only channel 0 builds the cubes
+          ASKAPLOG_DEBUG_STR(logger,"Configuring Spectral Cube");
+          ASKAPLOG_DEBUG_STR(logger,"nchan: " << nchanCube << " base f0: " << f0.getValue("MHz") << " MHz "
+          << " width: " << freqinc.getValue("MHz"));
 
-        ASKAPLOG_DEBUG_STR(logger,"Configuring Spectral Cube");
-        ASKAPLOG_DEBUG_STR(logger,"nchan: " << nchanCube << " base f0: " << f0.getValue("MHz") << " MHz "
-        << " width: " << freqinc.getValue("MHz"));
-
-        itsImageCube.reset(new cp::CubeBuilder(itsParset, nchanCube, f0, freqinc,img_name));
-        itsPSFCube.reset(new cp::CubeBuilder(itsParset, nchanCube, f0, freqinc, psf_name));
-        itsResidualCube.reset(new cp::CubeBuilder(itsParset, nchanCube, f0, freqinc, residual_name));
-        itsWeightsCube.reset(new cp::CubeBuilder(itsParset, nchanCube, f0, freqinc, weights_name));
-
+          itsImageCube.reset(new cp::CubeBuilder(itsParset, nchanCube, f0, freqinc,img_name));
+          itsPSFCube.reset(new cp::CubeBuilder(itsParset, nchanCube, f0, freqinc, psf_name));
+          itsResidualCube.reset(new cp::CubeBuilder(itsParset, nchanCube, f0, freqinc, residual_name));
+          itsWeightsCube.reset(new cp::CubeBuilder(itsParset, nchanCube, f0, freqinc, weights_name));
+        }
+        else {
+          itsImageCube.reset(new cp::CubeBuilder(itsParset, img_name));
+          itsPSFCube.reset(new cp::CubeBuilder(itsParset,  psf_name));
+          itsResidualCube.reset(new cp::CubeBuilder(itsParset,  residual_name));
+          itsWeightsCube.reset(new cp::CubeBuilder(itsParset, weights_name));
+        }
 
         handleImageParams();
+
 
         return 0;
     }

@@ -69,6 +69,30 @@ namespace askap {
 
 namespace askap {
 
+int NEUtils::getChan(char *uid) {
+
+    // FIXME: make this more robust
+
+    char *token, *string, *tofree;
+
+    tofree = string = strdup(uid);
+    assert(string != NULL);
+
+    char * sessionID = strsep(&string, "_");
+    char * logicalGraphID = strsep(&string, "_");
+    char * contextID = strsep(&string, "_");
+
+    string = strdup(contextID);
+
+    char * branchID = strsep(&string,"/");
+
+    char * chanNum = strsep(&string,"/");
+
+
+    return atoi(chanNum);
+
+
+}
 
 void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg_input_info &input) {
     ASKAPCHECK(itsNE, "NormalEquations not defined");
