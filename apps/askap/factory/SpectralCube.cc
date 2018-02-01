@@ -187,6 +187,13 @@ namespace askap {
         }
         // sort out the cube ....
         // get this from the parset?
+        // essentially need to get the info from some sort of "prepare" functionality
+        //
+
+        // FIXME: put prepare functionality either here or in utils ....
+
+        //
+
         casa::Double baseFrequency = 1E9;
         casa::Double chanWidth = 1E5;
         casa::Int nchanCube = 8;
