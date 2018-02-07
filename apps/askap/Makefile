@@ -53,7 +53,7 @@ CASA_INCDIRS = -I$(ASKAP_ROOT)/3rdParty/casacore/casacore-$(CASACORE_VERSION)/in
 CASA_LIBDIRS = -L$(ASKAP_ROOT)/3rdParty/casacore/casacore-$(CASACORE_VERSION)/install/lib/
 
 ASKAP_LIBS = -llog4cxx -laskap_askap -lcommon -lblob -laskap_accessors -laskap_synthesis -laskap_scimath -laskap_imager -lboost_regex
-CASA_LIBS = -lcasa_casa -lcasa_measures -lcasa_coordinates -lcfitsio
+CASA_LIBS = -lcasa_ms -lcasa_tables -lcasa_casa -lcasa_measures -lcasa_coordinates -lcfitsio
 
 # Combined flags
 CXXFLAGS += -std=c++11 -fPIC -I. -g $(ASKAP_DEFS) $(ASKAP_INCDIRS) $(CASA_INCDIRS) $(DLG_INCDIRS)

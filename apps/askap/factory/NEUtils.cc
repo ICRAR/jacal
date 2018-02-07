@@ -62,12 +62,89 @@ namespace askap {
 #include <sys/time.h>
 
 #include <boost/regex.hpp>
-
-
+#include <casacore/casa/BasicSL.h>
+#include <casacore/casa/aips.h>
+#include <casacore/casa/OS/Timer.h>
+#include <casacore/ms/MeasurementSets/MeasurementSet.h>
+#include <casacore/ms/MeasurementSets/MSColumns.h>
+#include <casacore/ms/MSOper/MSReader.h>
+#include <casacore/casa/Arrays/ArrayIO.h>
+#include <casacore/casa/iostream.h>
+#include <casacore/casa/namespace.h>
+#include <casacore/casa/Quanta/MVTime.h>
 
 
 
 namespace askap {
+
+int NEUtils::getNChan(LOFAR::ParameterSet& parset) {
+  // Read from the configruation the list of datasets to process
+  const vector<string> ms = getDatasets(parset);
+
+  const casa::MeasurementSet in(ms[0]);
+
+  return casa::ROScalarColumn<casa::Int>(in.spectralWindow(),"NUM_CHAN")(0);
+
+}
+
+double NEUtils::getFrequency(LOFAR::ParameterSet& parset, int chan, bool barycentre) {
+
+  // Read from the configruation the list of datasets to process
+  const vector<string> ms = getDatasets(parset);
+
+
+  const casa::MeasurementSet in(ms[0]);
+  const casa::ROMSColumns srcCols(in);
+
+  const casa::ROMSSpWindowColumns& sc = srcCols.spectralWindow();
+  const casa::ROMSFieldColumns& fc = srcCols.field();
+  const casa::ROMSObservationColumns& oc = srcCols.observation();
+  const casa::ROMSAntennaColumns& ac = srcCols.antenna();
+  const casa::ROArrayColumn<casa::Double> times = casa::ROArrayColumn<casa::Double>(oc.timeRange());
+  const casa::ROArrayColumn<casa::Double> ants = casa::ROArrayColumn<casa::Double>(ac.position());
+  const casa::uInt thisRef = casa::ROScalarColumn<casa::Int>(in.spectralWindow(),"MEAS_FREQ_REF")(0);
+
+  casa::MVDirection Tangent;
+  casa::Vector<casa::MDirection> DirVec;
+  casa::MVEpoch Epoch;
+  casa::MPosition Position;
+
+  DirVec = fc.phaseDirMeasCol()(0);
+  Tangent = DirVec(0).getValue();
+
+  // Read the position on Antenna 0
+  Array<casa::Double> posval;
+  ants.get(0,posval,true);
+  vector<double> pval = posval.tovector();
+
+  MVPosition mvobs(Quantity(pval[0], "m").getBaseValue(),
+  Quantity(pval[1], "m").getBaseValue(),
+  Quantity(pval[2], "m").getBaseValue());
+
+  Position = MPosition(mvobs,casa::MPosition::ITRF);
+
+  // Get the Epoch
+  Array<casa::Double> tval;
+  vector<double> tvals;
+
+  times.get(0,tval,true);
+  tvals = tval.tovector();
+  double mjd = tvals[0]/(86400.);
+  casa::MVTime dat(mjd);
+
+  Epoch = MVEpoch(dat.day());
+  int srow = sc.nrow()-1;
+  if (barycentre == false) {
+    return sc.chanFreq()(srow)(casa::IPosition(1, chan));
+  }
+  else {
+    // need to put the barycentreing in here - the logic is all in the AdviseDI
+  }
+
+
+  return 1.0;
+
+}
 
 int NEUtils::getChan(char *uid) {
 
@@ -88,8 +165,10 @@ int NEUtils::getChan(char *uid) {
 
     char * chanNum = strsep(&string,"/");
 
-
-    return atoi(chanNum);
+    if (chanNum != NULL)
+      return atoi(chanNum);
+    else
+      return 0;
 
 
 }

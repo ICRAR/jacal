@@ -194,11 +194,10 @@ namespace askap {
 
         //
 
-        casa::Double baseFrequency = 1E9;
-        casa::Double chanWidth = 1E5;
-        casa::Int nchanCube = 8;
-
-        casa::Double channelFrequency = baseFrequency + itsChan*chanWidth;
+        casa::Double baseFrequency = NEUtils::getFrequency(itsParset,0);
+        casa::Double chanWidth = NEUtils::getFrequency(itsParset,1) - NEUtils::getFrequency(itsParset,1);
+        casa::Int nchanCube = NEUtils::getNChan(itsParset);
+        casa::Double channelFrequency = NEUtils::getFrequency(itsParset,itsChan);
 
 
 

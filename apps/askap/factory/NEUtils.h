@@ -18,6 +18,17 @@
 #include <fitting/ImagingNormalEquations.h>
 #include <fitting/Params.h>
 
+#include <casacore/casa/BasicSL.h>
+#include <casacore/casa/aips.h>
+#include <casacore/casa/OS/Timer.h>
+#include <casacore/ms/MeasurementSets/MeasurementSet.h>
+#include <casacore/ms/MeasurementSets/MSColumns.h>
+#include <casacore/ms/MSOper/MSReader.h>
+#include <casacore/casa/Arrays/ArrayIO.h>
+#include <casacore/casa/iostream.h>
+#include <casacore/casa/namespace.h>
+#include <casacore/casa/Quanta/MVTime.h>
+
 
 namespace askap {
 
@@ -26,6 +37,7 @@ namespace askap {
     {
       return (end->tv_sec - start->tv_sec) * 1000000 + (end->tv_usec - start->tv_usec);
     }
+
     /// @brief A set of static utilities
     /// @details These are just a set of static functions I use more than once
     class NEUtils
@@ -59,6 +71,12 @@ namespace askap {
         static int getOutput(dlg_app_info *app, const char * tag);
 
         static int getChan(char *uid);
+
+        static int getNChan(LOFAR::ParameterSet& parset);
+
+        static double getFrequency(LOFAR::ParameterSet& parset, int chan=0, bool barycentre=false);
+
+
 
         private:
 
