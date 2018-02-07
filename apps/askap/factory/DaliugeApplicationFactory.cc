@@ -46,6 +46,7 @@ namespace askap {
 #include <factory/SolveNE.h>
 #include <factory/CalcNE.h>
 #include <factory/OutputParams.h>
+#include <factory/SpectralCube.h>
 
 //
 
@@ -136,6 +137,7 @@ void DaliugeApplicationFactory::initial_population() {
 		addPreDefinedDaliugeApplication<SolveNE>();
 		addPreDefinedDaliugeApplication<OutputParams>();
 		addPreDefinedDaliugeApplication<CalcNE>();
+    addPreDefinedDaliugeApplication<SpectralCube>();
 	}
 }
 

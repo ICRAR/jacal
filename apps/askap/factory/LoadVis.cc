@@ -78,6 +78,7 @@ namespace askap {
         DaliugeApplication(raw_app)
     {
         this->itsModel.reset(new scimath::Params());
+        this->itsChan = NEUtils::getChan(raw_app->uid);
     }
 
     LoadVis::~LoadVis() {
@@ -118,11 +119,13 @@ namespace askap {
 
         // FIXME:
         // Arbitrarily setting frequency selection to 1
+
+
         this->freqInterval = casa::IPosition(2,0);
         this->timeInterval = casa::IPosition(2,0);
 
-        this->freqInterval[0] = 0;
-        this->freqInterval[1] = 1;
+        this->freqInterval[0] = itsChan;
+        this->freqInterval[1] = itsChan+1;
 
         return 0;
     }
@@ -204,7 +207,9 @@ namespace askap {
             accessors::IDataSelectorPtr sel = ds.createSelector();
 
             sel->chooseCrossCorrelations();
-            sel->chooseChannels(1, 0);
+            sel->chooseChannels(1, this->freqInterval[0]);
+
+            // FIXME: Use freq interval in a smarter way and use time interval
 
             accessors::IDataConverterPtr conv = ds.createConverter();
             conv->setFrequencyFrame(casa::MFrequency::Ref(casa::MFrequency::TOPO), "Hz");

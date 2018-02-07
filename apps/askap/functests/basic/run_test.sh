@@ -1,4 +1,5 @@
 #!/bin/bash
+WORKSPACE=${HOME}/Soft/
 RUNDIR=${WORKSPACE}/jacal/apps/askap/functests/basic
 JACAL_LIB=${WORKSPACE}/jacal/apps/askap/libaskapsoft_dlg.so
 
@@ -41,7 +42,7 @@ if [ -e /tmp/single.in ]; then
     if [ -e ${RUNDIR}/run_jacal.sh ]; then
         source ${RUNDIR}/run_jacal.sh
     else
-        exit -1
+#        exit -1
     fi
 else
     echo "Failed to copy parfile to /tmp"

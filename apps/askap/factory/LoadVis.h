@@ -73,6 +73,8 @@ namespace askap {
             // Its tangent point
             std::vector<casa::MVDirection> itsTangent;
 
+            int itsChan;
+
 
             // utility to build an Imaging Normal Equation from a parset
             // void buildNE();
