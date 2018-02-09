@@ -1,5 +1,3 @@
-source activate daliuge
-
 dlg nm -v --no-dlm &
 
 dlg dim -N localhost &

@@ -72,7 +72,8 @@ OBJS = factory/DaliugeApplicationFactory.o \
        factory/SolveNE.o \
        factory/CalcNE.o \
        factory/OutputParams.o \
-       factory/SpectralCube.o
+       factory/SpectralCube.o \
+       factory/InitSpectralCube.o
 .PHONY: all clean
 
 all: libaskapsoft_dlg.so standalone

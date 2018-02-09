@@ -168,7 +168,7 @@ int NEUtils::getChan(char *uid) {
     if (chanNum != NULL)
       return atoi(chanNum);
     else
-      return 0;
+      return -1;
 
 
 }

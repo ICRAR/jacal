@@ -5,8 +5,8 @@
 
 
 
-#ifndef ASKAP_FACTORY_CUBEBUILDER_H
-#define ASKAP_FACTORY_CUBEBUILDER_H
+#ifndef ASKAP_FACTORY_SPECTRALCUBE_H
+#define ASKAP_FACTORY_SPECTRALCUBE_H
 
 #include <daliuge/DaliugeApplication.h>
 
