@@ -152,8 +152,15 @@ namespace askap {
         // Lets get the key-value-parset
         ASKAP_LOGGER(logger, ".run");
         char buf[64*1024];
-
-        size_t n_read = input("Config").read(buf, 64*1024);
+        size_t n_read = 0;
+        try {
+          n_read = input("Config").read(buf, 64*1024);
+        }
+        catch (std::runtime_error)
+        {
+          ASKAPLOG_INFO_STR(logger, "No config file available");
+          return -1;
+        }
 
         LOFAR::ParameterSet parset(true);
         parset.adoptBuffer(buf);
@@ -173,17 +180,23 @@ namespace askap {
             return -1;
         }
 
-        // Actually there should be no model on input .... it should always be empty
-        // it is my job to fill it.
-        this->itsModel.reset(new scimath::Params());
-        NEUtils::receiveParams(itsModel, input("Model"));
+
+        if (itsChan >= 0) {
+          this->itsModel.reset(new scimath::Params());
+          try {
+            NEUtils::receiveParams(itsModel, input("Model"));
+          }
+          catch (std::runtime_error) {
+            ASKAPLOG_INFO_STR(logger, "Failed to receive model");
+            return -1;
+          }
+        }
+        
         //
         vector<string> images=itsModel->names();
 
         for (vector<string>::const_iterator it=images.begin(); it !=images.end(); it++) {
           ASKAPLOG_INFO_STR(logger, "Model contains "<< *it);
-
-
         }
         // sort out the cube ....
         // get this from the parset?
@@ -213,7 +226,7 @@ namespace askap {
         std::string residual_name = "residual";
         std::string weights_name = "weights";
 
-        if (itsChan == 0)  { // only channel 0 builds the cubes
+        if (itsChan == -1)  { // only channel 0 builds the cubes
           ASKAPLOG_DEBUG_STR(logger,"Configuring Spectral Cube");
           ASKAPLOG_DEBUG_STR(logger,"nchan: " << nchanCube << " base f0: " << f0.getValue("MHz") << " MHz "
           << " width: " << freqinc.getValue("MHz"));
@@ -228,9 +241,10 @@ namespace askap {
           itsPSFCube.reset(new cp::CubeBuilder(itsParset,  psf_name));
           itsResidualCube.reset(new cp::CubeBuilder(itsParset,  residual_name));
           itsWeightsCube.reset(new cp::CubeBuilder(itsParset, weights_name));
+          handleImageParams();
         }
 
-        handleImageParams();
+
 
 
         return 0;

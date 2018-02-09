@@ -1,12 +1,12 @@
-/// @file SpectralCube.h
+/// @file InitSpectralCube.h
 /// @brief Build an output image cube
 /// @details This drop will be able to build an output cube of any format
 /// supported by ASKAPSoft
 
 
 
-#ifndef ASKAP_FACTORY_SPECTRALCUBE_H
-#define ASKAP_FACTORY_SPECTRALCUBE_H
+#ifndef ASKAP_FACTORY_INITSPECTRALCUBE_H
+#define ASKAP_FACTORY_INITSPECTRALCUBE_H
 
 #include <daliuge/DaliugeApplication.h>
 
@@ -36,19 +36,19 @@ namespace askap {
     /// by the parset.
     ///
 
-    class SpectralCube : public DaliugeApplication
+    class InitSpectralCube : public DaliugeApplication
 
     {
 
     public:
 
-        typedef boost::shared_ptr<SpectralCube> ShPtr;
+        typedef boost::shared_ptr<InitSpectralCube> ShPtr;
 
-        SpectralCube(dlg_app_info *raw_app);
+        InitSpectralCube(dlg_app_info *raw_app);
 
-        static inline std::string ApplicationName() { return "SpectralCube";}
+        static inline std::string ApplicationName() { return "InitSpectralCube";}
 
-        virtual ~SpectralCube();
+        virtual ~InitSpectralCube();
 
         static DaliugeApplication::ShPtr createDaliugeApplication(dlg_app_info *raw_app);
 
@@ -60,7 +60,7 @@ namespace askap {
 
         virtual void drop_completed(const char *uid, drop_status status);
 
-        void handleImageParams();
+      
 
         private:
             /// The model
