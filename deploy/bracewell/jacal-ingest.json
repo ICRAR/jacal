@@ -1,14 +1,153 @@
-{ "class": "go.GraphLinksModel",
+{
+  "class": "go.GraphLinksModel",
   "linkFromPortIdProperty": "fromPort",
   "linkToPortIdProperty": "toPort",
-  "nodeDataArray": [ 
-{"category":"Component", "text":"Receiver", "execution_time":5, "num_cpus":1, "group_start":0, "appclass":"jacal.apps.OSKAR2SpeadReceiver", "Arg01":"port=41000", "Arg02":"", "Arg03":"", "Arg04":"", "Arg05":"", "Arg06":"", "Arg07":"", "Arg08":"", "Arg09":"", "Arg10":"", "key":-3, "loc":"-1045.328125 -534"},
-{"category":"Component", "text":"Flagger", "execution_time":5, "num_cpus":1, "group_start":0, "appclass":"jacal.apps.StreamFlaggerApp", "Arg01":"", "Arg02":"", "Arg03":"", "Arg04":"", "Arg05":"", "Arg06":"", "Arg07":"", "Arg08":"", "Arg09":"", "Arg10":"", "key":-2, "loc":"-794.328125 -534"},
-{"category":"Component", "text":"Calibrator", "execution_time":5, "num_cpus":1, "group_start":0, "appclass":"jacal.apps.StreamCalibratorApp", "Arg01":"", "Arg02":"", "Arg03":"", "Arg04":"", "Arg05":"", "Arg06":"", "Arg07":"", "Arg08":"", "Arg09":"", "Arg10":"", "key":-4, "loc":"-554.328125 -534"},
-{"category":"file", "text":"FileDrop", "data_volume":5, "group_end":0, "check_filepath_exists":"1", "filepath":"", "dirname":"", "key":-7, "loc":"-339.328125 -534"}
- ],
-  "linkDataArray": [ 
-{"from":-3, "to":-2, "fromPort":"R", "toPort":"L", "points":[-1007.9128036499023,-534,-997.9128036499023,-534,-917.7939262390137,-534,-917.7939262390137,-534,-837.675048828125,-534,-827.675048828125,-534]},
-{"from":-2, "to":-4, "fromPort":"R", "toPort":"L", "points":[-760.981201171875,-534,-750.981201171875,-534,-677.7882308959961,-534,-677.7882308959961,-534,-604.5952606201172,-534,-594.5952606201172,-534]},
-{"from":-4, "to":-7, "fromPort":"R", "toPort":"L", "points":[-514.0609893798828,-534,-504.0609893798828,-534,-445.8047637939453,-534,-445.8047637939453,-534,-387.5485382080078,-534,-377.5485382080078,-534]}
- ]}
+  "nodeDataArray": [
+    {
+      "category": "Component",
+      "text": "Receiver",
+      "execution_time": 5,
+      "num_cpus": 1,
+      "group_start": 0,
+      "appclass": "jacal.apps.OSKAR2SpeadReceiver",
+      "Arg01": "port=41000",
+      "Arg02": "",
+      "Arg03": "",
+      "Arg04": "",
+      "Arg05": "",
+      "Arg06": "",
+      "Arg07": "",
+      "Arg08": "",
+      "Arg09": "",
+      "Arg10": "",
+      "key": -3,
+      "loc": "-1088.328125 -668.9999999999999",
+      "group": -12
+    },
+    {
+      "category": "Component",
+      "text": "Flagger",
+      "execution_time": 5,
+      "num_cpus": 1,
+      "group_start": 0,
+      "appclass": "jacal.apps.StreamFlaggerApp",
+      "Arg01": "",
+      "Arg02": "",
+      "Arg03": "",
+      "Arg04": "",
+      "Arg05": "",
+      "Arg06": "",
+      "Arg07": "",
+      "Arg08": "",
+      "Arg09": "",
+      "Arg10": "",
+      "key": -2,
+      "loc": "-837.328125 -668.9999999999999",
+      "group": -12
+    },
+    {
+      "category": "Component",
+      "text": "Calibrator",
+      "execution_time": 5,
+      "num_cpus": 1,
+      "group_start": 0,
+      "appclass": "jacal.apps.StreamCalibratorApp",
+      "Arg01": "",
+      "Arg02": "",
+      "Arg03": "",
+      "Arg04": "",
+      "Arg05": "",
+      "Arg06": "",
+      "Arg07": "",
+      "Arg08": "",
+      "Arg09": "",
+      "Arg10": "",
+      "key": -4,
+      "loc": "-597.3281250000002 -668.9999999999999",
+      "group": -12
+    },
+    {
+      "category": "file",
+      "text": "FileDrop",
+      "data_volume": 5,
+      "group_end": 0,
+      "check_filepath_exists": "1",
+      "filepath": "",
+      "dirname": "",
+      "key": -7,
+      "loc": "-382.32812500000017 -669.0000000000001",
+      "group": -12
+    },
+    {
+      "category": "SplitData",
+      "text": "Scatter",
+      "isGroup": true,
+      "num_of_copies": 4,
+      "scatter_axis": "time",
+      "key": -12,
+      "loc": "-734.9254760742188 -669"
+    }
+  ],
+  "linkDataArray": [
+    {
+      "from": -3,
+      "to": -2,
+      "fromPort": "R",
+      "toPort": "L",
+      "points": [
+        -1050.9128036499023,
+        -669,
+        -1040.9128036499023,
+        -669,
+        -960.7939262390137,
+        -669,
+        -960.7939262390137,
+        -669,
+        -880.675048828125,
+        -669,
+        -870.675048828125,
+        -669
+      ]
+    },
+    {
+      "from": -2,
+      "to": -4,
+      "fromPort": "R",
+      "toPort": "L",
+      "points": [
+        -803.981201171875,
+        -669,
+        -793.981201171875,
+        -669,
+        -720.7882308959961,
+        -669,
+        -720.7882308959961,
+        -669,
+        -647.5952606201172,
+        -669,
+        -637.5952606201172,
+        -669
+      ]
+    },
+    {
+      "from": -4,
+      "to": -7,
+      "fromPort": "R",
+      "toPort": "L",
+      "points": [
+        -557.0609893798828,
+        -669,
+        -547.0609893798828,
+        -669,
+        -488.8047637939453,
+        -669,
+        -488.8047637939453,
+        -669,
+        -430.5485382080078,
+        -669,
+        -420.5485382080078,
+        -669
+      ]
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH   --job-name=Daliuge-Jacal-Test
-#SBATCH   --nodes=3
+#SBATCH   --nodes=7
 #SBATCH   --ntasks-per-node=1
 #SBATCH   --time=01:00:00
 #SBATCH   --mem=100g
@@ -51,5 +51,7 @@ mkdir $LOG_DIR
 module load openmpi
 echo $LD_LIBRARY_PATH
 #ulimit -c unlimited
-mpirun -np 3 $MYPYTHON $MYCLUSTER -l $LOG_DIR -L $LG_GRAPH
+DLG_MON_HOST="sdp-dfms.ddns.net"
+DLG_MON_PORT="8081"
+mpirun -np 7 $MYPYTHON $MYCLUSTER -l $LOG_DIR -L $LG_GRAPH -m $DLG_MON_HOST -o $DLG_MON_PORT
 #dlg nm -v --no-dlm
