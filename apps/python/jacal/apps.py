@@ -28,10 +28,12 @@
 import logging
 import math
 
+import dlg
 from dlg.drop import AppDROP, BarrierAppDROP
 from dlg.ddap_protocol import AppDROPStates, DROPStates
 from dlg.exceptions import InvalidDropException
 import six.moves.cPickle as pickle  # @UnresolvedImport
+import six.moves.http_client as httplib  # @UnresolvedImport
 import oskar
 import spead2
 import spead2.recv
@@ -51,6 +53,13 @@ class OSKAR2SpeadReceiver(BarrierAppDROP):
 
         self._stream = spead2.recv.Stream(spead2.ThreadPool(), 0)
         self._stream.add_udp_reader(int(self._port))
+
+        try:
+            ip = dlg.utils.get_local_ip_addr()[0][0]
+            con = httplib.HTTPConnection('sdp-dfms.ddns.net', 8096)
+            con.request('GET', '/reg_receiver?ip=%s' % (ip))
+        except:
+            logger.exception('Failed to register, will continue anyway')
 
     def run(self):
         """Run the receiver. Each heap is put in a dictionary and sent to our output"""
