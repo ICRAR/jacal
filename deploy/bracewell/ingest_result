@@ -1,0 +1,5 @@
+#_of_samples	Sender graph	Receiver graph		# of nodes	data volume per node (MB)
+1200		67.042		65.642			5			21
+6000		342.5339  340.8659		5			101
+12000		680.417		679.32899		5			200
+48000
