@@ -79,6 +79,9 @@ namespace askap {
     {
         this->itsModel.reset(new scimath::Params());
         this->itsChan = NEUtils::getChan(raw_app->uid);
+        if (this->itsChan < 0) {
+          this->itsChan = 0;
+        }
     }
 
     LoadVis::~LoadVis() {
@@ -124,8 +127,8 @@ namespace askap {
         this->freqInterval = casa::IPosition(2,0);
         this->timeInterval = casa::IPosition(2,0);
 
-        this->freqInterval[0] = itsChan;
-        this->freqInterval[1] = itsChan+1;
+        this->freqInterval[0] = this->itsChan;
+        this->freqInterval[1] = this->itsChan+1;
 
         return 0;
     }
