@@ -67,6 +67,7 @@ ASKAP_LOGGER(logger, ".parallel");
 #include <measurementequation/NoXPolFreqDependentGain.h>
 #include <measurementequation/NoXPolBeamIndependentGain.h>
 #include <measurementequation/ImagingEquationAdapter.h>
+#include <measurementequation/IMeasurementEquation.h>
 #include <gridding/VisGridderFactory.h>
 #include <askapparallel/AskapParallel.h>
 #include <Common/ParameterSet.h>
@@ -384,7 +385,7 @@ std::pair<casa::uInt, casa::uInt> JacalBPCalibrator::currentBeamAndChannel() con
 /// @brief send current model to the master
 /// @details This method is supposed to be called from workers in the parallel mode and
 /// sends the current results to the master rank
-void JacalBPCalibrator::sendModelToMaster() const
+void JacalBPCalibrator::sendModelToMaster()
 {
 
 
@@ -402,7 +403,8 @@ void JacalBPCalibrator::sendModelToMaster() const
    out.putEnd();
    bobmw.flush();
    */
-   
+   NEUtils::sendParams(itsModel,output("Model"));
+
 }
 
 /// @brief asynchronously receive model from one of the workers
@@ -411,9 +413,12 @@ void JacalBPCalibrator::sendModelToMaster() const
 /// in itsModel.
 void JacalBPCalibrator::receiveModelFromWorker()
 {
-   ASKAPDEBUGTRACE("JacalBPCalibrator::receiveModelFromWorker");
-   itsModel.reset(new scimath::Params);
 
+
+
+   itsModel.reset(new scimath::Params);
+   NEUtils::receiveParams(itsModel, input("Model"));
+   /* FIXME: THis is the old receive once the above works - just remove this
    // wait for the notification
    const int source = itsComms.waitForNotification().first;
    ASKAPLOG_DEBUG_STR(logger, "Receiving results from rank "<<source);
@@ -424,6 +429,8 @@ void JacalBPCalibrator::receiveModelFromWorker()
    ASKAPASSERT(version == BPCALIBRATOR_PARALLEL_BLOB_STREAM_VERSION);
    in >> *itsModel;
    in.getEnd();
+   */
+
 }
 
 
@@ -433,13 +440,18 @@ void JacalBPCalibrator::receiveModelFromWorker()
 /// CalibrationME to calculate the generic normal equations.
 void JacalBPCalibrator::calcNE()
 {
-  ASKAPDEBUGASSERT(itsComms.isWorker());
+  ASKAPDEBUGASSERT(this->isWorker);
 
   // create a new instance of the normal equations class
   boost::shared_ptr<scimath::GenericNormalEquations> gne(new scimath::GenericNormalEquations);
   itsNe = gne;
 
+  // create the gridder too
+
+  itsGridder = askap::synthesis::VisGridderFactory::make(this->itsParset);
+
   ASKAPDEBUGASSERT(itsNe);
+  ASKAPDEBUGASSERT(itsGridder);
 
   // obtain details on the current iteration, i.e. beam and channel
   ASKAPDEBUGASSERT(itsWorkUnitIterator.hasMore());
@@ -467,7 +479,7 @@ void JacalBPCalibrator::invalidateSolution() {
 /// @details Parameters of the calibration problem are solved for here
 void JacalBPCalibrator::solveNE()
 {
-  if (itsComms.isWorker()) {
+  if (this->isWorker) {
       ASKAPLOG_INFO_STR(logger, "Solving normal equations");
       ASKAPDEBUGASSERT(itsNe);
       if (itsNe->unknowns().size() == 0) {
@@ -519,7 +531,7 @@ void JacalBPCalibrator::solveNE()
 /// @details The solution (calibration parameters) is reported via solution accessor
 void JacalBPCalibrator::writeModel(const std::string &)
 {
-  ASKAPDEBUGASSERT(itsComms.isMaster());
+  ASKAPDEBUGASSERT(this->isMaster);
 
   const std::pair<casa::uInt, casa::uInt> indices = currentBeamAndChannel();
 
@@ -550,19 +562,19 @@ void JacalBPCalibrator::writeModel(const std::string &)
 /// @param[in] dsi data shared iterator
 /// @param[in] perfectME uncorrupted measurement equation
 void JacalBPCalibrator::createCalibrationME(const accessors::IDataSharedIter &dsi,
-                const boost::shared_ptr<IMeasurementEquation const> &perfectME)
+                const boost::shared_ptr<synthesis::IMeasurementEquation const> &perfectME)
 {
    ASKAPDEBUGASSERT(itsModel);
    ASKAPDEBUGASSERT(perfectME);
 
    // it is handy to have a shared pointer to the base type because it is
    // not templated
-   boost::shared_ptr<PreAvgCalMEBase> preAvgME;
+   boost::shared_ptr<synthesis::PreAvgCalMEBase> preAvgME;
    // solve as normal gains (rather than bandpass) because only one channel is supposed to be selected
    // this also opens a possibility to use several (e.g. 54 = coarse resolution) channels to get one gain
    // solution which is then replicated to all channels involved. We can also add frequency-dependent leakage, if
    // tests show it is required (currently it is not in the calibration model)
-   preAvgME.reset(new CalibrationME<NoXPolGain, PreAvgCalMEBase>());
+   preAvgME.reset(new synthesis::CalibrationME<synthesis::NoXPolGain, synthesis::PreAvgCalMEBase>());
    ASKAPDEBUGASSERT(preAvgME);
 
    ASKAPDEBUGASSERT(dsi.hasMore());
@@ -585,7 +597,7 @@ void JacalBPCalibrator::createCalibrationME(const accessors::IDataSharedIter &ds
 void JacalBPCalibrator::rotatePhases()
 {
   // the intention is to rotate phases in worker (for this class)
-  ASKAPDEBUGASSERT(itsComms.isWorker());
+  ASKAPDEBUGASSERT(this->isWorker);
   ASKAPDEBUGASSERT(itsModel);
   //wasim was here
  /*
@@ -654,13 +666,15 @@ void JacalBPCalibrator::calcOne(const std::string& ms, const casa::uInt chan, co
   if (!itsEquation) {
       ASKAPLOG_INFO_STR(logger, "Creating measurement equation" );
       accessors::TableDataSource ds(ms, accessors::TableDataSource::DEFAULT, dataColumn());
-      ds.configureUVWMachineCache(uvwMachineCacheSize(),uvwMachineCacheTolerance());
+      /// FIXME: Not sure I need this
+      ///ds.configureUVWMachineCache(uvwMachineCacheSize(),uvwMachineCacheTolerance());
+
       accessors::IDataSelectorPtr sel=ds.createSelector();
       sel << this->parset();
       sel->chooseChannels(1,chan);
       sel->chooseFeed(beam);
       accessors::IDataConverterPtr conv=ds.createConverter();
-      conv->setFrequencyFrame(getFreqRefFrame(), "Hz");
+      conv->setFrequencyFrame(casa::MFrequency::Ref(casa::MFrequency::TOPO), "Hz");
       conv->setDirectionFrame(casa::MDirection::Ref(casa::MDirection::J2000));
       // ensure that time is counted in seconds since 0 MJD
       conv->setEpochFrame();
@@ -672,20 +686,20 @@ void JacalBPCalibrator::calcOne(const std::string& ms, const casa::uInt chan, co
       if (!itsPerfectME) {
           ASKAPLOG_INFO_STR(logger, "Constructing measurement equation corresponding to the uncorrupted model");
           ASKAPCHECK(itsPerfectModel, "Uncorrupted model not defined");
-          if (SynthesisParamsHelper::hasImage(itsPerfectModel)) {
-              ASKAPCHECK(!SynthesisParamsHelper::hasComponent(itsPerfectModel),
+          if (synthesis::SynthesisParamsHelper::hasImage(itsPerfectModel)) {
+              ASKAPCHECK(!synthesis::SynthesisParamsHelper::hasComponent(itsPerfectModel),
                          "Image + component case has not yet been implemented");
               // have to create an image-specific equation
-              boost::shared_ptr<ImagingEquationAdapter> ieAdapter(new ImagingEquationAdapter);
-              ASKAPCHECK(gridder(), "Gridder not defined");
-              ieAdapter->assign<ImageFFTEquation>(*itsPerfectModel, gridder());
+              boost::shared_ptr<synthesis::ImagingEquationAdapter> ieAdapter(new synthesis::ImagingEquationAdapter);
+              ASKAPCHECK(itsGridder, "Gridder not defined");
+              ieAdapter->assign<synthesis::ImageFFTEquation>(*itsPerfectModel, itsGridder);
               itsPerfectME = ieAdapter;
           } else {
               // model is a number of components, don't need an adapter here
 
               // it doesn't matter which iterator is passed below. It is not used
-              boost::shared_ptr<ComponentEquation>
-                  compEq(new ComponentEquation(*itsPerfectModel,it));
+              boost::shared_ptr<synthesis::ComponentEquation>
+                  compEq(new synthesis::ComponentEquation(*itsPerfectModel,it));
               itsPerfectME = compEq;
           }
       }
@@ -705,7 +719,14 @@ void JacalBPCalibrator::calcOne(const std::string& ms, const casa::uInt chan, co
   ASKAPLOG_INFO_STR(logger, "Calculated normal equations for "<< ms << " channel "<<chan<<" beam " <<beam<<" in "<< timer.real()
                      << " seconds ");
 }
+void JacalBPCalibrator::data_written(const char *uid, const char *data, size_t n) {
+    dlg_app_running();
+}
 
+void JacalBPCalibrator::drop_completed(const char *uid, drop_status status) {
+
+    dlg_app_done(APP_FINISHED);
+}
 
 
 

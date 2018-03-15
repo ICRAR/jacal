@@ -54,12 +54,13 @@ ASKAP_LIBDIRS = -L$(ASKAP_ROOT)/3rdParty/log4cxx/log4cxx-0.10.0/install/lib/ \
                 -L$(ASKAP_ROOT)/Code/Components/Synthesis/synthesis/current/install/lib \
                 -L$(ASKAP_ROOT)/Code/Components/CP/askap_imager/current/install/lib \
                 -L$(ASKAP_ROOT)/Code/Components/Services/calibration/client-cpp/current/install/lib \
-                -L$(ASKAP_ROOT)/Code/Components/Services/cpdataservices/client-cpp/current/install/lib 
+                -L$(ASKAP_ROOT)/Code/Components/Services/cpdataservices/client-cpp/current/install/lib \
+                -L$(ASKAP_ROOT)/Code/Interfaces/cpp/current/install/lib 
 
 CASA_INCDIRS = -I$(ASKAP_ROOT)/3rdParty/casacore/casacore-$(CASACORE_VERSION)/install/include/
 CASA_LIBDIRS = -L$(ASKAP_ROOT)/3rdParty/casacore/casacore-$(CASACORE_VERSION)/install/lib/
 
-ASKAP_LIBS = -llog4cxx -laskap_askap -lcommon -lblob -laskap_accessors -laskap_synthesis -laskap_scimath -laskap_imager -laskap_calserviceaccessor  -lboost_regex
+ASKAP_LIBS = -lIce -lIceUtil -llog4cxx -laskap_askap -lcommon -lblob -laskap_accessors -laskap_synthesis -laskap_scimath -laskap_imager -laskap_calserviceaccessor  -lboost_regex -lboost_system  -laskap_iceinterfaces
 CASA_LIBS = -lcasa_ms -lcasa_tables -lcasa_casa -lcasa_measures -lcasa_coordinates -lcfitsio
 
 # Combined flags

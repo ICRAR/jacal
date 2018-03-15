@@ -72,6 +72,8 @@ namespace askap
 
         inline const std::vector<std::string>& measurementSets() const { return itsMs;}
 
+
+
       protected:
 
       // virtual methods of the abstract base, define them as protected because they
@@ -150,6 +152,8 @@ namespace askap
       /// @return number of channels to solve for
       inline casa::uInt nChan() const { return parset().getInt32("nChan", 304); }
 
+      inline const std::string dataColumn() const { return this->itsParset.getString("datacolumn", "DATA");}
+
       /// @brief extract current beam/channel pair from the iterator
       /// @details This method encapsulates interpretation of the output of itsWorkUnitIterator.cursor() for workers and
       /// in the serial mode. However, it extracts the current beam and channel info out of the model for the master
@@ -178,7 +182,7 @@ namespace askap
       /// @brief send current model to the master
       /// @details This method is supposed to be called from workers in the parallel mode and
       /// sends the current results to the master rank
-      void sendModelToMaster() const;
+      void sendModelToMaster();
 
       /// @brief asynchronously receive model from one of the workers
       /// @details This method is supposed to be used in the master rank in the parallel mode. It
@@ -253,9 +257,11 @@ namespace askap
 
       askap::scimath::Equation::ShPtr itsEquation;
 
-       askap::scimath::Params::ShPtr itsModel;
+      askap::scimath::Params::ShPtr itsModel;
 
+      askap::scimath::INormalEquations::ShPtr itsNe;
 
+      askap::synthesis::IVisGridder::ShPtr itsGridder;
 
 
 
