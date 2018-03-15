@@ -26,12 +26,16 @@ ASKAP_INCDIRS = -I$(ASKAP_ROOT)/3rdParty/log4cxx/log4cxx-0.10.0/install/include 
                 -I$(ASKAP_ROOT)/3rdParty/LOFAR/Blob/Blob-1.2/install/include \
                 -I$(ASKAP_ROOT)/3rdParty/boost/boost-1.56.0/install/include \
                 -I$(ASKAP_ROOT)/3rdParty/wcslib/wcslib-$(WCSLIB_VERSION)/install/include \
+                -I$(ASKAP_ROOT)/3rdParty/Ice/Ice-3.5.0/install/include \
                 -I$(ASKAP_ROOT)/Code/Base/askap/current/ \
                 -I$(ASKAP_ROOT)/Code/Base/accessors/current/install/include \
                 -I$(ASKAP_ROOT)/Code/Base/askapparallel/current/install/include \
                 -I$(ASKAP_ROOT)/Code/Base/scimath/current/install/include \
                 -I$(ASKAP_ROOT)/Code/Components/Synthesis/synthesis/current/install/include \
-                -I$(ASKAP_ROOT)/Code/Components/CP/askap_imager/current/install/include
+                -I$(ASKAP_ROOT)/Code/Components/CP/askap_imager/current/install/include \
+                -I$(ASKAP_ROOT)/Code/Components/Services/calibration/client-cpp/current/install/include \
+                -I$(ASKAP_ROOT)/Code/Components/Services/cpdataservices/client-cpp/current/install/include \
+                -I$(ASKAP_ROOT)/Code/Interfaces/cpp/current/install/include/icegenerated
 
 ASKAP_DEFS = -DDEBUG
 ifeq ($(ASKAP_PATCHED), 1)
@@ -43,20 +47,23 @@ ASKAP_LIBDIRS = -L$(ASKAP_ROOT)/3rdParty/log4cxx/log4cxx-0.10.0/install/lib/ \
                 -L$(ASKAP_ROOT)/3rdParty/LOFAR/Blob/Blob-1.2/install/lib \
                 -L$(ASKAP_ROOT)/3rdParty/cfitsio/cfitsio-3.35/cfitsio/ \
                 -L$(ASKAP_ROOT)/3rdParty/boost/boost-1.56.0/install/lib \
+                -L$(ASKAP_ROOT)/3rdParty/Ice/Ice-3.5.0/install/lib \
                 -L$(ASKAP_ROOT)/Code/Base/askap/current/install/lib \
                 -L$(ASKAP_ROOT)/Code/Base/accessors/current/install/lib \
                 -L$(ASKAP_ROOT)/Code/Base/scimath/current/install/lib \
                 -L$(ASKAP_ROOT)/Code/Components/Synthesis/synthesis/current/install/lib \
-                -L$(ASKAP_ROOT)/Code/Components/CP/askap_imager/current/install/lib
+                -L$(ASKAP_ROOT)/Code/Components/CP/askap_imager/current/install/lib \
+                -L$(ASKAP_ROOT)/Code/Components/Services/calibration/client-cpp/current/install/lib \
+                -L$(ASKAP_ROOT)/Code/Components/Services/cpdataservices/client-cpp/current/install/lib 
 
 CASA_INCDIRS = -I$(ASKAP_ROOT)/3rdParty/casacore/casacore-$(CASACORE_VERSION)/install/include/
 CASA_LIBDIRS = -L$(ASKAP_ROOT)/3rdParty/casacore/casacore-$(CASACORE_VERSION)/install/lib/
 
-ASKAP_LIBS = -llog4cxx -laskap_askap -lcommon -lblob -laskap_accessors -laskap_synthesis -laskap_scimath -laskap_imager -lboost_regex
+ASKAP_LIBS = -llog4cxx -laskap_askap -lcommon -lblob -laskap_accessors -laskap_synthesis -laskap_scimath -laskap_imager -laskap_calserviceaccessor  -lboost_regex
 CASA_LIBS = -lcasa_ms -lcasa_tables -lcasa_casa -lcasa_measures -lcasa_coordinates -lcfitsio
 
 # Combined flags
-CXXFLAGS += -std=c++11 -fPIC -I. -g $(ASKAP_DEFS) $(ASKAP_INCDIRS) $(CASA_INCDIRS) $(DLG_INCDIRS)
+CXXFLAGS += -ferror-limit=1 -std=c++11 -fPIC -I. -g $(ASKAP_DEFS) $(ASKAP_INCDIRS) $(CASA_INCDIRS) $(DLG_INCDIRS)
 LDFLAGS += $(ASKAP_LIBDIRS) $(ASKAP_LIBS) $(CASA_LIBDIRS) $(CASA_LIBS)
 
 
@@ -73,7 +80,8 @@ OBJS = factory/DaliugeApplicationFactory.o \
        factory/CalcNE.o \
        factory/OutputParams.o \
        factory/SpectralCube.o \
-       factory/InitSpectralCube.o
+       factory/InitSpectralCube.o \
+       factory/JacalBPCalibrator.o
 .PHONY: all clean
 
 all: libaskapsoft_dlg.so standalone

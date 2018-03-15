@@ -212,7 +212,7 @@ namespace askap {
             sel->chooseCrossCorrelations();
             sel->chooseChannels(1, this->freqInterval[0]);
 
-            // FIXME: Use freq interval in a smarter way and use time interval
+            // FIXME: Use time interval and perhaps beam?
 
             accessors::IDataConverterPtr conv = ds.createConverter();
             conv->setFrequencyFrame(casa::MFrequency::Ref(casa::MFrequency::TOPO), "Hz");

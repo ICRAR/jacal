@@ -48,6 +48,7 @@ namespace askap {
 #include <measurementequation/SynthesisParamsHelper.h>
 #include <measurementequation/ImageParamsHelper.h>
 #include <measurementequation/ImageFFTEquation.h>
+#include <parallel/SynParallel.h>
 #include <parallel/GroupVisAggregator.h>
 
 
@@ -392,9 +393,6 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
 
   int NEUtils::getInput(dlg_app_info *app, const char* tag) {
 
-
-
-
     boost::regex exp1(tag);
     boost::cmatch what;
 
@@ -422,4 +420,75 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
     return -1;
 
   }
+
+  void NEUtils::readModels(LOFAR::ParameterSet& parset, const scimath::Params::ShPtr &pModel)
+  {
+
+    ASKAP_LOGGER(logger, ".readModels");
+    ASKAPCHECK(pModel, "model is not initialised prior to call to SynParallel::readModels");
+
+    const std::vector<std::string> sources = parset.getStringVector("sources.names");
+    std::set<std::string> loadedImageModels;
+    for (size_t i=0; i<sources.size(); ++i) {
+       const std::string modelPar = std::string("sources.")+sources[i]+".model";
+       const std::string compPar = std::string("sources.")+sources[i]+".components";
+       // check that only one is defined
+       ASKAPCHECK(parset.isDefined(compPar) != parset.isDefined(modelPar),
+            "The model should be defined with either image (via "<<modelPar<<") or components (via "<<
+             compPar<<"), not both");
+       //
+         if (parset.isDefined(modelPar)) {
+             const std::vector<std::string> vecModels = parset.getStringVector(modelPar);
+             int nTaylorTerms = parset.getInt32(std::string("sources.")+sources[i]+".nterms",1);
+             ASKAPCHECK(nTaylorTerms>0, "Number of Taylor terms is supposed to be a positive number, you gave "<<
+                       nTaylorTerms);
+             if (nTaylorTerms>1) {
+                 ASKAPLOG_WARN_STR(logger,"Simulation from model presented by Taylor series (a.k.a. MFS-model) with "<<
+                             nTaylorTerms<<" terms is not supported");
+                 nTaylorTerms = 1;
+             }
+             ASKAPCHECK((vecModels.size() == 1) || (int(vecModels.size()) == nTaylorTerms),
+                  "Number of model images given by "<<modelPar<<" should be either 1 or one per taylor term, you gave "<<
+                  vecModels.size()<<" nTaylorTerms="<<nTaylorTerms);
+             synthesis::ImageParamsHelper iph("image."+sources[i]);
+             // for simulations we don't need cross-terms
+             for (int order = 0; order<nTaylorTerms; ++order) {
+                  if (nTaylorTerms > 1) {
+                      // this is an MFS case, setup Taylor terms
+                      iph.makeTaylorTerm(order);
+                      ASKAPLOG_INFO_STR(logger,"Processing Taylor term "<<order);
+                  }
+                  std::string model = vecModels[0];
+                  if (vecModels.size() == 1) {
+                      // only base name is given, need to add taylor suffix
+                      model += iph.suffix();
+                  }
+
+                  if (std::find(loadedImageModels.begin(),loadedImageModels.end(),model) != loadedImageModels.end()) {
+                      ASKAPLOG_INFO_STR(logger, "Model " << model << " has already been loaded, reusing it for "<< sources[i]);
+                      if (vecModels.size()!=1) {
+                          ASKAPLOG_WARN_STR(logger, "MFS simulation will not work correctly if you specified the same model "<<
+                               model<<" for multiple Taylor terms");
+                      }
+                  } else {
+                      ASKAPLOG_INFO_STR(logger, "Adding image " << model << " as model for "<< sources[i]
+                                         << ", parameter name: "<<iph.paramName() );
+                      // need to patch model to append taylor suffix
+                      synthesis::SynthesisParamsHelper::loadImageParameter(*pModel, iph.paramName(), model);
+                      loadedImageModels.insert(model);
+                  }
+             }
+         } else {
+             // loop through components
+             ASKAPLOG_INFO_STR(logger, "Adding components as model for "<< sources[i] );
+             const vector<string> compList = parset.getStringVector(compPar);
+             for (vector<string>::const_iterator cmp = compList.begin(); cmp != compList.end(); ++cmp) {
+                  ASKAPLOG_INFO_STR(logger, "Loading component " << *cmp << " as part of the model for " << sources[i]);
+                  synthesis::SynthesisParamsHelper::copyComponent(pModel, parset,*cmp,"sources.");
+              }
+         }
+    }
+    ASKAPLOG_INFO_STR(logger, "Successfully read models");
+  }
+
 } // namespace
