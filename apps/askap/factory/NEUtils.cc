@@ -421,7 +421,7 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
 
   }
 
-  void NEUtils::readModels(LOFAR::ParameterSet& parset, const scimath::Params::ShPtr &pModel)
+  void NEUtils::readModels(const LOFAR::ParameterSet& parset, const scimath::Params::ShPtr &pModel)
   {
 
     ASKAP_LOGGER(logger, ".readModels");

@@ -34,6 +34,7 @@
 
 // Include own header file first
 #include "JacalBPCalibrator.h"
+#include "NEUtils.h"
 #include <daliuge/DaliugeApplication.h>
 // logging stuff
 #include <askap_synthesis.h>
@@ -107,6 +108,8 @@ JacalBPCalibrator::JacalBPCalibrator(dlg_app_info *raw_app) : DaliugeApplication
 
   }
   this->isParallel =  true;
+
+
 }
 
 DaliugeApplication::ShPtr JacalBPCalibrator::createDaliugeApplication(dlg_app_info *raw_app)
@@ -114,7 +117,7 @@ DaliugeApplication::ShPtr JacalBPCalibrator::createDaliugeApplication(dlg_app_in
     return JacalBPCalibrator::ShPtr(new JacalBPCalibrator(raw_app));
 }
 
-JacalBPCalibrator::init(const char ***arguments) {
+int JacalBPCalibrator::init(const char ***arguments) {
 
   // Argument parsing is not working as yet
 
@@ -171,7 +174,7 @@ int JacalBPCalibrator::run() {
   this->itsParset = parset.makeSubset("Cbpcalibrator.");
 
   ASKAPLOG_INFO_STR(logger, "Bandpass will be solved for using a specialised pipeline");
-  if () {
+  if (this->isMaster) {
       // setup solution source (or sink to be exact, because we're writing the solution here)
       itsSolutionSource = accessors::CalibAccessFactory::rwCalSolutionSource(this->itsParset);
       ASKAPASSERT(itsSolutionSource);
@@ -229,34 +232,12 @@ int JacalBPCalibrator::run() {
           "Number of measurement sets given in the parset ("<<measurementSets().size()<<
           ") should be either 1 or equal the number of beams ("<<nBeam()<<")");
   }
-  if (!this->isParallel { // not implemented
+  if (!this->isParallel) { // not implemented
       // setup work units in the serial case - all work to be done here
       ASKAPLOG_INFO_STR(logger, "All work for "<<nBeam()<<" beams and "<<nChan()<<" channels will be handled by this rank");
       itsWorkUnitIterator.init(casa::IPosition(2, nBeam(), nChan()));
   }
 
-}
-
-/// @brief helper method to remove the dataset name from a parset
-/// @details We deal with multiple measurement sets in a dit different
-/// way from the other synthesis applications (they are not per worker
-/// here). This method allows to remove the string with measurement sets
-/// in the parset passed to base classes and replace it by empty string
-/// @param[in] parset input parset
-/// @return a copy without the dataset keyword
-LOFAR::ParameterSet BPCalibratorParallel::emptyDatasetKeyword(const LOFAR::ParameterSet &parset)
-{
-  LOFAR::ParameterSet result(parset.makeSubset(""));
-  result.replace("dataset",std::string());
-  return result;
-}
-
-/// @brief method which does the main job
-/// @details it iterates over all channels/beams and writes the result.
-/// In the parallel mode each worker iterates over their own portion of work and
-/// then sends the result to master for writing.
-void BPCalibratorParallel::run()
-{
   if (this->isMaster) {
     ASKAPLOG_DEBUG_STR(logger, "About to set the solution accessor");
     if (!itsSolutionIDValid) {
@@ -272,9 +253,9 @@ void BPCalibratorParallel::run()
     ASKAPASSERT(itsSolAcc);
   }
 
-  if (this->itsChan >=0 {
+  if (this->itsChan >=0) {
       ASKAPDEBUGASSERT(itsModel);
-      const int nCycles = parset().getInt32("ncycles", 1);
+      const int nCycles = this->parset().getInt32("ncycles", 1);
       ASKAPCHECK(nCycles >= 0, " Number of calibration iterations should be a non-negative number, you have " << nCycles);
       for (itsWorkUnitIterator.origin(); itsWorkUnitIterator.hasMore(); itsWorkUnitIterator.next()) {
            // this will force creation of the new measurement equation for this beam/channel pair
@@ -293,7 +274,7 @@ void BPCalibratorParallel::run()
            // setup reference gain, if needed
            if (itsRefAntenna >= 0) {
                //itsRefGain = accessors::CalParamNameHelper::paramName(itsRefAntenna, indices.first, casa::Stokes::XX);
-	       //wasim was here
+         //wasim was here
                itsRefGainXX = accessors::CalParamNameHelper::paramName(itsRefAntenna, indices.first, casa::Stokes::XX);
                itsRefGainYY = accessors::CalParamNameHelper::paramName(itsRefAntenna, indices.first, casa::Stokes::YY);
            } else {
@@ -323,7 +304,7 @@ void BPCalibratorParallel::run()
            }
       }
   }
-  if (this->isMaster && this->isParallel {
+  if (this->isMaster && this->isParallel) {
       const casa::uInt numberOfWorkUnits = nBeam() * nChan();
       for (casa::uInt chunk = 0; chunk < numberOfWorkUnits; ++chunk) {
            // asynchronously receive result from workers
@@ -337,7 +318,23 @@ void BPCalibratorParallel::run()
   // Destroy the accessor, which should call syncCache and write the table out.
   ASKAPLOG_INFO_STR(logger, "Syncing the cached bandpass table to disk");
   itsSolAcc.reset();
+
 }
+
+/// @brief helper method to remove the dataset name from a parset
+/// @details We deal with multiple measurement sets in a dit different
+/// way from the other synthesis applications (they are not per worker
+/// here). This method allows to remove the string with measurement sets
+/// in the parset passed to base classes and replace it by empty string
+/// @param[in] parset input parset
+/// @return a copy without the dataset keyword
+LOFAR::ParameterSet JacalBPCalibrator::emptyDatasetKeyword(const LOFAR::ParameterSet &parset)
+{
+  LOFAR::ParameterSet result(parset.makeSubset(""));
+  result.replace("dataset",std::string());
+  return result;
+}
+
 
 /// @brief verify that the current solution is valid
 /// @details We use a special keywork 'invalid' in the model to
@@ -345,7 +342,7 @@ void BPCalibratorParallel::run()
 /// This flag is checked to avoid writing the solution (which would
 /// automatically set validity flag
 /// @return true, if the current solution is valid
-bool BPCalibratorParallel::validSolution() const
+bool JacalBPCalibrator::validSolution() const
 {
    if (itsModel) {
        return !itsModel->has("invalid");
@@ -359,9 +356,9 @@ bool BPCalibratorParallel::validSolution() const
 /// in the parallel case. This is done because calibration data are sent to the master asynchronously and there is no
 /// way of knowing what iteration in the worker they correspond to without looking at the data.
 /// @return pair of beam (first) and channel (second) indices
-std::pair<casa::uInt, casa::uInt> BPCalibratorParallel::currentBeamAndChannel() const
+std::pair<casa::uInt, casa::uInt> JacalBPCalibrator::currentBeamAndChannel() const
 {
-  if (itsComms.isMaster() && itsComms.isParallel()) {
+  if (this->isMaster && this->isParallel) {
       ASKAPDEBUGASSERT(itsModel);
       ASKAPDEBUGASSERT(itsModel->has("beam") && itsModel->has("channel"));
       const double beam = itsModel->scalarValue("beam");
@@ -387,9 +384,13 @@ std::pair<casa::uInt, casa::uInt> BPCalibratorParallel::currentBeamAndChannel() 
 /// @brief send current model to the master
 /// @details This method is supposed to be called from workers in the parallel mode and
 /// sends the current results to the master rank
-void BPCalibratorParallel::sendModelToMaster() const
+void JacalBPCalibrator::sendModelToMaster() const
 {
-   ASKAPDEBUGTRACE("BPCalibratorParallel::sendModelToMaster");
+
+
+   /* FIXME - send this to the correct OUTPUT */
+   /*
+   ASKAPDEBUGTRACE("JacalBPCalibrator::sendModelToMaster");
    ASKAPLOG_DEBUG_STR(logger, "Sending results to the master");
    itsComms.notifyMaster();
    ASKAPDEBUGASSERT(itsModel);
@@ -400,15 +401,17 @@ void BPCalibratorParallel::sendModelToMaster() const
    out << *itsModel;
    out.putEnd();
    bobmw.flush();
+   */
+   
 }
 
 /// @brief asynchronously receive model from one of the workers
 /// @details This method is supposed to be used in the master rank in the parallel mode. It
 /// waits until the result becomes available from any of the workers and then stores it
 /// in itsModel.
-void BPCalibratorParallel::receiveModelFromWorker()
+void JacalBPCalibrator::receiveModelFromWorker()
 {
-   ASKAPDEBUGTRACE("BPCalibratorParallel::receiveModelFromWorker");
+   ASKAPDEBUGTRACE("JacalBPCalibrator::receiveModelFromWorker");
    itsModel.reset(new scimath::Params);
 
    // wait for the notification
@@ -428,7 +431,7 @@ void BPCalibratorParallel::receiveModelFromWorker()
 /// @brief Calculate the normal equations (runs in workers)
 /// @details Model, either image-based or component-based, is used in conjunction with
 /// CalibrationME to calculate the generic normal equations.
-void BPCalibratorParallel::calcNE()
+void JacalBPCalibrator::calcNE()
 {
   ASKAPDEBUGASSERT(itsComms.isWorker());
 
@@ -453,7 +456,7 @@ void BPCalibratorParallel::calcNE()
 }
 
 /// @brief helper method to invalidate curremt solution
-void BPCalibratorParallel::invalidateSolution() {
+void JacalBPCalibrator::invalidateSolution() {
    ASKAPDEBUGASSERT(itsModel);
    itsModel->add("invalid",1.);
    itsModel->fix("invalid");
@@ -462,7 +465,7 @@ void BPCalibratorParallel::invalidateSolution() {
 
 /// @brief Solve the normal equations (runs in workers)
 /// @details Parameters of the calibration problem are solved for here
-void BPCalibratorParallel::solveNE()
+void JacalBPCalibrator::solveNE()
 {
   if (itsComms.isWorker()) {
       ASKAPLOG_INFO_STR(logger, "Solving normal equations");
@@ -484,7 +487,7 @@ void BPCalibratorParallel::solveNE()
       ASKAPLOG_INFO_STR(logger, "Solved normal equations in "<< timer.real() << " seconds ");
       ASKAPLOG_INFO_STR(logger, "Solution quality: "<<q);
 
-      const unsigned int minRank = parset().getUint32("minrank",15u);
+      const unsigned int minRank = this->parset().getUint32("minrank",15u);
       if (q.rank() < minRank) {
           ASKAPLOG_WARN_STR(logger, "Solution failed - minimum rank is "<<minRank<<", normal matrix has rank = "<<q.rank());
           invalidateSolution();
@@ -514,7 +517,7 @@ void BPCalibratorParallel::solveNE()
 
 /// @brief Write the results (runs in master)
 /// @details The solution (calibration parameters) is reported via solution accessor
-void BPCalibratorParallel::writeModel(const std::string &)
+void JacalBPCalibrator::writeModel(const std::string &)
 {
   ASKAPDEBUGASSERT(itsComms.isMaster());
 
@@ -546,7 +549,7 @@ void BPCalibratorParallel::writeModel(const std::string &)
 /// CalibrationME template.
 /// @param[in] dsi data shared iterator
 /// @param[in] perfectME uncorrupted measurement equation
-void BPCalibratorParallel::createCalibrationME(const accessors::IDataSharedIter &dsi,
+void JacalBPCalibrator::createCalibrationME(const accessors::IDataSharedIter &dsi,
                 const boost::shared_ptr<IMeasurementEquation const> &perfectME)
 {
    ASKAPDEBUGASSERT(itsModel);
@@ -579,7 +582,7 @@ void BPCalibratorParallel::createCalibrationME(const accessors::IDataSharedIter 
 /// would make the solution different from the simulated gains).
 /// @note The method throws exception if itsRefGain is not among
 /// the parameters of itsModel
-void BPCalibratorParallel::rotatePhases()
+void JacalBPCalibrator::rotatePhases()
 {
   // the intention is to rotate phases in worker (for this class)
   ASKAPDEBUGASSERT(itsComms.isWorker());
@@ -621,7 +624,7 @@ void BPCalibratorParallel::rotatePhases()
 /// @return solution time (seconds since 0 MJD)
 /// @note if no start/stop time metadata are present in the normal equations
 /// this method returns 0.
-double BPCalibratorParallel::solutionTime() const
+double JacalBPCalibrator::solutionTime() const
 {
   // use the earliest time corresponding to the data used to make this calibration solution
   // to tag the solution. A request for any latest time than this would automatically
@@ -642,7 +645,7 @@ double BPCalibratorParallel::solutionTime() const
 /// @param[in] ms Name of data set
 /// @param[in] chan channel to work with
 /// @param[in] beam beam to work with
-void BPCalibratorParallel::calcOne(const std::string& ms, const casa::uInt chan, const casa::uInt beam)
+void JacalBPCalibrator::calcOne(const std::string& ms, const casa::uInt chan, const casa::uInt beam)
 {
   casa::Timer timer;
   timer.mark();
@@ -653,7 +656,7 @@ void BPCalibratorParallel::calcOne(const std::string& ms, const casa::uInt chan,
       accessors::TableDataSource ds(ms, accessors::TableDataSource::DEFAULT, dataColumn());
       ds.configureUVWMachineCache(uvwMachineCacheSize(),uvwMachineCacheTolerance());
       accessors::IDataSelectorPtr sel=ds.createSelector();
-      sel << parset();
+      sel << this->parset();
       sel->chooseChannels(1,chan);
       sel->chooseFeed(beam);
       accessors::IDataConverterPtr conv=ds.createConverter();

@@ -20,6 +20,7 @@
 
 // own includes
 #include <daliuge/DaliugeApplication.h>
+#include "NEUtils.h"
 
 // askap ones
 #include <askapparallel/AskapParallel.h>
@@ -63,7 +64,13 @@ namespace askap
         virtual void drop_completed(const char *uid, drop_status status);
 
         // Parameter set
-        LOFAR::ParameterSet parset() const { return itsParset;}
+        inline const LOFAR::ParameterSet& parset() const { return itsParset;}
+
+        // set the Meaasurement Set Vector
+
+        inline void setMeasurementSets(const std::vector<std::string>& ms) { itsMs = ms;}
+
+        inline const std::vector<std::string>& measurementSets() const { return itsMs;}
 
       protected:
 
@@ -129,7 +136,7 @@ namespace askap
       /// @brief read the model from parset file and populate itsPerfectModel
       /// @details This method is common between several classes and probably
       /// should be pushed up in the class hierarchy
-      /// inline void readModels() const { readModels(parset(),itsPerfectModel); }
+      inline void readModels() const { NEUtils::readModels(itsParset,itsPerfectModel); }
 
       /// @brief number of antennas to solve for
       /// @return number of antennas to solve for
@@ -223,6 +230,36 @@ namespace askap
 
       // Parameter set
       LOFAR::ParameterSet itsParset;
+
+      // The channel number we are Solving
+      int itsChan;
+
+      // Bool flag for whether we are the Master or Worker. I've kept some of the MPIComms ideas
+      // probably not ideal - but it gets us into the drops refPhaseTerm
+      bool isMaster;
+      bool isWorker;
+      bool isParallel;
+
+      // I should use these to make the drop smaller
+      casa::IPosition freqInterval;
+      casa::IPosition timeInterval;
+
+      // the Measurement sets
+
+      std::vector<std::string> itsMs;
+
+      // its Solver
+      askap::scimath::Solver::ShPtr itsSolver;
+
+      askap::scimath::Equation::ShPtr itsEquation;
+
+       askap::scimath::Params::ShPtr itsModel;
+
+
+
+
+
+
     };
 
   }

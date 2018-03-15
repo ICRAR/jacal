@@ -87,7 +87,7 @@ namespace askap {
         /// @param[in] parset reference to a LOFAR parameter set
         /// @param[in] pModel shared pointer to the params object (must exist)
 
-        static void readModels(LOFAR::ParameterSet& parset, const scimath::Params::ShPtr &pModel);
+        static void readModels(const LOFAR::ParameterSet& parset, const scimath::Params::ShPtr &pModel);
 
         private:
 
