@@ -287,7 +287,11 @@ int JacalBPCalibrator::run() {
                 ASKAPLOG_INFO_STR(logger, "*** Starting calibration iteration " << cycle + 1 << " for beam="<<
                               indices.first<<" and channel="<<indices.second<<" ***");
                 // iterator is used to access the current work unit inside calcNE
+
+                /// FIXME: I could break this into two pieces as I have for the imaging - instead the BP calibrator
+                /// does all it needs to do in a single drop.
                 calcNE();
+                ///
                 solveNE();
            }
            if (this->itsChan >=0) {
