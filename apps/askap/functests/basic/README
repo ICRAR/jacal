@@ -1,8 +1,11 @@
-This test just 
+to run a basic test execute 
 
+>./run.sh
+
+This is a bash script
 1) Reads a config file
-2) Grids a data set with an empty model as initial conditions
-3) runs a solver
-4) generates a updated model
+2) Stars up the daliuge environment
+3) stars up the daliuge daemons
+4) unrolls a basic imaging graph
 
-This is encapsultated in the logica graph test_basic
+This is encapsultated in the logical graph basic_imge.json
