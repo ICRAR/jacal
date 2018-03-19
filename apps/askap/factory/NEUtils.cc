@@ -300,13 +300,14 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
           param = "Images."+imageNames[img]+".frequency";
 
           if ( !parset.isDefined(param) ) {
-
+              ASKAPLOG_WARN_STR(logger, "Frequency not in Parset and it needs to be");
               ASKAPTHROW(std::runtime_error,"Frequency not in parset");
 
           }
           param ="Images."+imageNames[img]+".direction";
           if ( !parset.isDefined(param) && directionNeeded) {
 
+              ASKAPLOG_WARN_STR(logger, "Direction not in Parset and it needs to be");
               ASKAPTHROW(std::runtime_error,"direction not in parset");
           }
           else if (!parset.isDefined(param) && !directionNeeded) {
@@ -344,6 +345,7 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
           param = "visweights.MFS.reffreq"; // set to average frequency if unset and nTerms > 1
           if ((parset.getString("visweights")=="MFS")) {
               if (!parset.isDefined(param)) {
+                  ASKAPLOG_WARN_STR(logger, "Param not found: " << param << " and cannot be predicted");
                   ASKAPTHROW(std::runtime_error,"MFS reference frequency not in parset");
               }
 

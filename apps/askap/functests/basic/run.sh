@@ -70,8 +70,8 @@ echo $ASKAP_ROOT
 waitNodeManager
 waitDIManager
 
-read -n1 -r -p "Press any key to start the test..." key
-
+# read -n1 -r -p "Press any key to start the test..." key
+sleep 5 
 # Run the tests
 runBasicTest
 
