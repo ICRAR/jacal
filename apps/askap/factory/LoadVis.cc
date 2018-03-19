@@ -142,7 +142,7 @@ namespace askap {
         // Lets get the key-value-parset
         ASKAP_LOGGER(logger, ".run");
         char buf[64*1024];
-        size_t n_read = input(0).read(buf, 64*1024);
+        size_t n_read = input("Config").read(buf, 64*1024);
         if (n_read == 64*1024) {
             n_read--;
         }
