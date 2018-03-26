@@ -92,7 +92,7 @@ namespace askap {
 /// @param[in] raw_app Daliuge communication object
 
 JacalBPCalibrator::JacalBPCalibrator(dlg_app_info *raw_app) : DaliugeApplication(raw_app),
-      itsPerfectModel(new scimath::Params()), itsRefAntenna(-1), itsSolutionID(-1), itsSolutionIDValid(false)
+      itsPerfectModel(new scimath::Params()), itsRefAntenna(-1), itsSolutionID(-1), itsSolutionIDValid(false),itsModel(new scimath::Params()),itsSolver(scimath::Solver::ShPtr(new scimath::Solver)),itsNe(new scimath::ImagingNormalEquations(*itsModel))
 {
 
   this->itsChan = NEUtils::getChan(raw_app->uid);
@@ -109,6 +109,8 @@ JacalBPCalibrator::JacalBPCalibrator(dlg_app_info *raw_app) : DaliugeApplication
 
   }
   this->isParallel =  true;
+
+
 
 
 }

@@ -19,4 +19,4 @@ Cbpcalibrator.sources.src.calibrator          = 1934-638
 #
 Cbpcalibrator.gridder                         = SphFunc
 #
-Cbpcalibrator.ncycles                         = 1
+Cbpcalibrator.ncycles                         = 2
