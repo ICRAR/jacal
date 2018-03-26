@@ -226,7 +226,8 @@ int JacalBPCalibrator::run() {
           // setup work units in the parallel case, make beams the first (fastest to change) parameter to achieve
           // greater benefits if multiple measurement sets are present (more likely to be scheduled for different ranks)
           ASKAPLOG_INFO_STR(logger, "Work for "<<nBeam()<<" beams and "<<nChan()<<" channels will be split between ranks, this one handles a single channel - but we could define a chunk");
-          itsWorkUnitIterator.init(casa::IPosition(2, nBeam(), nChan()), this->itsChan, this->itsChan+1);
+          itsWorkUnitIterator.init(casa::IPosition(2, nBeam(), nChan()), 1, this->itsChan);
+          ASKAPLOG_INFO_STR(logger, "Initialised iterator");
       }
 
       ASKAPCHECK((measurementSets().size() == 1) || (measurementSets().size() == nBeam()),
@@ -240,7 +241,7 @@ int JacalBPCalibrator::run() {
   }
 
   if (this->isMaster) {
-    ASKAPLOG_DEBUG_STR(logger, "About to set the solution accessor");
+    ASKAPLOG_INFO_STR(logger, "About to set the solution accessor");
     if (!itsSolutionIDValid) {
         // obtain solution ID only once, the results can come in random order and the
         // accessor is responsible for aggregating all of them together. This is done based on this ID.
