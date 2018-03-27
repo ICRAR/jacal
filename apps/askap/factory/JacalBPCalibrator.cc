@@ -213,8 +213,8 @@ int JacalBPCalibrator::run() {
       /// Create solver in workers
       itsSolver.reset(new scimath::LinearSolver(1e3));
       ASKAPCHECK(itsSolver, "Solver not defined correctly");
-      ASKAPCHECK(!parset.isDefined("refgain"), "usage of refgain is deprecated, define reference antenna instead");
-      itsRefAntenna = parset.getInt32("refantenna",-1);
+      ASKAPCHECK(!itsParset.isDefined("refgain"), "usage of refgain is deprecated, define reference antenna instead");
+      itsRefAntenna = itsParset.getInt32("refantenna",-1);
       if (itsRefAntenna >= 0) {
           ASKAPLOG_INFO_STR(logger, "Phases will be rotated, so antenna "<<itsRefAntenna<<" has zero phase for all channels and beams in the first polarisation");
           ASKAPCHECK(itsRefAntenna < static_cast<int>(nAnt()), "Requested reference antenna doesn't exist, nAnt="<<nAnt());
@@ -257,8 +257,9 @@ int JacalBPCalibrator::run() {
     ASKAPASSERT(itsSolAcc);
   }
 
-  if (this->itsChan >=0) {
+  if (this->itsChan >=0 && this->isWorker) {
       ASKAPDEBUGASSERT(itsModel);
+
       const int nCycles = this->parset().getInt32("ncycles", 1);
       ASKAPCHECK(nCycles >= 0, " Number of calibration iterations should be a non-negative number, you have " << nCycles);
       for (itsWorkUnitIterator.origin(); itsWorkUnitIterator.hasMore(); itsWorkUnitIterator.next()) {
@@ -304,7 +305,7 @@ int JacalBPCalibrator::run() {
                itsModel->fix("beam");
                itsModel->fix("channel");
                sendModelToMaster();
-           } else {
+           } else if (!this->isParallel){
                // serial operation, just write the result
                if (validSolution()) {
                    writeModel();
@@ -316,6 +317,7 @@ int JacalBPCalibrator::run() {
       const casa::uInt numberOfWorkUnits = nBeam() * nChan();
       for (casa::uInt chunk = 0; chunk < numberOfWorkUnits; ++chunk) {
            // asynchronously receive result from workers
+           ASKAPLOG_INFO_STR(logger, "Master received chunk " << chunk);
            receiveModelFromWorker();
            if (validSolution()) {
                writeModel();
@@ -324,8 +326,11 @@ int JacalBPCalibrator::run() {
   }
 
   // Destroy the accessor, which should call syncCache and write the table out.
-  ASKAPLOG_INFO_STR(logger, "Syncing the cached bandpass table to disk");
-  itsSolAcc.reset();
+  if (this->isMaster) {
+    ASKAPLOG_INFO_STR(logger, "Syncing the cached bandpass table to disk");
+    itsSolAcc.reset();
+
+  }
 
 }
 
@@ -542,7 +547,7 @@ void JacalBPCalibrator::writeModel(const std::string &)
 
   const std::pair<casa::uInt, casa::uInt> indices = currentBeamAndChannel();
 
-  ASKAPLOG_DEBUG_STR(logger, "Writing results of the calibration for beam="<<indices.first<<" channel="<<indices.second);
+  ASKAPLOG_INFO_STR(logger, "Writing results of the calibration for beam="<<indices.first<<" channel="<<indices.second);
 
   ASKAPCHECK(itsSolutionSource, "Solution source has to be defined by this stage");
 
@@ -552,6 +557,8 @@ void JacalBPCalibrator::writeModel(const std::string &)
   std::vector<std::string> parlist = itsModel->freeNames();
   for (std::vector<std::string>::const_iterator it = parlist.begin(); it != parlist.end(); ++it) {
        const casa::Complex val = itsModel->complexValue(*it);
+       // ASKAPLOG_INFO_STR(logger,"Value " << val << " Param " << *it);
+
        const std::pair<accessors::JonesIndex, casa::Stokes::StokesTypes> paramType =
              accessors::CalParamNameHelper::parseParam(*it);
        // beam is also coded in the parameters, although we don't need it because the data are partitioned
