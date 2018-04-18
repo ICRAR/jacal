@@ -1,0 +1,71 @@
+import logging
+import os
+import time
+
+from jacalstreaming.engine.ascii.asciifilemessagingsystem import AsciiFileMessagingSystem
+from jacalstreaming.engine.messagingsystem import MessagingSystem
+from jacalstreaming.ingest.visibilitydatagramsourceservice import VisibilityDatagramSourceService
+from jacalstreaming.ingest.visibilitydatagram import VisibilityDatagram
+from jacalstreaming.stringdomain.tostringservice import ToStringService
+from jacalstreaming.stringdomain.stringwriterservice import StringWriterService
+
+from jacalstreaming.testbed.icerunner import IceRunner
+from jacalstreaming.testbed.playback import Playback
+
+def main():
+    """Tests the system by establishing and running a simple streaming topology"""
+
+    # set up logging
+    logging.basicConfig(level=logging.INFO, format='%(threadName)s, %(module)s: %(message)s')
+    
+    # set up messaging system. This would be replaced by something like Kafka
+    messaging_system = AsciiFileMessagingSystem()
+    
+    # set up the visibility datagram source service
+    visibility_datagram_source_service = VisibilityDatagramSourceService(messaging_system, "localhost", 3000, "visibility", "playbackstatus", "visibilitystatus")
+    
+    # set up a dummy service that consumes messages from the topic "concatenation" and writes them to file
+    to_string_service = ToStringService(messaging_system, VisibilityDatagram, "visibility", "visibilitystring", "visibilitystatus", "tostringstatus")
+    
+    # set up a dummy service that consumes messages from the topic "concatenation" and writes them to file
+    string_writer_service = StringWriterService(messaging_system, "visibilitystring", "tostringstatus", "output.txt")
+    
+    # start Ice
+    logging.info("Starting Ice")
+    ice_runner = IceRunner("testbed_data")
+    ice_runner.start()
+
+    # start them, wait ten seconds, stop them
+    logging.info("Starting services")
+    string_writer_service.start()
+    to_string_service.start()
+    visibility_datagram_source_service.start()
+    
+    # start playback
+    logging.info("Starting playback")
+    playback = Playback("testbed_data")
+    playback.playback("data/ade1card.ms")
+    playback.wait()
+
+    logging.info("Playback has finished; sending drain message.")
+    messaging_system.publish("playbackstatus", "Finished")
+
+    logging.info("Waiting for VisibilityDatagramSourceService to finish...")
+    visibility_datagram_source_service.wait()
+
+    logging.info("Waiting for ToStringService to finish...")
+    to_string_service.wait()
+
+    logging.info("Waiting for StringWriterService to finish...")
+    string_writer_service.wait()
+
+    
+    # stop Ice
+    logging.info("stopping Ice")
+    ice_runner.stop()
+
+
+
+if __name__ == '__main__':
+    main()
+

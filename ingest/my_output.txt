@@ -1,0 +1,534 @@
+MainThread, genericmonitorservice: initializing
+MainThread, test_alignservice: Starting Ice
+MainThread, icerunner: Trying to start Ice Registry...
+MainThread, icerunner: Waiting for Ice Registry to start...
+MainThread, icerunner: Ice Registry started.
+MainThread, icerunner: Trying to start Ice Storm...
+MainThread, icerunner: Waiting for IceStorm to start...
+MainThread, icerunner: IceStorm started.
+MainThread, test_alignservice: Starting services
+MainThread, servicerunner: Starting service...
+MainThread, genericmonitorservice: Starting
+MainThread, servicerunner: Starting service...
+MainThread, servicerunner: Starting service...
+MainThread, servicerunner: Starting service...
+MainThread, servicerunner: Starting service...
+MainThread, servicerunner: Starting service...
+MainThread, test_alignservice: Publishing configuration
+MainThread, test_alignservice: Starting processing
+MainThread, test_alignservice: Starting playback
+ServiceRunner main thread, configurationadapter: Processing configuration message for service with label string_writer_service
+ServiceRunner main thread, stringwriterservice: Initializing
+ServiceRunner main thread, configurableservice: Initializing
+ServiceRunner main thread, stringwriterservice: Output will be written to output.txt
+ServiceRunner main thread, stringwriterservice: Received 'Start' control message.
+ServiceRunner main thread, monitoradapter: Publishing metrics on change of state.
+Debug: registered context Global=0
+Debug: registered context Global=0
+nodeName returns: virtualdeb7
+ServiceRunner main thread, configurationadapter: Processing configuration message for service with label visibility_datagram_source_service
+ServiceRunner main thread, configurableservice: Initializing
+ServiceRunner main thread, visibilitydatagramsourceservice: Binding to localhost:3000
+ServiceRunner main thread, configurationadapter: Processing configuration message for service with label ice_metadata_source_service
+ServiceRunner main thread, icemetadatasourceservice: initializing
+ServiceRunner main thread, configurableservice: Initializing
+ServiceRunner main thread, icemetadatasourceservice: Topic manager name is 'IceStorm/TopicManager@IceStorm.TopicManager'
+ServiceRunner main thread, icemetadatasourceservice: Locator value is 'IceGrid/Locator:tcp -h localhost -p 4061'
+ServiceRunner main thread, configurationadapter: Processing configuration message for service with label align_service
+ServiceRunner main thread, alignservice: Initializing
+ServiceRunner main thread, configurableservice: Initializing
+ServiceRunner main thread, alignservice: baseline_antenna_indices is [1, 3, 4, 11]
+ServiceRunner main thread, configurationadapter: Processing configuration message for service with label to_string_service
+ServiceRunner main thread, configurableservice: Initializing
+ServiceRunner main thread, tostringservice: Received 'Start' control message
+ServiceRunner main thread, monitoradapter: Publishing metrics on change of state.
+ServiceRunner main thread, visibilitydatagramsourceservice: Received 'Start' control message
+ServiceRunner main thread, alignservice: Received 'Start' control message
+ServiceRunner main thread, monitoradapter: Publishing metrics on change of state.
+ServiceRunner main thread, visibilitydatagramsourceservice: New state is 2
+ServiceRunner main thread, monitoradapter: Publishing metrics on change of state.
+ServiceRunner main thread, icemetadatasourceservice: Received 'Start' control message
+ServiceRunner main thread, icemetadatasourceservice: New state is 2
+ServiceRunner main thread, monitoradapter: Publishing metrics on change of state.
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 1
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 1
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 2
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 2
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 3
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 3
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 4
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 5
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 1
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 6
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 2
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 7
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 3
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 8
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 4
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 9
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 5
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 10
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 6
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 11
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 6
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 12
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 7
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 13
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 8
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 14
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 9
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 15
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 10
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, alignservice: Received TOS metadata with timestamp 4679920058342343
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 16
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 11
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 17
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 12
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 18
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 13
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 19
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 14
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 20
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 15
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 21
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 16
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 22
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 17
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 23
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 18
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 24
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 19
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 25
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 20
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 26
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 20
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 27
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 21
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 28
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 22
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 29
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 23
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 30
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 24
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 31
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 23
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 32
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 24
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 33
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 25
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 34
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 26
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 35
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 27
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 36
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 26
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 37
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 27
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 38
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 28
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 39
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 29
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 40
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 30
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 41
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 29
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 42
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 30
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 43
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 31
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 44
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 32
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 45
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 33
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 46
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 33
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 47
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 34
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 48
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 35
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 49
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 36
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 50
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 37
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 51
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 36
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 52
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 37
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 53
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 38
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 54
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 39
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 55
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 40
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 56
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 39
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 57
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 40
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 58
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 41
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 59
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 42
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 60
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 43
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 61
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 44
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 62
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 43
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 63
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 44
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 64
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 45
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 65
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 46
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 66
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 45
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 67
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 46
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 68
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 47
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 69
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 48
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 70
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 49
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 71
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 50
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 72
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 49
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 73
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 50
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 74
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 51
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 75
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 52
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 76
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 53
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 77
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 52
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 78
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 53
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 79
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 54
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 80
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 55
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 81
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 56
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 82
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 57
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 83
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 56
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 84
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 57
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 85
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 58
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 86
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 59
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 87
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 60
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 88
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 59
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 89
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 60
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 90
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 61
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 91
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 62
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 92
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 63
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 93
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 63
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 94
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 64
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 95
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 65
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 96
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 66
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 97
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 67
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 98
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 66
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 99
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 67
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic datagram
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 100
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 1
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 2
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 3
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 4
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 5
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 6
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 7
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 8
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 9
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 10
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 11
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 12
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 13
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 14
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 15
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 16
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 17
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 18
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 19
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 20
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 21
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 22
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 23
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 24
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 25
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 26
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 27
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 28
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 29
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 30
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 31
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 32
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 33
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 34
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 35
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 36
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 37
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 38
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 39
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 40
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 41
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 42
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 43
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 44
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 45
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 46
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 47
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, blockingqueuemessagingsystem: Publishing message to topic metadata
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 48
+ServiceRunner main thread, blockingqueuemessagingsystem: 	Queue qsize is 0
+ServiceRunner main thread, alignservice: Received 'Stop' control message
+ServiceRunner main thread, monitoradapter: Publishing metrics on change of state.
+ServiceRunner main thread, icemetadatasourceservice: Received 'Stop' control message
+ServiceRunner main thread, icemetadatasourceservice: New state is 1
+ServiceRunner main thread, tostringservice: Received 'Stop' control message
+ServiceRunner main thread, monitoradapter: Publishing metrics on change of state.
+ServiceRunner main thread, stringwriterservice: Received 'Stop' control message.
+ServiceRunner main thread, monitoradapter: Publishing metrics on change of state.
+MainThread, servicerunner: Terminating service...
+MainThread, monitoradapter: Publishing metrics on termination
+MainThread, servicerunner: Terminating service...
+MainThread, monitoradapter: Publishing metrics on termination
+MainThread, servicerunner: Terminating service...
+MainThread, monitoradapter: Publishing metrics on termination
+MainThread, servicerunner: Terminating service...
+MainThread, monitoradapter: Publishing metrics on termination
+MainThread, servicerunner: Terminating service...
+MainThread, monitoradapter: Publishing metrics on termination
+MainThread, servicerunner: Terminating service...
+MainThread, genericmonitorservice: Terminating
+MainThread, test_alignservice: stopping Ice
+MainThread, icerunner: Terminating Ice Storm...
+ServiceRunner main thread, monitoradapter: Publishing metrics on change of state.
+ServiceRunner main thread, monitoradapter: Publishing metrics on change of state.
+ServiceRunner main thread, monitoradapter: Publishing metrics on change of state.
+MainThread, icerunner: Terminating Ice Registry...
+MainThread, icerunner: Ice Storm and Registry terminated.
+.
+----------------------------------------------------------------------
+Ran 1 test in 315.524s
+
+OK
