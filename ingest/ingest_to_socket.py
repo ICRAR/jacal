@@ -1,7 +1,6 @@
 import logging
 import os
 import time
-import unittest
 
 from jacalingest.engine.servicerunner import ServiceRunner
 from jacalingest.engine.servicerunnerfactory import ServiceRunnerFactory
@@ -30,14 +29,12 @@ from jacalingest.stringdomain.tostringservice import ToStringService
 from jacalingest.testbed.icerunner import IceRunner
 from jacalingest.testbed.playback import Playback
 
-class TestAlignService(unittest.TestCase):
+class IngesterToSocket:
+    def __init__(self, socket_host, socket_port):
+        self.socket_host = socket_host
+        self.socket_port = socket_port
 
-    @classmethod
-    def setUpClass(self):
-        logging.basicConfig(level=logging.INFO, format='%(threadName)s, %(module)s: %(message)s')
-
-
-    def test(self):
+    def ingest_to_socket(self):
         messaging_system = QueueMessagingSystem()
         messager = Messager()
 
@@ -84,10 +81,10 @@ class TestAlignService(unittest.TestCase):
 
         configuration_control_stream = messager.get_stream(messaging_system, "configurationcontrol", StringMessage)
         configuration_service = HardConfigurationService("configuration_service", configuration_control_stream.get_read_endpoint(), configuration_stream.get_write_endpoint())
-        configuration_service.add_configuration({"socket_writer_service": {"host": "localhost",
-                                                                           "port": "10001"},
-                                                 "socket_reader_service": {"host": "localhost",
-                                                                           "port": "10001"},
+        configuration_service.add_configuration({"socket_writer_service": {"host": self.socket_host,
+                                                                           "port": self.socket_port},
+                                                 "socket_reader_service": {"host": self.socket_host,
+                                                                           "port": self.socket_port},
                                                  "string_writer_service.output_path": "output.txt"})
 
         configuration_service_runner = ServiceRunner(configuration_service, messager)
@@ -150,5 +147,7 @@ class TestAlignService(unittest.TestCase):
     
     
 if __name__ == '__main__':
-    unittest.main()
-    
+    logging.basicConfig(level=logging.INFO, format='%(threadName)s, %(module)s: %(message)s')
+    ingester_to_socket = IngesterToSocket("localhost", 10001)
+    ingester_to_socket.ingest_to_socket()
+

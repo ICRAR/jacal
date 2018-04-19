@@ -93,19 +93,18 @@ class HardConfigurationService(HandlerService):
                                                             "interval": "5000000",
                                                             "number_of_channels": "216",
                                                             "stokes": ["XX", "XY", "YX", "YY"]}},
-                         "maximum_number_of_beams": "36",
-                         "socket_writer_service": {"host": "localhost",
-                                                   "port": "10001"},
-                         "socket_reader_service": {"host": "localhost",
-                                                   "port": "10001"},
-                         "string_writer_service.output_path": "output.txt"}
-        self.configuration_message = ConfigurationMessage(self.configuration)
+                         "maximum_number_of_beams": "36"}
+
+    def add_configuration(self, configuration_dictionary):
+        for key in configuration_dictionary:
+            assert key not in self.configuration
+            self.configuration[key] = configuration_dictionary[key]
 
     def handle_control(self, message, state):
         command = message.get_payload()
         if command == "Start":
             logging.info("Received 'Start' control message: publishing Configuration")
-            self.messager.publish(self.configuration_endpoint, self.configuration_message)
+            self.messager.publish(self.configuration_endpoint, ConfigurationMessage(self.configuration))
         else:
             logging.info("Received unknown control message: {}".format(command))
         return state
