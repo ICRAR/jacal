@@ -110,6 +110,8 @@ JacalBPCalibrator::JacalBPCalibrator(dlg_app_info *raw_app) : DaliugeApplication
   }
   this->isParallel =  true;
 
+  // only beam 0 for the moment
+  this->itsBeam = 0;
 
 
 
@@ -228,7 +230,21 @@ int JacalBPCalibrator::run() {
           // setup work units in the parallel case, make beams the first (fastest to change) parameter to achieve
           // greater benefits if multiple measurement sets are present (more likely to be scheduled for different ranks)
           ASKAPLOG_INFO_STR(logger, "Work for "<<nBeam()<<" beams and "<<nChan()<<" channels will be split between ranks, this one handles a single channel - but we could define a chunk");
-          itsWorkUnitIterator.init(casa::IPosition(2, nBeam(), nChan()), 1, this->itsChan);
+          /// @brief initialise to iterate over given range
+          /// @details
+          /// @param[in] shape shape of the volume to iterate
+          /// @param[in] start position of the origin
+          /// @param[in] end end position
+
+          int allocation = nChan() / nChanPerRank();
+
+          casa::IPosition start(2, this->itsBeam, this->itsChan*allocation);
+          casa::IPosition stop(2, this->itsBeam, (this->itsChan+1)*allocation-1);
+
+          ASKAPLOG_INFO_STR(logger,"Allocation start " << start << " stop " << stop);
+
+          itsWorkUnitIterator.init(casa::IPosition(2, nBeam(), nChan()), start, stop);
+          //itsWorkUnitIterator.init(casa::IPosition(2, nBeam(), nChan()), 1, this->itsChan);
           ASKAPLOG_INFO_STR(logger, "Initialised iterator");
       }
 
@@ -315,9 +331,9 @@ int JacalBPCalibrator::run() {
   }
   if (this->isMaster && this->isParallel) {
       const casa::uInt numberOfWorkUnits = nBeam() * nChan();
+      ASKAPLOG_INFO_STR(logger, "Master waiting for " << nBeam() << " beams " << "with " << nChan() << " channels");
       for (casa::uInt chunk = 0; chunk < numberOfWorkUnits; ++chunk) {
            // asynchronously receive result from workers
-           ASKAPLOG_INFO_STR(logger, "Master received chunk " << chunk);
            receiveModelFromWorker();
            if (validSolution()) {
                writeModel();
@@ -328,6 +344,24 @@ int JacalBPCalibrator::run() {
   // Destroy the accessor, which should call syncCache and write the table out.
   if (this->isMaster) {
     ASKAPLOG_INFO_STR(logger, "Syncing the cached bandpass table to disk");
+    // begin check
+    ASKAPDEBUGASSERT(itsModel);
+    std::vector<std::string> parlist = itsModel->freeNames();
+    for (casa::uInt chan ; chan < nChan(); ++chan ) {
+
+      for (std::vector<std::string>::const_iterator it = parlist.begin(); it != parlist.end(); ++it) {
+
+         // ASKAPLOG_INFO_STR(logger,"Value " << val << " Param " << *it);
+
+         const std::pair<accessors::JonesIndex, casa::Stokes::StokesTypes> paramType =
+               accessors::CalParamNameHelper::parseParam(*it);
+         // beam is also coded in the parameters, although we don't need it because the data are partitioned
+         // just cross-check it
+         ASKAPLOG_INFO_STR(logger,"bandpass:" << itsSolAcc->bandpass(paramType.first,chan).g1() << ":" << itsSolAcc->bandpass(paramType.first,chan).g2());
+
+      }
+    }
+    // end check
     itsSolAcc.reset();
 
   }
@@ -470,6 +504,8 @@ void JacalBPCalibrator::calcNE()
 
   // first is beam, second is channel
   const std::pair<casa::uInt, casa::uInt> indices = currentBeamAndChannel();
+
+  ASKAPLOG_INFO_STR(logger,"Processing beam " << indices.first << " and channel " << indices.second);
 
   ASKAPDEBUGASSERT((measurementSets().size() == 1) || (indices.first < measurementSets().size()));
 
@@ -679,19 +715,23 @@ void JacalBPCalibrator::calcOne(const std::string& ms, const casa::uInt chan, co
   // First time around we need to generate the equation
   if (!itsEquation) {
       ASKAPLOG_INFO_STR(logger, "Creating measurement equation" );
+      ASKAPLOG_INFO_STR(logger, "Creating table data source" );
       accessors::TableDataSource ds(ms, accessors::TableDataSource::DEFAULT, dataColumn());
       /// FIXME: Not sure I need this
       ///ds.configureUVWMachineCache(uvwMachineCacheSize(),uvwMachineCacheTolerance());
-
+      ASKAPLOG_INFO_STR(logger, "Creating selector from parset" );
       accessors::IDataSelectorPtr sel=ds.createSelector();
       sel << this->parset();
       sel->chooseChannels(1,chan);
       sel->chooseFeed(beam);
+      ASKAPLOG_INFO_STR(logger, "Creating converter for selector" );
       accessors::IDataConverterPtr conv=ds.createConverter();
       conv->setFrequencyFrame(casa::MFrequency::Ref(casa::MFrequency::TOPO), "Hz");
       conv->setDirectionFrame(casa::MDirection::Ref(casa::MDirection::J2000));
       // ensure that time is counted in seconds since 0 MJD
       conv->setEpochFrame();
+      ASKAPLOG_INFO_STR(logger, "Creating iterator");
+
       accessors::IDataSharedIter it=ds.createIterator(sel, conv);
       ASKAPCHECK(it.hasMore(), "No data seem to be available for channel "<<chan<<" and beam "<<beam);
 

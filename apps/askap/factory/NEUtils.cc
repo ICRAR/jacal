@@ -228,13 +228,16 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
       b1.resize(ParamsSize);
       n_read = input.read(b1.data(), ParamsSize);
 
-      ASKAPCHECK(n_read == ParamsSize, "Unable to read Params of expected size");
+      if (n_read == ParamsSize) {
 
-      LOFAR::BlobIBufString bib(b1);
-      LOFAR::BlobIStream bis(bib);
-      bis >> *Params;
 
-    }
+        LOFAR::BlobIBufString bib(b1);
+        LOFAR::BlobIStream bis(bib);
+        bis >> *Params;
+      }
+
+
+  }
   LOFAR::ParameterSet NEUtils::addMissingParameters(LOFAR::ParameterSet& parset) {
 
 

@@ -152,6 +152,11 @@ namespace askap
       /// @return number of channels to solve for
       inline casa::uInt nChan() const { return parset().getInt32("nChan", 304); }
 
+
+      /// @brief number of channels to solve for
+      /// @return number of channels per rank
+      inline casa::uInt nChanPerRank() const { return parset().getInt32("nChanPerRank", 1); }
+
       inline const std::string dataColumn() const { return this->itsParset.getString("datacolumn", "DATA");}
 
       /// @brief extract current beam/channel pair from the iterator
@@ -237,6 +242,9 @@ namespace askap
 
       // The channel number we are Solving
       int itsChan;
+
+      // The beam we are solving
+      int itsBeam;
 
       // Bool flag for whether we are the Master or Worker. I've kept some of the MPIComms ideas
       // probably not ideal - but it gets us into the drops refPhaseTerm
