@@ -64,7 +64,7 @@ ASKAP_LIBS = -lIce -lIceUtil -llog4cxx -laskap_askap -lcommon -lblob -laskap_acc
 CASA_LIBS = -lcasa_ms -lcasa_tables -lcasa_casa -lcasa_measures -lcasa_coordinates -lcfitsio
 
 # Combined flags
-CXXFLAGS += -ferror-limit=1 -std=c++11 -fPIC -I. -g $(ASKAP_DEFS) $(ASKAP_INCDIRS) $(CASA_INCDIRS) $(DLG_INCDIRS)
+CXXFLAGS += -std=c++11 -fPIC -I. -g $(ASKAP_DEFS) $(ASKAP_INCDIRS) $(CASA_INCDIRS) $(DLG_INCDIRS)
 LDFLAGS += $(ASKAP_LIBDIRS) $(ASKAP_LIBS) $(CASA_LIBDIRS) $(CASA_LIBS)
 
 
@@ -85,7 +85,7 @@ OBJS = factory/DaliugeApplicationFactory.o \
        factory/JacalBPCalibrator.o
 .PHONY: all clean
 
-all: libaskapsoft_dlg.so standalone
+all: libaskapsoft_dlg.so 
 
 clean:
 	rm -f factory/*.o daliuge/*.o *.o *.so standalone
