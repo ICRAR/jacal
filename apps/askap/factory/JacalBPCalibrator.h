@@ -278,7 +278,7 @@ namespace askap
 
       vector<int> itsModelInputs;
 
-      dlg_app_info *appInfo;
+      
 
 
     };

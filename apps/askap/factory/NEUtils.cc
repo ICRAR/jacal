@@ -416,9 +416,9 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
     boost::regex exp1(tag);
     boost::cmatch what;
     vector<int> inputs;
-
+    
     for (int i = 0; i < app->n_inputs; i++) {
-  
+
       if (boost::regex_search(app->inputs[i].name, what, exp1)) {
 
         inputs.push_back(i);

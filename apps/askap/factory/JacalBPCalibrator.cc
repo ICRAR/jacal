@@ -92,7 +92,7 @@ namespace askap {
 /// @param[in] raw_app Daliuge communication object
 
 JacalBPCalibrator::JacalBPCalibrator(dlg_app_info *raw_app) : DaliugeApplication(raw_app),
-      itsPerfectModel(new scimath::Params()), itsRefAntenna(-1), itsSolutionID(-1), itsSolutionIDValid(false),itsModel(new scimath::Params()),itsSolver(scimath::Solver::ShPtr(new scimath::Solver)),itsNe(new scimath::ImagingNormalEquations(*itsModel)), appInfo(raw_app)
+      itsPerfectModel(new scimath::Params()), itsRefAntenna(-1), itsSolutionID(-1), itsSolutionIDValid(false),itsModel(new scimath::Params()),itsSolver(scimath::Solver::ShPtr(new scimath::Solver)),itsNe(new scimath::ImagingNormalEquations(*itsModel))
 {
 
   this->itsChan = NEUtils::getChan(raw_app->uid);
@@ -161,16 +161,17 @@ int JacalBPCalibrator::init(const char ***arguments) {
   this->freqInterval[0] = this->itsChan;
   this->freqInterval[1] = this->itsChan+1;
 
-  this->itsModelInputs = NEUtils::getInputs(this->appInfo,"Model");
+
 
   return 0;
 }
 int JacalBPCalibrator::run() {
   // Lets get the key-value-parset
   ASKAP_LOGGER(logger, ".run");
-  ASKAPLOG_INFO_STR(logger,"UID:" << appInfo->uid);
-  ASKAPLOG_INFO_STR(logger,"NStreaming: " << appInfo->n_streaming_inputs);
 
+  itsModelInputs = get_inputs("Model");
+
+  
   char buf[64*1024];
   size_t n_read = input("Config").read(buf, 64*1024);
   if (n_read == 64*1024) {
@@ -378,8 +379,9 @@ int JacalBPCalibrator::run() {
     // end check
     itsSolAcc.reset();
 
-  }
 
+  }
+  return 0;
 }
 
 /// @brief helper method to remove the dataset name from a parset
@@ -807,7 +809,7 @@ void JacalBPCalibrator::calcOne(const std::string& ms, const casa::uInt chan, co
   itsEquation->calcEquations(*itsNe);
   ASKAPLOG_INFO_STR(logger, "Calculated normal equations for "<< ms << " channel "<<chan<<" beam " <<beam<<" in "<< timer.real()
                      << " seconds ");
-  
+
 }
 void JacalBPCalibrator::data_written(const char *uid, const char *data, size_t n) {
     dlg_app_running();
