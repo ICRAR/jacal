@@ -68,6 +68,8 @@ namespace askap {
 
         static int getInput(dlg_app_info *app, const char * tag);
 
+        static vector<int> getInputs(dlg_app_info *app, const char* tag);
+
         static int getOutput(dlg_app_info *app, const char * tag);
 
         static int getChan(char *uid);

@@ -8,7 +8,7 @@ waitNodeManager()
     TIMEOUT=10
     STATUS=1
     while [ $STATUS -ne 0 ] && [ $TIMEOUT -ne 0 ]; do
-        dlg nm -v --no-dlm & #> /dev/null 2>&1
+        dlg nm -v --no-dlm 1> ./nm.log 2>&1 &
         NMPID=$! 
         STATUS=$?
         TIMEOUT=`expr $TIMEOUT - 1`
@@ -27,7 +27,7 @@ waitDIManager()
     TIMEOUT=10
     STATUS=1
     while [ $STATUS -ne 0 ] && [ $TIMEOUT -ne 0 ]; do
-        dlg dim -N localhost & #> /dev/null 2>&1
+        dlg dim -N localhost 1> ./dim.log 2>&1 &
         DMPID=$! 
         STATUS=$?
         TIMEOUT=`expr $TIMEOUT - 1`
@@ -44,7 +44,7 @@ runBasicTest()
 { # Wait for daliuge to start, but timeout after 10 seconds
     echo -n Starting basic test
     TIMEOUT=10
-    dlg unroll-and-partition -L ./askap_BPCalibration.json -a metis | dlg map -N localhost,localhost -i 1 | dlg submit -H localhost -p 8001
+    dlg unroll-and-partition -L ./askap_BPCalibration.json -a metis | sed 's/DynlibApp/DynlibProcApp/g' | dlg map -N localhost,localhost,localhost,localhost -i 3 | dlg submit -H localhost -p 8001
 
 }
 cleanup()

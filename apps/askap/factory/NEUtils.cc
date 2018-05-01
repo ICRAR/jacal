@@ -410,6 +410,25 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
     return -1;
 
   }
+
+  vector<int> NEUtils::getInputs(dlg_app_info *app, const char* tag) {
+
+    boost::regex exp1(tag);
+    boost::cmatch what;
+    vector<int> inputs;
+
+    for (int i = 0; i < app->n_inputs; i++) {
+  
+      if (boost::regex_search(app->inputs[i].name, what, exp1)) {
+
+        inputs.push_back(i);
+      }
+
+    }
+    return inputs;
+
+  }
+
   int NEUtils::getOutput(dlg_app_info *app, const char* tag) {
 
 

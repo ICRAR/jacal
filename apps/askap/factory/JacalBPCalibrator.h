@@ -155,7 +155,7 @@ namespace askap
 
       /// @brief number of channels to solve for
       /// @return number of channels per rank
-      inline casa::uInt nChanPerRank() const { return parset().getInt32("nChanPerRank", 1); }
+      inline casa::uInt nChanPerRank() const { return parset().getInt32("nChanPerRank", 54); }
 
       inline const std::string dataColumn() const { return this->itsParset.getString("datacolumn", "DATA");}
 
@@ -194,6 +194,11 @@ namespace askap
       /// waits until the result becomes available from any of the workers and then stores it
       /// in itsModel.
       void receiveModelFromWorker();
+      /// @brief asynchronously receive model from one of the workers
+      /// @details This method is supposed to be used in the master rank in the parallel mode. It
+      /// waits until the result becomes available from a particular input and then stores it
+      /// in itsModel.
+      void receiveModelFromWorker(int input);
 
       /// uncorrupted model
       askap::scimath::Params::ShPtr itsPerfectModel;
@@ -271,7 +276,9 @@ namespace askap
 
       askap::synthesis::IVisGridder::ShPtr itsGridder;
 
+      vector<int> itsModelInputs;
 
+      dlg_app_info *appInfo;
 
 
     };

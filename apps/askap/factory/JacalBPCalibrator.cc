@@ -92,10 +92,11 @@ namespace askap {
 /// @param[in] raw_app Daliuge communication object
 
 JacalBPCalibrator::JacalBPCalibrator(dlg_app_info *raw_app) : DaliugeApplication(raw_app),
-      itsPerfectModel(new scimath::Params()), itsRefAntenna(-1), itsSolutionID(-1), itsSolutionIDValid(false),itsModel(new scimath::Params()),itsSolver(scimath::Solver::ShPtr(new scimath::Solver)),itsNe(new scimath::ImagingNormalEquations(*itsModel))
+      itsPerfectModel(new scimath::Params()), itsRefAntenna(-1), itsSolutionID(-1), itsSolutionIDValid(false),itsModel(new scimath::Params()),itsSolver(scimath::Solver::ShPtr(new scimath::Solver)),itsNe(new scimath::ImagingNormalEquations(*itsModel)), appInfo(raw_app)
 {
 
   this->itsChan = NEUtils::getChan(raw_app->uid);
+
 
   if (this->itsChan < 0) { // we are outside a loop
 
@@ -160,14 +161,18 @@ int JacalBPCalibrator::init(const char ***arguments) {
   this->freqInterval[0] = this->itsChan;
   this->freqInterval[1] = this->itsChan+1;
 
+  this->itsModelInputs = NEUtils::getInputs(this->appInfo,"Model");
+
   return 0;
 }
 int JacalBPCalibrator::run() {
   // Lets get the key-value-parset
   ASKAP_LOGGER(logger, ".run");
+  ASKAPLOG_INFO_STR(logger,"UID:" << appInfo->uid);
+  ASKAPLOG_INFO_STR(logger,"NStreaming: " << appInfo->n_streaming_inputs);
 
   char buf[64*1024];
-  size_t n_read = input(0).read(buf, 64*1024);
+  size_t n_read = input("Config").read(buf, 64*1024);
   if (n_read == 64*1024) {
       n_read--;
   }
@@ -236,12 +241,12 @@ int JacalBPCalibrator::run() {
           /// @param[in] start position of the origin
           /// @param[in] end end position
 
-          int allocation = nChan() / nChanPerRank();
+          int allocation = nChanPerRank();
 
-          casa::IPosition start(2, this->itsBeam, this->itsChan*allocation);
+          casa::IPosition start(2, this->itsBeam, (this->itsChan)*allocation);
           casa::IPosition stop(2, this->itsBeam, (this->itsChan+1)*allocation-1);
 
-          ASKAPLOG_INFO_STR(logger,"Allocation start " << start << " stop " << stop);
+          ASKAPLOG_INFO_STR(logger,"Allocation of " << allocation << " starts at " << start << " stop " << stop);
 
           itsWorkUnitIterator.init(casa::IPosition(2, nBeam(), nChan()), start, stop);
           //itsWorkUnitIterator.init(casa::IPosition(2, nBeam(), nChan()), 1, this->itsChan);
@@ -276,6 +281,9 @@ int JacalBPCalibrator::run() {
   if (this->itsChan >=0 && this->isWorker) {
       ASKAPDEBUGASSERT(itsModel);
 
+      // static std::mutex safety;
+      // std::lock_guard<std::mutex> guard(safety);
+
       const int nCycles = this->parset().getInt32("ncycles", 1);
       ASKAPCHECK(nCycles >= 0, " Number of calibration iterations should be a non-negative number, you have " << nCycles);
       for (itsWorkUnitIterator.origin(); itsWorkUnitIterator.hasMore(); itsWorkUnitIterator.next()) {
@@ -304,6 +312,7 @@ int JacalBPCalibrator::run() {
            }
 
            for (int cycle = 0; (cycle < nCycles) && validSolution(); ++cycle) {
+
                 ASKAPLOG_INFO_STR(logger, "*** Starting calibration iteration " << cycle + 1 << " for beam="<<
                               indices.first<<" and channel="<<indices.second<<" ***");
                 // iterator is used to access the current work unit inside calcNE
@@ -321,6 +330,7 @@ int JacalBPCalibrator::run() {
                itsModel->fix("beam");
                itsModel->fix("channel");
                sendModelToMaster();
+
            } else if (!this->isParallel){
                // serial operation, just write the result
                if (validSolution()) {
@@ -330,15 +340,19 @@ int JacalBPCalibrator::run() {
       }
   }
   if (this->isMaster && this->isParallel) {
-      const casa::uInt numberOfWorkUnits = nBeam() * nChan();
-      ASKAPLOG_INFO_STR(logger, "Master waiting for " << nBeam() << " beams " << "with " << nChan() << " channels");
-      for (casa::uInt chunk = 0; chunk < numberOfWorkUnits; ++chunk) {
+      ASKAPLOG_INFO_STR(logger,"There are " << this->itsModelInputs.size() << " inputs to iterate over");
+      for (std::vector<int>::const_iterator it =  this->itsModelInputs.begin(); it != this->itsModelInputs.end(); ++it) {
+
+        const casa::uInt numberOfWorkUnits = nBeam() * nChanPerRank();
+        ASKAPLOG_INFO_STR(logger, "Master waiting for " << nBeam() << " beams " << "with " << nChan() << " channels");
+        for (casa::uInt chunk = 0; chunk < numberOfWorkUnits; ++chunk) {
            // asynchronously receive result from workers
-           receiveModelFromWorker();
+           receiveModelFromWorker(*it);
            if (validSolution()) {
                writeModel();
            }
-      }
+         }
+       }
   }
 
   // Destroy the accessor, which should call syncCache and write the table out.
@@ -479,7 +493,27 @@ void JacalBPCalibrator::receiveModelFromWorker()
 
 }
 
+void JacalBPCalibrator::receiveModelFromWorker(int theInput)
+{
 
+
+
+   itsModel.reset(new scimath::Params);
+   NEUtils::receiveParams(itsModel, input(theInput));
+   /* FIXME: THis is the old receive once the above works - just remove this
+   // wait for the notification
+   const int source = itsComms.waitForNotification().first;
+   ASKAPLOG_DEBUG_STR(logger, "Receiving results from rank "<<source);
+
+   askapparallel::BlobIBufMW bibmw(itsComms, source);
+   LOFAR::BlobIStream in(bibmw);
+   const int version = in.getStart("calmodel");
+   ASKAPASSERT(version == BPCALIBRATOR_PARALLEL_BLOB_STREAM_VERSION);
+   in >> *itsModel;
+   in.getEnd();
+   */
+
+}
 
 /// @brief Calculate the normal equations (runs in workers)
 /// @details Model, either image-based or component-based, is used in conjunction with
@@ -602,6 +636,7 @@ void JacalBPCalibrator::writeModel(const std::string &)
        ASKAPDEBUGASSERT(static_cast<casa::uInt>(paramType.first.beam()) == indices.first);
        itsSolAcc->setBandpassElement(paramType.first, paramType.second, indices.second, val);
   }
+  ASKAPLOG_INFO_STR(logger, "Done writing results of the calibration for beam="<<indices.first<<" channel="<<indices.second);
 }
 
 /// @brief create measurement equation
@@ -772,6 +807,7 @@ void JacalBPCalibrator::calcOne(const std::string& ms, const casa::uInt chan, co
   itsEquation->calcEquations(*itsNe);
   ASKAPLOG_INFO_STR(logger, "Calculated normal equations for "<< ms << " channel "<<chan<<" beam " <<beam<<" in "<< timer.real()
                      << " seconds ");
+  
 }
 void JacalBPCalibrator::data_written(const char *uid, const char *data, size_t n) {
     dlg_app_running();
