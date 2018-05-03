@@ -1,19 +1,22 @@
 #!/bin/bash --login
-#SBATCH   --partition=knlq
+#SBATCH   --partition=workq
 #SBATCH   --job-name=Daliuge-Jacal-Test
-#SBATCH   --nodes=3
+#SBATCH   --nodes=6
 #SBATCH   --ntasks-per-node=1
 #SBATCH   --time=01:00:00
-#SBATCH   --account=pawsey0233
+#SBATCH   --account=askaprt
 
+module swap PrgEnv-cray PrgEnv-gnu
+module load python/2.7.14
+module load mpi4py
 
 # run this for the first time
 #pip install mpi4py
 
 # run "JACAL-enabled" DAliuGe node managers on multiple nodes on Athena
 
-JACAL_HOME=/group/askap/sord/athena/jacal
-ASKAP_HOME=/group/askap/sord/athena/askapsdp
+JACAL_HOME=/group/askap/sord/galaxy/jacal
+ASKAP_HOME=/group/askap/sord/galaxy/askapsdp
 ASKAP_3RD=$ASKAP_HOME/3rdParty
 
 JACAL_LIB_PATH=$JACAL_HOME/apps/askap/askapsoft_lib:\
@@ -44,11 +47,15 @@ source ${ASKAP_HOME}/Code/Interfaces/cpp/current/init_package_env.sh
 export LD_LIBRARY_PATH=$JACAL_LIB_PATH:$LD_LIBRARY_PATH
 #echo $LD_LIBRARY_PATH
 
-DALIUGE_SRC=/group/pawsey0245/cwu/daliuge
-LOG_ROOT=/group/askap/sord/athena/jacal_logs
+DALIUGE_SRC=/group/askap/sord/galaxy/daliuge
+LOG_ROOT=/group/askap/sord/galaxy/jacal_logs
+MYENV==/group/askap/sord/galaxy/env/daliuge/
 
-MYPYTHON=/group/pawsey0245/software/daliuge/bin/python
-MYCLUSTER=$DALIUGE_SRC"/dfms/deploy/pawsey/start_dfms_cluster.py"
+source ${MYENV}/bin/activate
+
+MYPYTHON=/group/askap/sord/galaxy/env/daliuge/bin/python
+
+MYCLUSTER=$JACAL_HOME"/apps/askap/functests/calibration/start_dfms_cluster.py"
 
 LG_GRAPH=$JACAL_HOME"/apps/askap/functests/calibration/askap_BPCalibration_athena.json"
 
@@ -56,12 +63,7 @@ SID=$(date +"%Y-%m-%d_%H-%M-%S")
 LOG_DIR=$LOG_ROOT"/"$SID
 echo "Creating direcotry "$LOG_DIR
 mkdir $LOG_DIR
-module purge all
-module load gcc/4.8.5
-module load mpi4py
-module unload gcc/4.8.5
 
-module load knl intel mvapich
 echo $LD_LIBRARY_PATH
 ulimit -c unlimited
 srun -n 3 -N 3 $MYPYTHON $MYCLUSTER -l $LOG_DIR -L $LG_GRAPH
