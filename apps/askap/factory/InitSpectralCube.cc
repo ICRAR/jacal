@@ -189,8 +189,8 @@ namespace askap {
         std::string residual_name = "residual";
         std::string weights_name = "weights";
 
-        ASKAPLOG_DEBUG_STR(logger,"Configuring Spectral Cube");
-        ASKAPLOG_DEBUG_STR(logger,"nchan: " << nchanCube << " base f0: " << f0.getValue("MHz") << " MHz "
+        ASKAPLOG_INFO_STR(logger,"Configuring Spectral Cube");
+        ASKAPLOG_INFO_STR(logger,"nchan: " << nchanCube << " base f0: " << f0.getValue("MHz") << " MHz "
         << " width: " << freqinc.getValue("MHz"));
 
         itsImageCube.reset(new cp::CubeBuilder(itsParset, nchanCube, f0, freqinc,img_name));
