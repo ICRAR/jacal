@@ -68,6 +68,8 @@ namespace askap {
 
         static int getInput(dlg_app_info *app, const char * tag);
 
+        static vector<int> getInputs(dlg_app_info *app, const char* tag);
+
         static int getOutput(dlg_app_info *app, const char * tag);
 
         static int getChan(char *uid);
@@ -76,7 +78,18 @@ namespace askap {
 
         static double getFrequency(LOFAR::ParameterSet& parset, int chan=0, bool barycentre=false);
 
+        // these are from Synparallel.
 
+        /// @brief read the models a parset file to the given params object
+        /// @details The model can be composed from both images and components. This
+        /// method populates Params object by adding model data read from the parset file.
+        /// The model is given by shared pointer because the same method can be used for both
+        /// simulations and calibration (the former populates itsModel, the latter populates
+        /// itsPerfectModel)
+        /// @param[in] parset reference to a LOFAR parameter set
+        /// @param[in] pModel shared pointer to the params object (must exist)
+
+        static void readModels(const LOFAR::ParameterSet& parset, const scimath::Params::ShPtr &pModel);
 
         private:
 

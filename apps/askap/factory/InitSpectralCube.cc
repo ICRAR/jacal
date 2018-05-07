@@ -101,7 +101,7 @@ namespace askap {
     {
       ASKAPLOG_INFO_STR(logger, "Initialised cube builder - UID is " << raw_app->uid);
 
-      
+
 
     }
 
@@ -170,6 +170,7 @@ namespace askap {
         }
         catch (std::runtime_error)
         {
+            ASKAPLOG_INFO_STR(logger, "Exception thrown in addMissingParameters");
             return -1;
         }
 

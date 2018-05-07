@@ -142,7 +142,7 @@ namespace askap {
         // Lets get the key-value-parset
         ASKAP_LOGGER(logger, ".run");
         char buf[64*1024];
-        size_t n_read = input(0).read(buf, 64*1024);
+        size_t n_read = input("Config").read(buf, 64*1024);
         if (n_read == 64*1024) {
             n_read--;
         }
@@ -212,7 +212,7 @@ namespace askap {
             sel->chooseCrossCorrelations();
             sel->chooseChannels(1, this->freqInterval[0]);
 
-            // FIXME: Use freq interval in a smarter way and use time interval
+            // FIXME: Use time interval and perhaps beam?
 
             accessors::IDataConverterPtr conv = ds.createConverter();
             conv->setFrequencyFrame(casa::MFrequency::Ref(casa::MFrequency::TOPO), "Hz");

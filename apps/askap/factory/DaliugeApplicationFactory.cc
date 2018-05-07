@@ -48,6 +48,8 @@ namespace askap {
 #include <factory/OutputParams.h>
 #include <factory/SpectralCube.h>
 #include <factory/InitSpectralCube.h>
+#include <factory/JacalBPCalibrator.h>
+
 
 //
 
@@ -138,9 +140,10 @@ void DaliugeApplicationFactory::initial_population() {
 		addPreDefinedDaliugeApplication<SolveNE>();
 		addPreDefinedDaliugeApplication<OutputParams>();
 		addPreDefinedDaliugeApplication<CalcNE>();
-        addPreDefinedDaliugeApplication<SpectralCube>();
-        addPreDefinedDaliugeApplication<InitSpectralCube>();
-	}
+    addPreDefinedDaliugeApplication<SpectralCube>();
+    addPreDefinedDaliugeApplication<InitSpectralCube>();
+    addPreDefinedDaliugeApplication<JacalBPCalibrator>();
+  }
 }
 
 static std::once_flag init_logging_flag;
