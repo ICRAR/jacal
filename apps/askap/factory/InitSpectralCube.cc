@@ -176,10 +176,10 @@ namespace askap {
         ASKAPLOG_INFO_STR(logger, "Getting base frequency");
         casa::Double baseFrequency = NEUtils::getFrequency(itsParset,0);
         ASKAPLOG_INFO_STR(logger, "Getting chanwidth");
-        casa::Double chanWidth = NEUtils::getFrequency(itsParset,1) - NEUtils::getFrequency(itsParset,1);
+        casa::Double chanWidth = NEUtils::getFrequency(itsParset,1) - NEUtils::getFrequency(itsParset,0);
         ASKAPLOG_INFO_STR(logger, "Getting chanwidth");
         casa::Int nchanCube = NEUtils::getNChan(itsParset);
-        
+
 
         casa::Quantity f0(baseFrequency,"Hz");
     /// The width of a channel. THis does <NOT> take account of the variable width
