@@ -5,7 +5,7 @@ Cbpcalibrator.nAnt                            = 12
 Cbpcalibrator.nBeam                           = 1
 Cbpcalibrator.nChan                           = 54
 Cbpcalibrator.refantenna                      = 1
-Cbpcalibrator.nChanPerRank                    = 27
+Cbpcalibrator.nChanPerRank                    = 2
 #
 Cbpcalibrator.calibaccess                     = table
 Cbpcalibrator.calibaccess.table.maxant        = 12

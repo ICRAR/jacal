@@ -1,7 +1,7 @@
 #!/bin/bash --login
 #SBATCH   --partition=workq
 #SBATCH   --job-name=Daliuge-Jacal-Test
-#SBATCH   --nodes=6
+#SBATCH   --nodes=3
 #SBATCH   --ntasks-per-node=1
 #SBATCH   --time=01:00:00
 #SBATCH   --account=askaprt
@@ -57,7 +57,7 @@ MYPYTHON=/group/askap/sord/galaxy/env/daliuge/bin/python
 
 MYCLUSTER=$JACAL_HOME"/apps/askap/functests/calibration/start_dfms_cluster.py"
 
-LG_GRAPH=$JACAL_HOME"/apps/askap/functests/calibration/askap_BPCalibration_athena.json"
+LG_GRAPH=$JACAL_HOME"/apps/askap/functests/calibration/askap_BPCalibration_galaxy.json"
 
 SID=$(date +"%Y-%m-%d_%H-%M-%S")
 LOG_DIR=$LOG_ROOT"/"$SID
