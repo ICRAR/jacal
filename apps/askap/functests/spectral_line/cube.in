@@ -1,13 +1,13 @@
-Cimager.dataset                                 = [full_band.ms]
+Cimager.dataset                                 = [multi_chan_00.ms]
 Cimager.beams                                   = [0]
 Cimager.nUVWMachines                            = 1
 Cimager.uvwMachineDirTolerance                  = 0.2arcsec
 Cimager.imagetype                               = fits
 Cimager.memorybuffers                           = true
 Cimager.barycentre                              = true
-Cimager.nchanpercore                            = 2
+Cimager.nchanpercore                            = 1
 Cimager.solverpercore                           = true
-Cimager.nwriters                                = 2
+Cimager.nwriters                                = 1
 Cimager.Channels                                = [1,%w]
 Cimager.usetmpfs                                = false
 Cimager.tmpfs                                   = /Volumes/RAMDisk
@@ -20,7 +20,7 @@ Cimager.Images.restFrequency                    = HI
 #Cimager.visweights.MFS.reffreq                  = 1.10697e+09
 #Cimager.Images.image.cont.nterms          = 3
 Cimager.Images.direction=[12:30:00.00, -045.00.00.00, J2000]
-Cimager.Images.image.cont.frequency              = [1.10697e+09,1.10697e+09]
+Cimager.Images.image.cont.frequency              = [1.1e+09,1.10007e+09]
 Cimager.Images.image.cont.nchan          = 1
 #Cimager.nworkergroups                           = 3
 
