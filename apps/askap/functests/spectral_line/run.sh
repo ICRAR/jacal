@@ -78,9 +78,9 @@ runBasicTest
 #read -n1 -r -p "Press any key to shutdown" key
 
 # Request IceGrid shutdown and wait
-echo -n "Stopping NM and DIM..."
+#echo -n "Stopping NM and DIM..."
 # Remove temporary directories
 
-cleanup
+#cleanup
 
 # exit $STATUS
