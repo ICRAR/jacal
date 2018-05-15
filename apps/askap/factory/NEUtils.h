@@ -62,7 +62,7 @@ namespace askap {
         static void sendParams(askap::scimath::Params::ShPtr params, dlg_output_info &output);
 
         // add parameters that may be missing from a configuration file
-        static LOFAR::ParameterSet addMissingParameters(LOFAR::ParameterSet& parset);
+        static LOFAR::ParameterSet addMissingParameters(LOFAR::ParameterSet& parset, const int chan=0);
 
         static std::vector<std::string> getDatasets(const LOFAR::ParameterSet& parset);
 

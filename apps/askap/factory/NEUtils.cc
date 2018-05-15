@@ -238,7 +238,7 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
 
 
   }
-  LOFAR::ParameterSet NEUtils::addMissingParameters(LOFAR::ParameterSet& parset) {
+  LOFAR::ParameterSet NEUtils::addMissingParameters(LOFAR::ParameterSet& parset, const int chan) {
 
 
 
@@ -302,9 +302,28 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
 
           param = "Images."+imageNames[img]+".frequency";
 
-          if ( !parset.isDefined(param) ) {
-              ASKAPLOG_WARN_STR(logger, "Frequency not in Parset and it needs to be");
-              ASKAPTHROW(std::runtime_error,"Frequency not in parset");
+          if ( parset.isDefined(param) ) {
+              ASKAPLOG_WARN_STR(logger, "Frequency in Parset and it may need to be overridden");
+          }
+          casa::Int nchanCube = NEUtils::getNChan(parset);
+          if (nchanCube > 1) {
+            ASKAPLOG_WARN_STR(logger, "Overridding parset frequency with channel based information from measurement set - Am I half a channel out?");
+
+            ASKAPLOG_INFO_STR(logger, "Getting base frequency");
+            casa::Double baseFrequency = NEUtils::getFrequency(parset,chan);
+            ASKAPLOG_INFO_STR(logger, "Getting chanwidth");
+            casa::Double chanWidth = NEUtils::getFrequency(parset,1) - NEUtils::getFrequency(parset,0);
+            ASKAPLOG_INFO_STR(logger, "Getting chanwidth");
+            std::ostringstream pstr;
+            pstr<<"["<< baseFrequency <<","<<baseFrequency+chanWidth <<"]";
+            if ( parset.isDefined(param) ) {
+              parset.replace(param, pstr.str().c_str());
+            }
+            else {
+              parset.add(param, pstr.str().c_str());
+            }
+              //ASKAPTHROW(std::runtime_error,"Frequency not in parset");
+            ASKAPLOG_WARN_STR(logger, "Overridden");
 
           }
           param ="Images."+imageNames[img]+".direction";
@@ -332,7 +351,16 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
           }
           param = "Images."+imageNames[img]+".nchan";
           if ( !parset.isDefined(param)) {
-              ASKAPLOG_WARN_STR(logger, "Param not found: " << param);
+              ASKAPLOG_WARN_STR(logger, "Setting " << param);
+              std::ostringstream pstr;
+              pstr<<"1";
+              parset.add(param, pstr.str().c_str());
+          }
+          else {
+            ASKAPLOG_WARN_STR(logger, "Overriding " << param);
+            std::ostringstream pstr;
+            pstr<<"1";
+            parset.replace(param, pstr.str().c_str());
           }
       }
 
@@ -416,7 +444,7 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
     boost::regex exp1(tag);
     boost::cmatch what;
     vector<int> inputs;
-    
+
     for (int i = 0; i < app->n_inputs; i++) {
 
       if (boost::regex_search(app->inputs[i].name, what, exp1)) {
