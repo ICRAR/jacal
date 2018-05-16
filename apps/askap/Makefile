@@ -82,7 +82,9 @@ OBJS = factory/DaliugeApplicationFactory.o \
        factory/OutputParams.o \
        factory/SpectralCube.o \
        factory/InitSpectralCube.o \
-       factory/JacalBPCalibrator.o
+       factory/JacalBPCalibrator.o \
+       factory/MajorCycle.o
+
 .PHONY: all clean
 
 all: libaskapsoft_dlg.so 

@@ -265,11 +265,11 @@ namespace askap {
     {
 
         vector<string> images=itsModel->names();
-        std::regex peak_residual("peak_residual");
-        std::regex residual("residual");
-        std::regex image("image");
-        std::regex psf("psf");
-        std::regex weights("weights");
+        std::regex peak_residual("^peak_residual");
+        std::regex residual("^residual");
+        std::regex image("^image");
+        std::regex psf("^psf");
+        std::regex weights("^weights");
 
         for (vector<string>::const_iterator it=images.begin(); it !=images.end(); it++) {
 

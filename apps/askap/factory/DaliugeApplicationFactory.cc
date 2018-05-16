@@ -42,6 +42,7 @@ namespace askap {
 
 #include <factory/LoadParset.h>
 #include <factory/LoadVis.h>
+#include <factory/MajorCycle.h>
 #include <factory/LoadNE.h>
 #include <factory/SolveNE.h>
 #include <factory/CalcNE.h>
@@ -143,6 +144,7 @@ void DaliugeApplicationFactory::initial_population() {
     addPreDefinedDaliugeApplication<SpectralCube>();
     addPreDefinedDaliugeApplication<InitSpectralCube>();
     addPreDefinedDaliugeApplication<JacalBPCalibrator>();
+    addPreDefinedDaliugeApplication<MajorCycle>();
   }
 }
 

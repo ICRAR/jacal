@@ -1,10 +1,9 @@
 /// @file LoadVis.cc
 ///
 /// @abstract
-/// Derived from DaliugeApplication
+/// Loads a visibility set grids it onto the UV plane and FFTs the grid
 /// @ details
-/// Implements a test method that uses the contents of the the parset to load
-/// in a measurement set and print a summary of its contents
+///
 ///
 // for logging
 #define ASKAP_PACKAGE_NAME "LoadVis"
@@ -178,8 +177,15 @@ namespace askap {
             /// Create the specified images from the definition in the
             /// parameter set. We can solve for any number of images
             /// at once (but you may/will run out of memory!)
-            askap::synthesis::SynthesisParamsHelper::setUpImages(itsModel,
-                                      this->itsParset.makeSubset("Images."));
+            this->itsModel.reset(new scimath::Params());
+            try {
+              NEUtils::receiveParams(itsModel, input("Model"));
+            }
+            catch (std::runtime_error) {
+              ASKAPLOG_INFO_STR(logger, "Failed to receive model setting up empty one");
+              askap::synthesis::SynthesisParamsHelper::setUpImages(itsModel,
+                                        this->itsParset.makeSubset("Images."));
+            }
 
 
             ASKAPLOG_INFO_STR(logger, "Current model held by the drop: "<<*itsModel);
