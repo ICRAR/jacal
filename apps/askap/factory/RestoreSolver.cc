@@ -178,41 +178,41 @@ namespace askap {
         // Now we need to instantiate and initialise the solver
         {
 #ifndef ASKAP_PATCHED
-            std::lock_guard<std::mutex> guard(safety);
+          std::lock_guard<std::mutex> guard(safety);
 #endif // ASKAP_PATCHED
 
-            itsSolver->init();
-            itsSolver->addNormalEquations(*itsNe);
+          itsSolver->init();
+          itsSolver->addNormalEquations(*itsNe);
 
-          // Now we need to build the restore solver using this as the template_solver
-          boost::shared_ptr<synthesis::ImageRestoreSolver>
-          ir = synthesis::ImageRestoreSolver::createSolver(itsParset.makeSubset("restore."));
-          ASKAPDEBUGASSERT(ir);
-          ASKAPDEBUGASSERT(itsSolver);
-          // configure restore solver the same way as normal imaging solver
-          boost::shared_ptr<synthesis::ImageSolver>
-          template_solver = boost::dynamic_pointer_cast<synthesis::ImageSolver>(itsSolver);
-          ASKAPDEBUGASSERT(template_solver);
-          synthesis::ImageSolverFactory::configurePreconditioners(itsParset, ir);
-          ir->configureSolver(*template_solver);
-          ir->copyNormalEquations(*template_solver);
+          if (itsParset.getBool("restore", false)) {
+            // Now we need to build the restore solver using this as the template_solver
+            boost::shared_ptr<synthesis::ImageRestoreSolver>
+            ir = synthesis::ImageRestoreSolver::createSolver(itsParset.makeSubset("restore."));
+            ASKAPDEBUGASSERT(ir);
+            ASKAPDEBUGASSERT(itsSolver);
+            // configure restore solver the same way as normal imaging solver
+            boost::shared_ptr<synthesis::ImageSolver>
+            template_solver = boost::dynamic_pointer_cast<synthesis::ImageSolver>(itsSolver);
+            ASKAPDEBUGASSERT(template_solver);
+            synthesis::ImageSolverFactory::configurePreconditioners(itsParset, ir);
+            ir->configureSolver(*template_solver);
+            ir->copyNormalEquations(*template_solver);
 
-          ASKAPLOG_INFO_STR(logger, "(Restoring) Solving Normal Equations");
-          askap::scimath::Quality q;
+            ASKAPLOG_INFO_STR(logger, "(Restoring) Solving Normal Equations");
+            askap::scimath::Quality q;
 
 
-          ir->solveNormalEquations(*itsModel, q);
-          vector<string> resultimages=itsModel->names();
+            ir->solveNormalEquations(*itsModel, q);
+            vector<string> resultimages=itsModel->names();
 
-          for (vector<string>::const_iterator ci=resultimages.begin(); ci!=resultimages.end(); ++ci) {
+            for (vector<string>::const_iterator ci=resultimages.begin(); ci!=resultimages.end(); ++ci) {
 
-            ASKAPLOG_INFO_STR(logger, "Restored image " << *ci);
+              ASKAPLOG_INFO_STR(logger, "Restored image " << *ci);
 
+            }
+            ASKAPDEBUGASSERT(itsModel);  
           }
-          ASKAPDEBUGASSERT(itsModel);
-
           NEUtils::sendParams(itsModel, output("Restored Model"));
-
         }
 
         return 0;

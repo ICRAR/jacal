@@ -186,12 +186,14 @@ namespace askap {
     /// of Barycentric channels
         casa::Quantity freqinc(chanWidth,"Hz");
 
-    /// these names need to match the spectral cube names
+    /// these names need to match the spectral cube names - maybe put them in a header?
 
         std::string img_name = "image";
         std::string psf_name = "psf";
         std::string residual_name = "residual";
         std::string weights_name = "weights";
+        std::string restored_name = "restored";
+
 
         ASKAPLOG_INFO_STR(logger,"Configuring Spectral Cube");
         ASKAPLOG_INFO_STR(logger,"nchan: " << nchanCube << " base f0: " << f0.getValue("MHz") << " MHz "
@@ -204,7 +206,10 @@ namespace askap {
 
 // Need to add the restore cube test and build here
 
-
+        if (itsParset.getBool("restore", false)) {
+          itsRestoredCube.reset(new cp::CubeBuilder(itsParset, nchanCube, f0, freqinc, restored_name));
+        }
+        
         return 0;
     }
 
