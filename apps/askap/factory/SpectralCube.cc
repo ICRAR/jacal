@@ -277,7 +277,7 @@ namespace askap {
         std::regex image("^image");
         std::regex psf("^psf");
         std::regex weights("^weights");
-        std::regex restored("^restored");
+        std::regex restored("restored"); // restored is at the end
 
         for (vector<string>::const_iterator it=images.begin(); it !=images.end(); it++) {
 
