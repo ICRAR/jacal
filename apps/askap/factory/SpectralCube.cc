@@ -228,7 +228,7 @@ namespace askap {
         std::string residual_name = "residual";
         std::string weights_name = "weights";
 
-        if (itsChan == -1)  { // only channel 0 builds the cubes
+        if (itsChan == -1)  { // not sure this ever happens now
           ASKAPLOG_DEBUG_STR(logger,"Configuring Spectral Cube");
           ASKAPLOG_DEBUG_STR(logger,"nchan: " << nchanCube << " base f0: " << f0.getValue("MHz") << " MHz "
           << " width: " << freqinc.getValue("MHz"));

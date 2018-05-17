@@ -83,7 +83,8 @@ OBJS = factory/DaliugeApplicationFactory.o \
        factory/SpectralCube.o \
        factory/InitSpectralCube.o \
        factory/JacalBPCalibrator.o \
-       factory/MajorCycle.o
+       factory/MajorCycle.o \
+       factory/RestoreSolver.o
 
 .PHONY: all clean
 
