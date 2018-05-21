@@ -32,6 +32,7 @@ import dlg
 from dlg.drop import AppDROP, BarrierAppDROP
 from dlg.ddap_protocol import AppDROPStates, DROPStates
 from dlg.exceptions import InvalidDropException
+from dlg.apps.socket_listener import SocketListenerApp
 import six.moves.cPickle as pickle  # @UnresolvedImport
 import six.moves.http_client as httplib  # @UnresolvedImport
 import oskar
@@ -40,6 +41,46 @@ import spead2.recv
 
 
 logger = logging.getLogger(__name__)
+
+class SpeadTcpReceiver(SocketListenerApp):
+    """
+    Receives data drop a spead tcp stream and writes it into its single output
+    """
+    def initialize(self, **kwargs):
+        super(SpeadTcpReceiver, self).initialize(**kwargs)
+        try:
+            ip = dlg.utils.get_local_ip_addr()[0][0]
+            port = 6000 + int(self.oid.split('/')[-1]) #HACK HACK HACK
+            ipstr = '%s+%d' % (ip, port)
+            con = httplib.HTTPConnection('sdp-dfms.ddns.net', 8096)
+            con.request('GET', '/reg_receiver?ip=%s' % (ipstr))
+            self._host = ip
+            self._port = port
+        except:
+            logger.exception('Failed to register, will continue anyway')
+
+class PassbyStreamApp(AppDROP):
+    """
+    Simply let the data thru in a streaming mode
+    """
+    def initialize(self, **kwargs):
+        super(PassbyStreamApp, self).initialize(**kwargs)
+        self._count = 0
+
+    def dataWritten(self, uid, data):
+        if self.execStatus != AppDROPStates.RUNNING:
+            logger.info("First data received in Passby, moving to RUNNING state")
+            self.execStatus = AppDROPStates.RUNNING
+        self._count += len(data)
+        self.outputs[0].write(data)
+
+    def dropCompleted(self, uid, status):
+        outputDrop = self.outputs[0]
+        logger.info("Total data passed by from {0} to {1}: {2} bytes".\
+                    format(uid, self.oid, self._count)
+        self.execStatus = AppDROPStates.FINISHED
+        self._notifyAppIsFinished()
+
 
 class OSKAR2SpeadReceiver(BarrierAppDROP):
     """Receives data drop a spead stream and writes it into its single output"""
