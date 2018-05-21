@@ -77,7 +77,7 @@ class PassbyStreamApp(AppDROP):
     def dropCompleted(self, uid, status):
         outputDrop = self.outputs[0]
         logger.info("Total data passed by from {0} to {1}: {2} bytes".\
-                    format(uid, self.oid, self._count)
+                    format(uid, self.oid, self._count))
         self.execStatus = AppDROPStates.FINISHED
         self._notifyAppIsFinished()
 
