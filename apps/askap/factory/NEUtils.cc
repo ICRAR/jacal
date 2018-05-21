@@ -48,6 +48,7 @@ namespace askap {
 #include <measurementequation/SynthesisParamsHelper.h>
 #include <measurementequation/ImageParamsHelper.h>
 #include <measurementequation/ImageFFTEquation.h>
+#include <parallel/SynParallel.h>
 #include <parallel/GroupVisAggregator.h>
 
 
@@ -227,14 +228,17 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
       b1.resize(ParamsSize);
       n_read = input.read(b1.data(), ParamsSize);
 
-      ASKAPCHECK(n_read == ParamsSize, "Unable to read Params of expected size");
+      if (n_read == ParamsSize) {
 
-      LOFAR::BlobIBufString bib(b1);
-      LOFAR::BlobIStream bis(bib);
-      bis >> *Params;
 
-    }
-  LOFAR::ParameterSet NEUtils::addMissingParameters(LOFAR::ParameterSet& parset) {
+        LOFAR::BlobIBufString bib(b1);
+        LOFAR::BlobIStream bis(bib);
+        bis >> *Params;
+      }
+
+
+  }
+  LOFAR::ParameterSet NEUtils::addMissingParameters(LOFAR::ParameterSet& parset, const int chan) {
 
 
 
@@ -298,14 +302,34 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
 
           param = "Images."+imageNames[img]+".frequency";
 
-          if ( !parset.isDefined(param) ) {
+          if ( parset.isDefined(param) ) {
+              ASKAPLOG_WARN_STR(logger, "Frequency in Parset and it may need to be overridden");
+          }
+          casa::Int nchanCube = NEUtils::getNChan(parset);
+          if (nchanCube > 1) {
+            ASKAPLOG_WARN_STR(logger, "Overridding parset frequency with channel based information from measurement set - Am I half a channel out?");
 
-              ASKAPTHROW(std::runtime_error,"Frequency not in parset");
+            ASKAPLOG_INFO_STR(logger, "Getting base frequency");
+            casa::Double baseFrequency = NEUtils::getFrequency(parset,chan);
+            ASKAPLOG_INFO_STR(logger, "Getting chanwidth");
+            casa::Double chanWidth = NEUtils::getFrequency(parset,1) - NEUtils::getFrequency(parset,0);
+            ASKAPLOG_INFO_STR(logger, "Getting chanwidth");
+            std::ostringstream pstr;
+            pstr<<"["<< baseFrequency <<","<<baseFrequency+chanWidth <<"]";
+            if ( parset.isDefined(param) ) {
+              parset.replace(param, pstr.str().c_str());
+            }
+            else {
+              parset.add(param, pstr.str().c_str());
+            }
+              //ASKAPTHROW(std::runtime_error,"Frequency not in parset");
+            ASKAPLOG_WARN_STR(logger, "Overridden");
 
           }
           param ="Images."+imageNames[img]+".direction";
           if ( !parset.isDefined(param) && directionNeeded) {
 
+              ASKAPLOG_WARN_STR(logger, "Direction not in Parset and it needs to be");
               ASKAPTHROW(std::runtime_error,"direction not in parset");
           }
           else if (!parset.isDefined(param) && !directionNeeded) {
@@ -327,7 +351,16 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
           }
           param = "Images."+imageNames[img]+".nchan";
           if ( !parset.isDefined(param)) {
-              ASKAPLOG_WARN_STR(logger, "Param not found: " << param);
+              ASKAPLOG_WARN_STR(logger, "Setting " << param);
+              std::ostringstream pstr;
+              pstr<<"1";
+              parset.add(param, pstr.str().c_str());
+          }
+          else {
+            ASKAPLOG_WARN_STR(logger, "Overriding " << param);
+            std::ostringstream pstr;
+            pstr<<"1";
+            parset.replace(param, pstr.str().c_str());
           }
       }
 
@@ -343,6 +376,7 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
           param = "visweights.MFS.reffreq"; // set to average frequency if unset and nTerms > 1
           if ((parset.getString("visweights")=="MFS")) {
               if (!parset.isDefined(param)) {
+                  ASKAPLOG_WARN_STR(logger, "Param not found: " << param << " and cannot be predicted");
                   ASKAPTHROW(std::runtime_error,"MFS reference frequency not in parset");
               }
 
@@ -392,9 +426,6 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
 
   int NEUtils::getInput(dlg_app_info *app, const char* tag) {
 
-
-
-
     boost::regex exp1(tag);
     boost::cmatch what;
 
@@ -407,6 +438,25 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
     return -1;
 
   }
+
+  vector<int> NEUtils::getInputs(dlg_app_info *app, const char* tag) {
+
+    boost::regex exp1(tag);
+    boost::cmatch what;
+    vector<int> inputs;
+
+    for (int i = 0; i < app->n_inputs; i++) {
+
+      if (boost::regex_search(app->inputs[i].name, what, exp1)) {
+
+        inputs.push_back(i);
+      }
+
+    }
+    return inputs;
+
+  }
+
   int NEUtils::getOutput(dlg_app_info *app, const char* tag) {
 
 
@@ -422,4 +472,75 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
     return -1;
 
   }
+
+  void NEUtils::readModels(const LOFAR::ParameterSet& parset, const scimath::Params::ShPtr &pModel)
+  {
+
+    ASKAP_LOGGER(logger, ".readModels");
+    ASKAPCHECK(pModel, "model is not initialised prior to call to SynParallel::readModels");
+
+    const std::vector<std::string> sources = parset.getStringVector("sources.names");
+    std::set<std::string> loadedImageModels;
+    for (size_t i=0; i<sources.size(); ++i) {
+       const std::string modelPar = std::string("sources.")+sources[i]+".model";
+       const std::string compPar = std::string("sources.")+sources[i]+".components";
+       // check that only one is defined
+       ASKAPCHECK(parset.isDefined(compPar) != parset.isDefined(modelPar),
+            "The model should be defined with either image (via "<<modelPar<<") or components (via "<<
+             compPar<<"), not both");
+       //
+         if (parset.isDefined(modelPar)) {
+             const std::vector<std::string> vecModels = parset.getStringVector(modelPar);
+             int nTaylorTerms = parset.getInt32(std::string("sources.")+sources[i]+".nterms",1);
+             ASKAPCHECK(nTaylorTerms>0, "Number of Taylor terms is supposed to be a positive number, you gave "<<
+                       nTaylorTerms);
+             if (nTaylorTerms>1) {
+                 ASKAPLOG_WARN_STR(logger,"Simulation from model presented by Taylor series (a.k.a. MFS-model) with "<<
+                             nTaylorTerms<<" terms is not supported");
+                 nTaylorTerms = 1;
+             }
+             ASKAPCHECK((vecModels.size() == 1) || (int(vecModels.size()) == nTaylorTerms),
+                  "Number of model images given by "<<modelPar<<" should be either 1 or one per taylor term, you gave "<<
+                  vecModels.size()<<" nTaylorTerms="<<nTaylorTerms);
+             synthesis::ImageParamsHelper iph("image."+sources[i]);
+             // for simulations we don't need cross-terms
+             for (int order = 0; order<nTaylorTerms; ++order) {
+                  if (nTaylorTerms > 1) {
+                      // this is an MFS case, setup Taylor terms
+                      iph.makeTaylorTerm(order);
+                      ASKAPLOG_INFO_STR(logger,"Processing Taylor term "<<order);
+                  }
+                  std::string model = vecModels[0];
+                  if (vecModels.size() == 1) {
+                      // only base name is given, need to add taylor suffix
+                      model += iph.suffix();
+                  }
+
+                  if (std::find(loadedImageModels.begin(),loadedImageModels.end(),model) != loadedImageModels.end()) {
+                      ASKAPLOG_INFO_STR(logger, "Model " << model << " has already been loaded, reusing it for "<< sources[i]);
+                      if (vecModels.size()!=1) {
+                          ASKAPLOG_WARN_STR(logger, "MFS simulation will not work correctly if you specified the same model "<<
+                               model<<" for multiple Taylor terms");
+                      }
+                  } else {
+                      ASKAPLOG_INFO_STR(logger, "Adding image " << model << " as model for "<< sources[i]
+                                         << ", parameter name: "<<iph.paramName() );
+                      // need to patch model to append taylor suffix
+                      synthesis::SynthesisParamsHelper::loadImageParameter(*pModel, iph.paramName(), model);
+                      loadedImageModels.insert(model);
+                  }
+             }
+         } else {
+             // loop through components
+             ASKAPLOG_INFO_STR(logger, "Adding components as model for "<< sources[i] );
+             const vector<string> compList = parset.getStringVector(compPar);
+             for (vector<string>::const_iterator cmp = compList.begin(); cmp != compList.end(); ++cmp) {
+                  ASKAPLOG_INFO_STR(logger, "Loading component " << *cmp << " as part of the model for " << sources[i]);
+                  synthesis::SynthesisParamsHelper::copyComponent(pModel, parset,*cmp,"sources.");
+              }
+         }
+    }
+    ASKAPLOG_INFO_STR(logger, "Successfully read models");
+  }
+
 } // namespace

@@ -128,6 +128,20 @@ namespace askap {
                 return false;
             }
 
+            std::vector<int> get_inputs(const std::string &tag) {
+
+              boost::regex exp1(tag);
+              boost::cmatch what;
+              std::vector<int> the_inputs;
+              for (int i = 0; i < raw_dlg_app->n_inputs; i++) {
+                  if (boost::regex_search(raw_dlg_app->inputs[i].name, what, exp1)) {
+                      the_inputs.push_back(i);
+                  }
+              }
+              return the_inputs;
+
+            }
+
             dlg_input_info &input(size_t i) {
                 return raw_dlg_app->inputs[i];
             }

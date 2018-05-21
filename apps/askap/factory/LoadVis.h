@@ -53,7 +53,6 @@ namespace askap {
 
         static std::vector<std::string> getDatasets(const LOFAR::ParameterSet& parset);
 
-        static LOFAR::ParameterSet addMissingParameters(LOFAR::ParameterSet& parset);
 
         private:
 
