@@ -101,7 +101,7 @@ namespace askap {
     {
       ASKAPLOG_INFO_STR(logger, "Initialised cube builder - UID is " << raw_app->uid);
 
-      
+
 
     }
 
@@ -170,13 +170,16 @@ namespace askap {
         }
         catch (std::runtime_error)
         {
+            ASKAPLOG_INFO_STR(logger, "Exception thrown in addMissingParameters");
             return -1;
         }
-
+        ASKAPLOG_INFO_STR(logger, "Getting base frequency");
         casa::Double baseFrequency = NEUtils::getFrequency(itsParset,0);
-        casa::Double chanWidth = NEUtils::getFrequency(itsParset,1) - NEUtils::getFrequency(itsParset,1);
+        ASKAPLOG_INFO_STR(logger, "Getting chanwidth");
+        casa::Double chanWidth = NEUtils::getFrequency(itsParset,1) - NEUtils::getFrequency(itsParset,0);
+        ASKAPLOG_INFO_STR(logger, "Getting chanwidth");
         casa::Int nchanCube = NEUtils::getNChan(itsParset);
-        casa::Double channelFrequency = NEUtils::getFrequency(itsParset,itsChan);
+
 
         casa::Quantity f0(baseFrequency,"Hz");
     /// The width of a channel. THis does <NOT> take account of the variable width
@@ -188,8 +191,8 @@ namespace askap {
         std::string residual_name = "residual";
         std::string weights_name = "weights";
 
-        ASKAPLOG_DEBUG_STR(logger,"Configuring Spectral Cube");
-        ASKAPLOG_DEBUG_STR(logger,"nchan: " << nchanCube << " base f0: " << f0.getValue("MHz") << " MHz "
+        ASKAPLOG_INFO_STR(logger,"Configuring Spectral Cube");
+        ASKAPLOG_INFO_STR(logger,"nchan: " << nchanCube << " base f0: " << f0.getValue("MHz") << " MHz "
         << " width: " << freqinc.getValue("MHz"));
 
         itsImageCube.reset(new cp::CubeBuilder(itsParset, nchanCube, f0, freqinc,img_name));

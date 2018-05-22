@@ -1,0 +1,59 @@
+Cimager.dataset                                 = [multi_chan_00.ms]
+Cimager.beams                                   = [0]
+Cimager.nUVWMachines                            = 1
+Cimager.uvwMachineDirTolerance                  = 0.2arcsec
+Cimager.imagetype                               = fits
+Cimager.memorybuffers                           = true
+Cimager.barycentre                              = true
+Cimager.nchanpercore                            = 1
+Cimager.solverpercore                           = true
+Cimager.nwriters                                = 1
+Cimager.Channels                                = [1,%w]
+Cimager.usetmpfs                                = false
+Cimager.tmpfs                                   = /Volumes/RAMDisk
+Cimager.Images.Names                            = image.cont
+Cimager.Images.reuse                            = false
+Cimager.Images.shape                            = [256,256]
+Cimager.Images.cellsize                         = [5arcsec, 5arcsec]
+Cimager.Images.restFrequency                    = HI
+#Cimager.visweights                              = MFS
+#Cimager.visweights.MFS.reffreq                  = 1.10697e+09
+#Cimager.Images.image.cont.nterms          = 3
+Cimager.Images.direction=[12:30:00.00, -045.00.00.00, J2000]
+Cimager.Images.image.cont.frequency              = [1.1e+09,1.10007e+09]
+Cimager.Images.image.cont.nchan          = 1
+#Cimager.nworkergroups                           = 3
+
+#Cimager.gridder                                 = SphFunc
+
+Cimager.gridder                                 = WProject
+Cimager.gridder.WProject.wmax                   = 45000
+Cimager.gridder.snapshotimaging                 = true
+Cimager.gridder.snapshotimaging.longtrack       = true
+Cimager.gridder.snapshotimaging.wtolerance       = 100
+Cimager.gridder.WProject.nwplanes               = 51
+Cimager.gridder.WProject.oversample             = 16
+Cimager.gridder.WProject.maxsupport             = 1024
+Cimager.gridder.WProject.cutoff                 = 0.001
+Cimager.gridder.WProject.variablesupport        = true
+Cimager.gridder.WProject.offsetsupport          = true
+
+Cimager.ncycles=1
+Cimager.Images.writeAtMajorCycle                = true
+
+# Use a multiscale Clean solver
+Cimager.solver                                  = Clean
+Cimager.solver.Clean.algorithm                  = Basisfunction
+Cimager.solver.Clean.scales                     = [0]
+Cimager.solver.Clean.niter                      = 100
+Cimager.solver.Clean.gain                       = 0.1
+
+Cimager.solver.Clean.tolerance                  = 0.1
+Cimager.solver.Clean.verbose                    = false
+
+Cimager.preconditioner.preservecf               = true
+Cimager.preconditioner.Names                    = [Wiener]
+Cimager.preconditioner.Wiener.robustness        = -2
+
+Cimager.restore                                 = true
+Cimager.restore.beam                            = fit

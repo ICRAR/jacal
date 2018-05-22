@@ -22,6 +22,8 @@ namespace askap {
 
 #include <vector>
 #include <mutex>
+#include <regex>
+
 
 
 #include <daliuge/DaliugeApplication.h>
@@ -191,7 +193,7 @@ namespace askap {
             return -1;
           }
         }
-        
+
         //
         vector<string> images=itsModel->names();
 
@@ -262,58 +264,62 @@ namespace askap {
     void SpectralCube::handleImageParams()
     {
 
+        vector<string> images=itsModel->names();
+        std::regex peak_residual("peak_residual");
+        std::regex residual("residual");
+        std::regex image("image");
+        std::regex psf("psf");
+        std::regex weights("weights");
 
-        // Pre-conditions
-        ASKAPCHECK(itsModel->has("image.cont"), "Params are missing model parameter");
-        ASKAPCHECK(itsModel->has("psf.cont"), "Params are missing psf parameter");
-        ASKAPCHECK(itsModel->has("residual.cont"), "Params are missing residual parameter");
-        ASKAPCHECK(itsModel->has("weights.cont"), "Params are missing weights parameter");
+        for (vector<string>::const_iterator it=images.begin(); it !=images.end(); it++) {
 
-/*
-        if (itsParset.getBool("restore", false)) {
-            // Record the restoring beam
-            const askap::scimath::Axes &axes = params->axes("image.slice");
-            recordBeam(axes, chan);
-            storeBeam(chan);
-        }
-*/
+          if (std::regex_search(*it,peak_residual)) {
+            continue;
+          }
+
+
         // Write image
-        {
-            ASKAPLOG_INFO_STR(logger,"Writing model for (local) channel " << itsChan);
-            const casa::Array<double> imagePixels(itsModel->value("image.cont"));
+          if (std::regex_search(*it,image))
+          {
+            ASKAPLOG_INFO_STR(logger, "Writing "<< *it);
+            const casa::Array<double> imagePixels(itsModel->value(*it));
             casa::Array<float> floatImagePixels(imagePixels.shape());
             casa::convertArray<float, double>(floatImagePixels, imagePixels);
             itsImageCube->writeSlice(floatImagePixels, itsChan);
-        }
+          }
 
         // Write PSF
-        {
-            ASKAPLOG_INFO_STR(logger,"Writing PSF");
-            const casa::Array<double> imagePixels(itsModel->value("psf.cont"));
+          if (std::regex_search(*it,psf))
+          {
+            ASKAPLOG_INFO_STR(logger,"Writing " << *it);
+            const casa::Array<double> imagePixels(itsModel->value(*it));
             casa::Array<float> floatImagePixels(imagePixels.shape());
             casa::convertArray<float, double>(floatImagePixels, imagePixels);
             itsPSFCube->writeSlice(floatImagePixels, itsChan);
-        }
+          }
 
         // Write residual
-        {
-            ASKAPLOG_INFO_STR(logger,"Writing Residual");
-            const casa::Array<double> imagePixels(itsModel->value("residual.cont"));
+          if (std::regex_search(*it,residual))
+          {
+            ASKAPLOG_INFO_STR(logger,"Writing " << *it);
+            const casa::Array<double> imagePixels(itsModel->value(*it));
             casa::Array<float> floatImagePixels(imagePixels.shape());
             casa::convertArray<float, double>(floatImagePixels, imagePixels);
             itsResidualCube->writeSlice(floatImagePixels, itsChan);
-        }
+          }
 
         // Write weights
-        {
-            ASKAPLOG_INFO_STR(logger,"Writing Weights");
-            const casa::Array<double> imagePixels(itsModel->value("weights.cont"));
+          if (std::regex_search(*it,weights))
+          {
+            ASKAPLOG_INFO_STR(logger,"Writing " << *it);
+            const casa::Array<double> imagePixels(itsModel->value(*it));
             casa::Array<float> floatImagePixels(imagePixels.shape());
             casa::convertArray<float, double>(floatImagePixels, imagePixels);
             itsWeightsCube->writeSlice(floatImagePixels, itsChan);
-        }
+          }
 
-/*
+        }
+        /*
         if (itsParset.getBool("restore", false)) {
 
             if (itsDoingPreconditioning) {

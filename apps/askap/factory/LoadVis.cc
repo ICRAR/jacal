@@ -142,7 +142,7 @@ namespace askap {
         // Lets get the key-value-parset
         ASKAP_LOGGER(logger, ".run");
         char buf[64*1024];
-        size_t n_read = input(0).read(buf, 64*1024);
+        size_t n_read = input("Config").read(buf, 64*1024);
         if (n_read == 64*1024) {
             n_read--;
         }
@@ -156,7 +156,7 @@ namespace askap {
         // we need to fill the local parset with parameters that maybe missing
         //
         try {
-            this->itsParset = addMissingParameters(this->itsParset);
+            this->itsParset = NEUtils::addMissingParameters(this->itsParset, this->itsChan);
         }
         catch (std::runtime_error)
         {
@@ -212,7 +212,7 @@ namespace askap {
             sel->chooseCrossCorrelations();
             sel->chooseChannels(1, this->freqInterval[0]);
 
-            // FIXME: Use freq interval in a smarter way and use time interval
+            // FIXME: Use time interval and perhaps beam?
 
             accessors::IDataConverterPtr conv = ds.createConverter();
             conv->setFrequencyFrame(casa::MFrequency::Ref(casa::MFrequency::TOPO), "Hz");
@@ -290,136 +290,5 @@ namespace askap {
         return ms;
     }
 
-    LOFAR::ParameterSet LoadVis::addMissingParameters(LOFAR::ParameterSet& parset) {
-
-        ASKAP_LOGGER(logger, ".addMissingParameters");
-
-        // Need to get some information from the input dataset
-        // this is done in "prepare" in AdviseDI - need to get the minimum
-        // set - or just throw an exception and make the user add
-        // the info ....
-
-        // test for missing image-specific parameters:
-
-        // these parameters can be set globally or individually
-        bool cellsizeNeeded = false;
-        bool shapeNeeded = false;
-        bool directionNeeded = true;
-
-        int nTerms = 1;
-
-        string param;
-
-        const vector<string> imageNames = parset.getStringVector("Images.Names", false);
-
-        param = "Images.direction";
-
-        if ( !parset.isDefined(param) ) {
-
-            ASKAPLOG_WARN_STR(logger,"Param not found: " << param);
-            directionNeeded = true;
-
-        }
-        else {
-            directionNeeded = false;
-        }
-        param = "Images.restFrequency";
-
-        if ( !parset.isDefined(param) ) {
-            std::ostringstream pstr;
-            // Only J2000 is implemented at the moment.
-            pstr<<"HI";
-            ASKAPLOG_INFO_STR(logger, "  Advising on parameter " << param << ": " << pstr.str().c_str());
-            parset.add(param, pstr.str().c_str());
-        }
-
-        for (size_t img = 0; img < imageNames.size(); ++img) {
-
-            param = "Images."+imageNames[img]+".cellsize";
-            if ( !parset.isDefined(param) ) {
-                cellsizeNeeded = true;
-            }
-            else {
-                 param = "Images.cellsize";
-                 if (!parset.isDefined(param) ) {
-                     const vector<string> cellSizeVector = parset.getStringVector("Images.cellsize");
-                     std::ostringstream pstr;
-                     pstr<<"["<< cellSizeVector[0].c_str() <<"arcsec,"<<cellSizeVector[1].c_str() <<"arcsec]";
-                     ASKAPLOG_INFO_STR(logger, "  Advising on parameter " << param <<": " << pstr.str().c_str());
-                     parset.add(param, pstr.str().c_str());
-                 }
-            }
-            param = "Images."+imageNames[img]+".shape";
-            if ( !parset.isDefined(param) ) shapeNeeded = true;
-
-            param = "Images."+imageNames[img]+".frequency";
-
-            if ( !parset.isDefined(param) ) {
-                ASKAPLOG_WARN_STR(logger,"Param not found: " << param);
-                ASKAPTHROW(std::runtime_error,"Frequency not in parset");
-
-            }
-            param ="Images."+imageNames[img]+".direction";
-            if ( !parset.isDefined(param) && directionNeeded) {
-                ASKAPLOG_WARN_STR(logger,"Param not found: " << param);
-                ASKAPTHROW(std::runtime_error,"direction not in parset");
-            }
-            else if (!parset.isDefined(param) && !directionNeeded) {
-                ASKAPLOG_INFO_STR(logger,"Root direction specified but no image direction. Assuming they are the same");
-                const vector<string> directionVector = parset.getStringVector("Images.direction");
-
-                std::ostringstream pstr;
-                pstr<<"["<< directionVector[0].c_str() <<","<<directionVector[1].c_str() <<"," << directionVector[2].c_str() << "]";
-                const string key="Images."+imageNames[img]+".direction";
-                ASKAPLOG_INFO_STR(logger, "  Advising on parameter " << param <<": " << pstr.str().c_str());
-
-                parset.add(param, pstr.str().c_str());
-
-
-            }
-            param = "Images."+imageNames[img]+".nterms"; // if nterms is set, store it for later
-            if (parset.isDefined(param)) {
-                if ((nTerms>1) && (nTerms!=parset.getInt(param))) {
-                    ASKAPLOG_WARN_STR(logger, "  Imaging with different nterms may not work");
-                }
-                nTerms = parset.getInt(param);
-            }
-
-            if ( !parset.isDefined("Images."+imageNames[img]+".nchan") ) {
-                ASKAPLOG_WARN_STR(logger,"Param not found: " << param);
-            }
-        }
-
-        if (nTerms > 1) { // check required MFS parameters
-            param = "visweights"; // set to "MFS" if unset and nTerms > 1
-            if (!parset.isDefined(param)) {
-                std::ostringstream pstr;
-                pstr<<"MFS";
-                ASKAPLOG_DEBUG_STR(logger, "  Advising on parameter " << param <<": " << pstr.str().c_str());
-                parset.add(param, pstr.str().c_str());
-            }
-
-            param = "visweights.MFS.reffreq"; // set to average frequency if unset and nTerms > 1
-            if ((parset.getString("visweights")=="MFS")) {
-                if (!parset.isDefined(param)) {
-                    ASKAPLOG_WARN_STR(logger,"Param not found: " << param);
-                    ASKAPTHROW(std::runtime_error,"MFS reference frequency not in parset");
-                }
-
-            }
-        }
-
-        // test for general missing parameters:
-        if ( cellsizeNeeded && !parset.isDefined("nUVWMachines") ) {
-
-        } else if ( cellsizeNeeded && !parset.isDefined("Images.cellsize") ) {
-
-        } else if ( shapeNeeded && !parset.isDefined("Images.shape") ) {
-
-        }
-        ASKAPLOG_INFO_STR(logger,"Done adding missing params ");
-
-        return parset;
-    }
 
 } // namespace
