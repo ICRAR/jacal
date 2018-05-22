@@ -16,7 +16,7 @@ class GenericMonitorService(Service):
         for endpoint in self.endpoints:
             message = self.messager.poll(endpoint)
             if message is not None:
-                logging.debug(str(message))
+                logging.info(str(message))
         return None
 
     def terminate(self):

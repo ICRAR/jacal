@@ -32,6 +32,10 @@ class QueueMessagingSystem(MessagingSystem):
         except Queue.Empty:
             return (None, cursor)
     
+    """Registers the intent to publish on a given topic."""
+    def register(self, topic):
+        pass
+
     """Publishes a message on a given topic."""
     def publish(self, topic, message):
         logging.debug("Publishing message %s to topic %s" % (message, topic))
