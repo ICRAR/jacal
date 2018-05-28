@@ -66,18 +66,17 @@ class PassbyStreamApp(AppDROP):
     def initialize(self, **kwargs):
         super(PassbyStreamApp, self).initialize(**kwargs)
         self._count = 0
-        self._passon = True if len(self.outputs) > 1 else False
 
     def dataWritten(self, uid, data):
         if self.execStatus != AppDROPStates.RUNNING:
             logger.info("First data received in Passby, moving to RUNNING state")
             self.execStatus = AppDROPStates.RUNNING
+            self._passon = True if len(self.outputs) > 1 else False
         self._count += len(data)
         if (self._passon):
             self.outputs[0].write(data)
 
     def dropCompleted(self, uid, status):
-        outputDrop = self.outputs[0]
         logger.info("Total data passed by from {0} to {1}: {2} bytes".\
                     format(uid, self.oid, self._count))
         self.execStatus = AppDROPStates.FINISHED
