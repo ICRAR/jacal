@@ -49,7 +49,7 @@ class SpeadTcpReceiver(SocketListenerApp):
     def initialize(self, **kwargs):
         super(SpeadTcpReceiver, self).initialize(**kwargs)
         try:
-            ip = dlg.utils.get_local_ip_addr()[0][0]
+            ip = dlg.utils.get_local_ip_addr()[1][0] # use infiniband over ip
             port = 6000 + int(self.oid.split('/')[-1]) #HACK HACK HACK
             ipstr = '%s+%d' % (ip, port)
             con = httplib.HTTPConnection('sdp-dfms.ddns.net', 8096)
@@ -66,13 +66,15 @@ class PassbyStreamApp(AppDROP):
     def initialize(self, **kwargs):
         super(PassbyStreamApp, self).initialize(**kwargs)
         self._count = 0
+        self._passon = True if len(self.outputs) > 1 else False
 
     def dataWritten(self, uid, data):
         if self.execStatus != AppDROPStates.RUNNING:
             logger.info("First data received in Passby, moving to RUNNING state")
             self.execStatus = AppDROPStates.RUNNING
         self._count += len(data)
-        self.outputs[0].write(data)
+        if (self._passon):
+            self.outputs[0].write(data)
 
     def dropCompleted(self, uid, status):
         outputDrop = self.outputs[0]
