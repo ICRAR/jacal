@@ -71,7 +71,7 @@ class PassbyStreamApp(AppDROP):
         if self.execStatus != AppDROPStates.RUNNING:
             logger.info("First data received in Passby, moving to RUNNING state")
             self.execStatus = AppDROPStates.RUNNING
-            self._passon = True if len(self.outputs) > 1 else False
+            self._passon = True if len(self.outputs) > 0 else False
         self._count += len(data)
         if (self._passon):
             self.outputs[0].write(data)
