@@ -3,7 +3,7 @@
   "linkToPortIdProperty": "toPort",
   "nodeDataArray": [ 
 {"category":"file", "text":"Config File", "data_volume":5, "group_end":0, "check_filepath_exists":"1", "filepath":"eight.in", "dirname":"", "key":-7, "loc":"-499.32812499999943 -1439.9999999999986"},
-{"category":"SplitData", "text":"For each Channel", "isGroup":true, "num_of_copies":8, "scatter_axis":"frequency", "key":-12, "loc":"-713.3284630732144 -1046.3256609604819"},
+{"category":"SplitData", "text":"For each Channel", "isGroup":true, "num_of_copies":2, "scatter_axis":"frequency", "key":-12, "loc":"-713.3284630732144 -1046.3256609604819"},
 {"category":"DynlibApp", "text":"Major Cycle", "execution_time":5, "num_cpus":1, "group_start":1, "libpath":"/tmp/libaskapsoft_dlg.so", "Arg01":"name=MajorCycle", "Arg02":"", "Arg03":"", "Arg04":"", "Arg05":"", "Arg06":"", "Arg07":"", "Arg08":"", "Arg09":"", "Arg10":"", "key":-5, "loc":"-1114.4522423700885 -1097.0932317110035", "group":-15},
 {"category":"memory", "text":"Normal \nEquation", "data_volume":5, "group_end":0, "key":-6, "loc":"-978.4522423700903 -1099.093231711001", "group":-15},
 {"category":"DynlibApp", "text":"SolveNE", "execution_time":5, "num_cpus":1, "group_start":0, "libpath":"/tmp/libaskapsoft_dlg.so", "Arg01":"name=SolveNE", "Arg02":"", "Arg03":"", "Arg04":"", "Arg05":"", "Arg06":"", "Arg07":"", "Arg08":"", "Arg09":"", "Arg10":"", "key":-8, "loc":"-851.4522423700903 -1099.093231711002", "group":-15},
