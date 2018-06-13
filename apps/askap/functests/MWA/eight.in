@@ -1,0 +1,52 @@
+Cimager.dataset                                 = [~/Data/mwa/MeasurementSets/1061317520_uvdump_01.ms]
+Cimager.nUVWMachines                            = 1
+Cimager.uvwMachineDirTolerance                  = 0.2arcsec
+Cimager.imagetype                               = fits
+Cimager.singleoutputfile                        = true
+Cimager.memorybuffers                           = true
+Cimager.barycentre                              = false
+Cimager.nchanpercore                            = 1
+Cimager.solverpercore                           = true
+Cimager.nwriters                                = 1
+Cimager.Channels                                = [1,%w]
+Cimager.usetmpfs                                = false
+Cimager.tmpfs                                   = /Volumes/RAMDisk
+Cimager.Images.Names                            = image.beam00A.cont
+Cimager.Images.reuse                            = false
+Cimager.Images.shape                            = [1024,1024]
+Cimager.Images.cellsize                         = [30arcsec, 30arcsec]
+Cimager.Images.restFrequency                    = HI
+Cimager.Images.direction                        = [0:00:00,-27.00.00,J2000]
+
+Cimager.gridder                                 = WProject
+Cimager.gridder.WProject.wmax                   = 1000
+Cimager.gridder.snapshotimaging                 = false
+Cimager.gridder.snapshotimaging.longtrack       = false
+Cimager.gridder.snapshotimaging.wtolerance       = 100
+Cimager.gridder.WProject.nwplanes               = 51
+Cimager.gridder.WProject.oversample             = 8
+Cimager.gridder.WProject.maxsupport             = 256
+Cimager.gridder.WProject.cutoff                 = 0.001
+Cimager.gridder.WProject.variablesupport        = true
+Cimager.gridder.WProject.offsetsupport          = true
+
+Cimager.ncycles=3
+Cimager.Images.writeAtMajorCycle                = true
+
+# Use a multiscale Clean solver
+Cimager.solver                                  = Clean
+Cimager.solver.Clean.algorithm                  = BasisfunctionMFS
+Cimager.solver.Clean.scales                     = [0]
+Cimager.solver.Clean.niter                      = 500
+Cimager.solver.Clean.gain                       = 0.7
+Cimager.solver.Clean.threshold.minorcycle       = [1mJy,0.01mJy]
+Cimager.solver.Clean.threshold.majorcycle       = [0.01mJy]
+Cimager.solver.Clean.tolerance                  = 0.1
+Cimager.solver.Clean.verbose                    = false
+
+Cimager.preconditioner.preservecf               = true
+Cimager.preconditioner.Names                    = [Wiener]
+Cimager.preconditioner.Wiener.robustness        = -2
+
+Cimager.restore                                 = true
+Cimager.restore.beam                            = fit

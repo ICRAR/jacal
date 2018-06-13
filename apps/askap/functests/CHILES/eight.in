@@ -14,7 +14,7 @@ Cimager.tmpfs                                   = /Volumes/RAMDisk
 Cimager.Images.Names                            = image.beam00A.cont
 Cimager.Images.reuse                            = false
 Cimager.Images.shape                            = [512,512]
-Cimager.Images.cellsize                         = [6arcsec, 6arcsec]
+Cimager.Images.cellsize                         = [1arcsec, 1arcsec]
 Cimager.Images.restFrequency                    = HI
 Cimager.Images.direction                        = [10:01:30.990,+002.26.35.216,J2000]
 
@@ -40,7 +40,7 @@ Cimager.solver.Clean.algorithm                  = BasisfunctionMFS
 Cimager.solver.Clean.scales                     = [0]
 Cimager.solver.Clean.niter                      = 500
 Cimager.solver.Clean.gain                       = 0.1
-Cimager.solver.Clean.threshold.minorcycle       = [1mJy,0.1mJy]
+Cimager.solver.Clean.threshold.minorcycle       = [1mJy,0.01mJy]
 Cimager.solver.Clean.threshold.majorcycle       = [0.01mJy]
 Cimager.solver.Clean.tolerance                  = 0.1
 Cimager.solver.Clean.verbose                    = false
