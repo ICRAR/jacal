@@ -221,10 +221,7 @@ namespace askap
       /// in parset file, casa table or a database.
       boost::shared_ptr<accessors::ICalSolutionSource> itsSolutionSource;
 
-      /// @brief solution accessor used to stage the results in memory
-      /// @details This object is initialised by the master. It provides a way to store
-      /// the solutions in memory, until we write out at the end.
-      boost::shared_ptr<accessors::ICalSolutionAccessor> itsSolAcc;
+      
 
       /// @brief shared pointer to measurement equation correspondent to the perfect model
       /// @details It is handy to store the perfect measurement equation, so it is not
@@ -278,7 +275,7 @@ namespace askap
 
       vector<int> itsModelInputs;
 
-      
+
 
 
     };

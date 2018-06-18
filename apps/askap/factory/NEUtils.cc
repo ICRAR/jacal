@@ -159,7 +159,9 @@ int NEUtils::getChan(char *uid) {
     char * sessionID = strsep(&string, "_");
     char * logicalGraphID = strsep(&string, "_");
     char * contextID = strsep(&string, "_");
-
+    if (contextID == NULL) {
+      return -1;
+    }
     string = strdup(contextID);
 
     char * branchID = strsep(&string,"/");
