@@ -17,8 +17,6 @@ fi
 
 # Make sure there is nothing in the PYTHONPATH
 # which could come from somewhere else
-unset PYTHONPATH
-
 mkdir ${WORKSPACE}/${ENVDIR}
 virtualenv --version
 virtualenv -p python2.7 ${WORKSPACE}/${ENVDIR}
