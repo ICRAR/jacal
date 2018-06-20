@@ -14,6 +14,8 @@ fi
 if [[ $(hostname -s) = galaxy-? ]]; then
     module load gcc/4.9.0
     module load python/2.7.10
+    module unload askapsoft/0.20.3
+    module unload askappipeline/0.20.3
     module load virtualenv
 fi
 
