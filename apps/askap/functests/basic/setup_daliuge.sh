@@ -5,15 +5,12 @@ killall dlg
 if [ $# -gt 0 ]; then
     cd $1
     source activate daliuge
-    cd $WORKSPACE
+    cd $OLDPWD
+elif [ -n "${DALIUGE_VENV}" ]; then
+    source ${DALIUGE_VENV}/bin/activate
 else
-    if [ -e ${WORKSPACE}/daliuge_env/bin/activate ]; then
-        source ${WORKSPACE}/daliuge_env/bin/activate
-    else
-        echo "Cannot find ${WORKSPACE}/daliuge_env/bin/activate"
-        exit -1
-    fi
+    echo "Assuming dlg is already available"
 fi
-cd $RUNDIR
-${WORKSPACE}/daliuge_env/bin/dlg nm -v --no-dlm &
-${WORKSPACE}/daliuge_env/bin/dlg dim -N localhost &
+
+dlg nm -v --no-dlm &
+dlg dim -N localhost &
