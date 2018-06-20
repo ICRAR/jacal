@@ -13,6 +13,8 @@ fi
 # test are we on galaxy
 if [[ $(hostname -s) = galaxy-? ]]; then
     module load virtualenv
+    module unload askapsoft/0.20.3
+    module unload askappipeline/0.20.3
 fi
 
 # Make sure there is nothing in the PYTHONPATH
