@@ -1,4 +1,4 @@
-#!/bin/bash -l
+#!/bin/bash
 
 if [ $# -gt 0 ]; then
     TOPDIR=$1
@@ -17,6 +17,7 @@ fi
 
 # Make sure there is nothing in the PYTHONPATH
 # which could come from somewhere else
+env
 mkdir ${WORKSPACE}/${ENVDIR}
 virtualenv --version
 virtualenv -p python2.7 ${WORKSPACE}/${ENVDIR}
