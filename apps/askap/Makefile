@@ -86,7 +86,7 @@ OBJS = factory/DaliugeApplicationFactory.o \
 
 .PHONY: all clean
 
-all: libaskapsoft_dlg.so libaskap_register_altwproject
+all: libaskapsoft_dlg.so
 
 clean:
 	rm -f factory/*.o daliuge/*.o *.o *.so standalone
