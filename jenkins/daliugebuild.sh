@@ -12,10 +12,7 @@ fi
 #
 # test are we on galaxy
 if [[ $(hostname -s) = galaxy-? ]]; then
-    module load gcc/4.8.5
-    module load python/2.7.14
     module load virtualenv
-
 fi
 
 # Make sure there is nothing in the PYTHONPATH
