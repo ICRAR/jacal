@@ -12,18 +12,21 @@ fi
 #
 # test are we on galaxy
 if [[ $(hostname -s) = galaxy-? ]]; then
-    module load gcc/4.9.0
-    module load python/2.7.10
+    module load gcc/4.8.5
+    module load python/2.7.14
     module load virtualenv
 
 fi
+
+# Make sure there is nothing in the PYTHONPATH
+# which could come from somewhere else
+unset PYTHONPATH
 
 mkdir ${WORKSPACE}/${ENVDIR}
 virtualenv --version
 virtualenv -p python2.7 ${WORKSPACE}/${ENVDIR}
 
 source ${WORKSPACE}/${ENVDIR}/bin/activate
-pip install --trusted-host pypi.python.org --upgrade pip wheel
 pip install --trusted-host pypi.python.org python-daemon pyzmq
 pip install --trusted-host pypi.python.org ${WORKSPACE}/${TOPDIR}
 if [ $? -ne 0 ]; then
