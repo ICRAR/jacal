@@ -11,8 +11,6 @@ fi
 # via a virtualenv
 #
 # test are we on galaxy
-cd $WORKSPACE
-
 if [[ $(hostname -s) = galaxy-? ]]; then
     module load gcc/4.9.0
     module load python/2.7.10
@@ -23,33 +21,14 @@ fi
 mkdir ${WORKSPACE}/${ENVDIR}
 virtualenv --version
 virtualenv -p python2.7 ${WORKSPACE}/${ENVDIR}
-cd ${WORKSPACE}/${ENVDIR}/bin
-if [ $? -ne 0 ]; then
-    echo "Error: Failed to chdir to  ${WORKSPACE}/${ENVDIR}/bin"
-    exit -1
-fi
 
-source ./activate
-
-${WORKSPACE}/${ENVDIR}/bin/pip install --trusted-host pypi.python.org --upgrade pip
-${WORKSPACE}/${ENVDIR}/bin/pip install --trusted-host pypi.python.org python-daemon
-${WORKSPACE}/${ENVDIR}/bin/pip install --trusted-host pypi.python.org pyzmq
-
-
-cd ${WORKSPACE}/${TOPDIR}
-if [ $? -ne 0 ]; then
-    echo "Error: Failed to chdir to  ${WORKSPACE}/${TOPDIR}"
-    exit -1
-fi
-
-#
-#
-pip install --process-dependency-links --trusted-host pypi.python.org ${WORKSPACE}/${TOPDIR}
-
+source ${WORKSPACE}/${ENVDIR}/bin/activate
+pip install --trusted-host pypi.python.org --upgrade pip wheel
+pip install --trusted-host pypi.python.org python-daemon pyzmq
+pip install --trusted-host pypi.python.org ${WORKSPACE}/${TOPDIR}
 if [ $? -ne 0 ]; then
     echo "Error: installation failed"
     exit -1
 fi
 
-cd ${WORKSPACE}/${ENVDIR}/bin
 deactivate
