@@ -57,11 +57,11 @@ dlg_app_info *dummy_dlg_app(const std::string &input_file) {
 	dlg_input_info *input = new dlg_input_info();
 	input->read = _read;
 	input->name = new char[7];
-	strcpy(input->name, "Parset");
+	strcpy(input->name, "Config");
 	dlg_output_info *output = new dlg_output_info();
 	output->write = _write;
-	output->name = new char[7];
-	strcpy(output->name, "Normal");
+	output->name = new char[6];
+	strcpy(output->name, "Model");
 	dlg_app_info *app = new dlg_app_info();
 	app->inputs = input;
 	app->n_inputs = 1;
@@ -69,35 +69,32 @@ dlg_app_info *dummy_dlg_app(const std::string &input_file) {
 	app->n_outputs = 1;
 	app->uid = new char[4];
 	app->oid = new char[4];
-	app->appname = new char[8];
-	strcpy(app->appname, "LoadVis");
+	app->appname = new char[18];
+	strcpy(app->appname, "JacalBPCalibrator");
 	strcpy(app->uid, "uid");
 	strcpy(app->oid, "oid");
 	return app;
 }
 
-void run_loadvis(const std::string &input_file) {
+void run_calibrate(const std::string &input_file) {
 	const char *arguments[][2] = {{nullptr, nullptr}};
 	dlg_app_info *app = dummy_dlg_app(input_file);
-	DaliugeApplication::ShPtr load_vis = DaliugeApplicationFactory::make(app);
-	load_vis->init((const char ***)arguments);
-	load_vis->run();
+	DaliugeApplication::ShPtr j_cal = DaliugeApplicationFactory::make(app);
+	j_cal->init((const char ***)arguments);
+	j_cal->run();
 }
 
-int run(int argc, std::string input1, std::string input2) {
-	std::thread t1(run_loadvis, input1);
-	std::thread t2(run_loadvis, input2);
-	t1.join();
-	t2.join();
+int run(int argc, std::string input1) {
+    run_calibrate(input1);
 }
 
 }
 
 int main(int argc, char **argv) {
-	if (argc < 3) {
-		std::cerr << "Usage: " << argv[0] << " <input0> <input1>" << std::endl;
+	if (argc < 2) {
+		std::cerr << "Usage: " << argv[0] << " <parset>" << std::endl;
 		return 1;
 	}
 
-	return askap::run(argc, argv[1], argv[2]);
+	return askap::run(argc, argv[1]);
 }

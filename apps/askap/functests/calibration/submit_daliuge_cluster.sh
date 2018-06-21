@@ -66,5 +66,6 @@ mkdir $LOG_DIR
 
 echo $LD_LIBRARY_PATH
 ulimit -c unlimited
-srun -n 3 -N 3 $MYPYTHON $MYCLUSTER -l $LOG_DIR -L $LG_GRAPH
+#srun -n 3 -N 3 $MYPYTHON $MYCLUSTER -l $LOG_DIR -L $LG_GRAPH
+srun -n 3 -N 3 $MYPYTHON $SOFT_HOME/tests/mpitest.py
 #dlg nm -v --no-dlm

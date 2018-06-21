@@ -1,0 +1,53 @@
+Cimager.dataset                                 = [/Users/ord006/Soft/jacal/apps/askap/functests/testdata/20131121_946_6.14.av.ms]
+Cimager.nUVWMachines                            = 1
+Cimager.uvwMachineDirTolerance                  = 0.2arcsec
+Cimager.imagetype                               = fits
+Cimager.singleoutputfile                        = true
+Cimager.memorybuffers                           = true
+Cimager.barycentre                              = false
+Cimager.nchanpercore                            = 1
+Cimager.solverpercore                           = true
+Cimager.nwriters                                = 1
+Cimager.Channels                                = [1,%w]
+Cimager.usetmpfs                                = false
+Cimager.tmpfs                                   = /Volumes/RAMDisk
+Cimager.Images.Names                            = image.beam00A.cont
+Cimager.Images.reuse                            = false
+Cimager.Images.shape                            = [256,256]
+Cimager.Images.cellsize                         = [3arcsec, 3arcsec]
+Cimager.Images.restFrequency                    = HI
+Cimager.Images.direction                        = [10:01:30.990,+002.26.35.216,J2000]
+
+
+Cimager.gridder                                 = SphFunc
+Cimager.gridder.WProject.wmax                   = 100
+Cimager.gridder.snapshotimaging                 = false
+Cimager.gridder.snapshotimaging.longtrack       = false
+Cimager.gridder.snapshotimaging.wtolerance       = 100
+Cimager.gridder.WProject.nwplanes               = 5101
+Cimager.gridder.WProject.oversample             = 16
+Cimager.gridder.WProject.maxsupport             = 1024
+Cimager.gridder.WProject.cutoff                 = 0.001
+Cimager.gridder.WProject.variablesupport        = true
+Cimager.gridder.WProject.offsetsupport          = true
+
+Cimager.ncycles=1
+Cimager.Images.writeAtMajorCycle                = true
+
+# Use a multiscale Clean solver
+Cimager.solver                                  = Clean
+Cimager.solver.Clean.algorithm                  = Basisfunction
+Cimager.solver.Clean.scales                     = [0]
+Cimager.solver.Clean.niter                      = 100
+Cimager.solver.Clean.gain                       = 0.1
+Cimager.solver.Clean.threshold.minorcycle       = 0.1
+Cimager.solver.Clean.threshold.majorcycle       = -1Jy
+Cimager.solver.Clean.tolerance                  = 0.1
+Cimager.solver.Clean.verbose                    = false
+
+Cimager.preconditioner.preservecf               = true
+Cimager.preconditioner.Names                    = [Wiener]
+Cimager.preconditioner.Wiener.robustness        = -2
+
+Cimager.restore                                 = true
+Cimager.restore.beam                            = fit

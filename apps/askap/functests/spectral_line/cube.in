@@ -20,7 +20,7 @@ Cimager.Images.restFrequency                    = HI
 #Cimager.visweights.MFS.reffreq                  = 1.10697e+09
 #Cimager.Images.image.cont.nterms          = 3
 Cimager.Images.direction=[12:30:00.00, -045.00.00.00, J2000]
-Cimager.Images.image.cont.frequency              = [1.1e+09,1.10007e+09]
+#Cimager.Images.image.cont.frequency              = [1.1e+09,1.10007e+09]
 Cimager.Images.image.cont.nchan          = 1
 #Cimager.nworkergroups                           = 3
 

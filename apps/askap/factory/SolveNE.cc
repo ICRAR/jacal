@@ -184,7 +184,17 @@ namespace askap {
             ASKAPDEBUGASSERT(itsModel);
             itsSolver->solveNormalEquations(*itsModel, q);
             ASKAPLOG_INFO_STR(logger, "Solved normal equations");
-
+            // need to increment a solverCount so anything outside the loop
+            // knows what majorCycle iteration this comes from
+            if (itsModel->has("iteration")) {
+                int iteration = itsModel->scalarValue("iteration");
+                iteration++;
+                itsModel->update("iteration",iteration);
+            }
+            else {
+              int iteration = 1;
+              itsModel->add("iteration",iteration);
+            }
             NEUtils::sendParams(itsModel, output("Model"));
         }
 

@@ -44,7 +44,7 @@ runBasicTest()
 { # Wait for daliuge to start, but timeout after 10 seconds
     echo -n Starting basic test
     TIMEOUT=10
-    dlg unroll-and-partition -L ./askap_SpectralLine.json -a metis | sed 's/DynlibApp/DynlibProcApp/g' | dlg map -N localhost,localhost,localhost,localhost,localhost,localhost,localhost,localhost,localhost -i 8 | dlg submit -H localhost -p 8001
+    dlg unroll-and-partition -L ./askap_SpectralLine.json -a metis | sed 's/DynlibApp/DynlibProcApp/g' | dlg map -N localhost,localhost,localhost,localhost,localhost,localhost,localhost,localhost,localhost -i 8 | dlg submit -H localhost -p 8001 > image.log
 
 }
 cleanup()

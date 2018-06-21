@@ -227,8 +227,10 @@ namespace askap {
         std::string psf_name = "psf";
         std::string residual_name = "residual";
         std::string weights_name = "weights";
+        std::string restored_name = "restored";
 
-        if (itsChan == -1)  { // only channel 0 builds the cubes
+
+        if (itsChan == -1)  { // not sure this ever happens now
           ASKAPLOG_DEBUG_STR(logger,"Configuring Spectral Cube");
           ASKAPLOG_DEBUG_STR(logger,"nchan: " << nchanCube << " base f0: " << f0.getValue("MHz") << " MHz "
           << " width: " << freqinc.getValue("MHz"));
@@ -243,6 +245,11 @@ namespace askap {
           itsPSFCube.reset(new cp::CubeBuilder(itsParset,  psf_name));
           itsResidualCube.reset(new cp::CubeBuilder(itsParset,  residual_name));
           itsWeightsCube.reset(new cp::CubeBuilder(itsParset, weights_name));
+
+          if (itsParset.getBool("restore", false)) {
+            itsRestoredCube.reset(new cp::CubeBuilder(itsParset, restored_name));
+          }
+
           handleImageParams();
         }
 
@@ -265,11 +272,12 @@ namespace askap {
     {
 
         vector<string> images=itsModel->names();
-        std::regex peak_residual("peak_residual");
-        std::regex residual("residual");
-        std::regex image("image");
-        std::regex psf("psf");
-        std::regex weights("weights");
+        std::regex peak_residual("^peak_residual");
+        std::regex residual("^residual");
+        std::regex image("^image");
+        std::regex psf("^psf");
+        std::regex weights("^weights");
+        std::regex restored("restored"); // restored is at the end
 
         for (vector<string>::const_iterator it=images.begin(); it !=images.end(); it++) {
 
@@ -317,7 +325,15 @@ namespace askap {
             casa::convertArray<float, double>(floatImagePixels, imagePixels);
             itsWeightsCube->writeSlice(floatImagePixels, itsChan);
           }
-
+          // Write restored
+            if (std::regex_search(*it,restored))
+            {
+              ASKAPLOG_INFO_STR(logger,"Writing " << *it);
+              const casa::Array<double> imagePixels(itsModel->value(*it));
+              casa::Array<float> floatImagePixels(imagePixels.shape());
+              casa::convertArray<float, double>(floatImagePixels, imagePixels);
+              itsRestoredCube->writeSlice(floatImagePixels, itsChan);
+            }
         }
         /*
         if (itsParset.getBool("restore", false)) {

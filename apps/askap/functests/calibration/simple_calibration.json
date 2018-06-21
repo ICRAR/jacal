@@ -1,0 +1,12 @@
+{ "class": "go.GraphLinksModel",
+  "linkFromPortIdProperty": "fromPort",
+  "linkToPortIdProperty": "toPort",
+  "nodeDataArray": [ 
+{"category":"Start", "text":"Start", "key":-1, "loc":"-591.2300599257512 -961.8097839355472"},
+{"category":"DynlibApp", "text":"Calibrate", "execution_time":5, "num_cpus":1, "group_start":0, "libpath":"/tmp/libaskapsoft_dlg.so", "Arg01":"name=JacalBPCalibrator", "Arg02":"", "Arg03":"", "Arg04":"", "Arg05":"", "Arg06":"", "Arg07":"", "Arg08":"", "Arg09":"", "Arg10":"", "key":-8, "loc":"-591.2288536982162 -770.3967361450183"},
+{"category":"file", "text":"Config File", "data_volume":5, "group_end":0, "check_filepath_exists":"1", "filepath":"/Users/ord006/Soft/jacal/apps/askap/functests/calibration/calib_table.in", "dirname":"", "key":-9, "loc":"-746.8281249999992 -1037.4999999999989"}
+ ],
+  "linkDataArray": [ 
+{"loop_aware":"0", "from":-9, "to":-8, "fromPort":"B", "toPort":"B", "points":[-746.8281249999992,-1010.1302897135405,-746.8281249999992,-1000.1302897135405,-746.8281249999992,-719.8020095825183,-669.0284893491078,-719.8020095825183,-591.2288536982162,-719.8020095825183,-591.2288536982162,-729.8020095825183]},
+{"loop_aware":"0", "from":-1, "to":-8, "fromPort":"B", "toPort":"T", "points":[-591.2300599257514,-941.8097839355471,-591.2300599257514,-931.8097839355471,-591.2300599257514,-876.4006233215327,-591.2288536982162,-876.4006233215327,-591.2288536982162,-820.9914627075183,-591.2288536982162,-810.9914627075183]}
+ ]}
