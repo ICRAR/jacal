@@ -5,6 +5,10 @@ class MessagingSystem:
     def __init__(self):
         raise NotImplementedError
 
+    """Registers the intent to publish messages on a topic"""
+    def register(self, topic):
+        raise NotImplementedError
+
     """Returns an initial cursor for a topic, so that a service
        may beging consuming messages on that topic."""
     def subscribe(self, topic):

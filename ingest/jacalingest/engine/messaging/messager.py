@@ -62,6 +62,8 @@ class Messager(ServiceContainer):
             self.topic = topic
             self.messageclass = messageclass
 
+            self.messaging_system.register(self.topic)
+
         def _publish(self, message_object):
             serialized_message = self.messageclass.serialize(message_object)
             self.messaging_system.publish(self.topic, serialized_message)
