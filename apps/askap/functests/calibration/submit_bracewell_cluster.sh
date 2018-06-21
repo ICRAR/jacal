@@ -1,22 +1,21 @@
 #!/bin/bash --login
-#SBATCH   --partition=workq
 #SBATCH   --job-name=Daliuge-Jacal-Test
 #SBATCH   --nodes=3
 #SBATCH   --ntasks-per-node=1
 #SBATCH   --time=01:00:00
-#SBATCH   --account=askaprt
 
-module swap PrgEnv-cray PrgEnv-gnu
-module load python/2.7.14
-module load mpi4py
+module unload gcc
+module load gcc/4.9.3
+module load openmpi/1.10.7-gcc
+module load jdk
 
 # run this for the first time
 #pip install mpi4py
 
 # run "JACAL-enabled" DAliuGe node managers on multiple nodes on Athena
-
-JACAL_HOME=/group/askap/sord/galaxy/jacal
-ASKAP_HOME=/group/askap/sord/galaxy/askapsdp
+SOFT_HOME=/home/ord006/soft
+JACAL_HOME=$SOFT_HOME/jacal
+ASKAP_HOME=$SOFT_HOME/askapsdp
 ASKAP_3RD=$ASKAP_HOME/3rdParty
 
 JACAL_LIB_PATH=$JACAL_HOME/apps/askap/askapsoft_lib:\
@@ -38,7 +37,7 @@ $ASKAP_3RD/Ice/Ice-3.5.0/install/lib
 source ${ASKAP_HOME}/Code/Base/askap/current/init_package_env.sh
 source ${ASKAP_HOME}/Code/Components/Synthesis/synthesis/current/init_package_env.sh
 source ${ASKAP_HOME}/Code/Components/CP/pipelinetasks/current/init_package_env.sh
-source ${ASKAP_HOME}/Code/Components/Analysis/analysis/current/init_package_env.sh
+#source ${ASKAP_HOME}/Code/Components/Analysis/analysis/current/init_package_env.sh
 #source ${ASKAP_HOME}/Code/Components/CP/simager/current/init_package_env.sh
 source ${ASKAP_HOME}/Code/Components/CP/askap_imager/current/init_package_env.sh
 source ${ASKAP_HOME}/Code/Interfaces/cpp/current/init_package_env.sh
@@ -47,17 +46,18 @@ source ${ASKAP_HOME}/Code/Interfaces/cpp/current/init_package_env.sh
 export LD_LIBRARY_PATH=$JACAL_LIB_PATH:$LD_LIBRARY_PATH
 #echo $LD_LIBRARY_PATH
 
-DALIUGE_SRC=/group/askap/sord/galaxy/daliuge
-LOG_ROOT=/group/askap/sord/galaxy/jacal_logs
-MYENV==/group/askap/sord/galaxy/env/daliuge/
+DALIUGE_SRC=$SOFT_HOME/daliuge
+LOG_ROOT=$SOFT_HOME/jacal_logs
+MYENV=$SOFT_HOME/env/daliuge/
 
 source ${MYENV}/bin/activate
 
-MYPYTHON=/group/askap/sord/galaxy/env/daliuge/bin/python
+MYPYTHON=${MYENV}/bin/python
 
-MYCLUSTER=$JACAL_HOME"/apps/askap/functests/calibration/start_dfms_cluster.py"
+#MYCLUSTER=$JACAL_HOME"/apps/askap/functests/calibration/start_dfms_bracewell.py"
 
-LG_GRAPH=$JACAL_HOME"/apps/askap/functests/calibration/askap_BPCalibration_galaxy.json"
+MYCLUSTER=" -m dlg.deploy.pawsey.start_dfms_cluster"
+LG_GRAPH=$JACAL_HOME"/apps/askap/functests/calibration/simple_calibration_bracewell.json"
 
 SID=$(date +"%Y-%m-%d_%H-%M-%S")
 LOG_DIR=$LOG_ROOT"/"$SID
@@ -65,7 +65,6 @@ echo "Creating direcotry "$LOG_DIR
 mkdir $LOG_DIR
 
 echo $LD_LIBRARY_PATH
-ulimit -c unlimited
-#srun -n 3 -N 3 $MYPYTHON $MYCLUSTER -l $LOG_DIR -L $LG_GRAPH
-srun -n 3 -N 3 $MYPYTHON $SOFT_HOME/tests/mpitest.py
+#ulimit -c unlimited
+mpirun -np 3 $MYPYTHON $MYCLUSTER -l $LOG_DIR -L $LG_GRAPH -m $DLG_MON_HOST -o $DLG_MON_PORT
 #dlg nm -v --no-dlm

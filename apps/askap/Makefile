@@ -3,6 +3,8 @@
 # assumes ASKAPSoft can be found under ASKAP_ROOT and that DALiuGE is installed
 # and can be loaded by the python executable
 #
+CXX=g++
+CC=gcc
 
 ifndef ASKAP_ROOT
 $(error ASKAP_ROOT is not set)
@@ -101,3 +103,6 @@ standalone: standalone.o libaskapsoft_dlg.so
 
 factory/%.s: factory/%.cc
 	$(CXX) -S $< $(CXXFLAGS) -o $@
+
+standalone.o: standalone.cpp
+	$(CXX) -c $< $(CXXFLAGS) -o $@

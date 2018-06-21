@@ -1,4 +1,4 @@
-Cbpcalibrator.dataset                         = [/Users/ord006/Soft/jacal/apps/askap/functests/calibration/1934_SB4094_b0_t0_ch0.ms]
+Cbpcalibrator.dataset                         = [/flush2/ord006/soft/jacal/apps/askap/functests/calibration/1934_SB4094_b0_t0_ch0.ms]
 # Minimum UV distance for bandpass calibration:
 Cbpcalibrator.MinUV = 200
 Cbpcalibrator.nAnt                            = 12
