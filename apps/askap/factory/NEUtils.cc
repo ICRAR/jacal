@@ -308,7 +308,7 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
               ASKAPLOG_WARN_STR(logger, "Frequency in Parset and it may need to be overridden");
           }
           casa::Int nchanCube = NEUtils::getNChan(parset);
-          if (nchanCube > 1) {
+          if (nchanCube >= 1) {
             ASKAPLOG_WARN_STR(logger, "Overridding parset frequency with channel based information from measurement set - Am I half a channel out?");
 
             ASKAPLOG_INFO_STR(logger, "Getting base frequency");
