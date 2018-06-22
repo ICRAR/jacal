@@ -93,16 +93,20 @@ OBJS = factory/DaliugeApplicationFactory.o \
 all: libaskapsoft_dlg.so
 
 clean:
-	rm -f factory/*.o daliuge/*.o *.o *.so standalone
+	rm -f factory/*.o daliuge/*.o *.o *.so standalone standalone_cube
 
 libaskapsoft_dlg.so: $(OBJS)
 	$(CXX) -shared -o $@ $(OBJS) $(LDFLAGS)
 
 standalone: standalone.o libaskapsoft_dlg.so
 	$(CXX) -o $@ standalone.o -pthread -L. $(LDFLAGS) -laskapsoft_dlg
+standalone_cube: standalone_cube.o libaskapsoft_dlg.so
+	$(CXX) -o $@ standalone_cube.o -pthread -L. $(LDFLAGS) -laskapsoft_dlg
 
 factory/%.s: factory/%.cc
 	$(CXX) -S $< $(CXXFLAGS) -o $@
 
 standalone.o: standalone.cpp
+	$(CXX) -c $< $(CXXFLAGS) -o $@
+standalone_cube.o: standalone_cube.cpp
 	$(CXX) -c $< $(CXXFLAGS) -o $@
