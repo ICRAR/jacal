@@ -210,7 +210,7 @@ namespace askap {
         //
 
         casa::Double baseFrequency = NEUtils::getFrequency(itsParset,0);
-        casa::Double chanWidth = NEUtils::getFrequency(itsParset,1) - NEUtils::getFrequency(itsParset,1);
+        casa::Double chanWidth = NEUtils::getChanWidth(itsParset,0);
         casa::Int nchanCube = NEUtils::getNChan(itsParset);
         casa::Double channelFrequency = NEUtils::getFrequency(itsParset,itsChan);
 
@@ -229,11 +229,12 @@ namespace askap {
         std::string weights_name = "weights";
         std::string restored_name = "restored";
 
+        ASKAPLOG_INFO_STR(logger,"From MS -> nchan: " << nchanCube << " base f0: " << f0.getValue("MHz") << " MHz "
+        << " width: " << freqinc.getValue("MHz"));
 
         if (itsChan == -1)  { // not sure this ever happens now
-          ASKAPLOG_DEBUG_STR(logger,"Configuring Spectral Cube");
-          ASKAPLOG_DEBUG_STR(logger,"nchan: " << nchanCube << " base f0: " << f0.getValue("MHz") << " MHz "
-          << " width: " << freqinc.getValue("MHz"));
+          ASKAPLOG_INFO_STR(logger,"Configuring New Spectral Cube");
+
 
           itsImageCube.reset(new cp::CubeBuilder(itsParset, nchanCube, f0, freqinc,img_name));
           itsPSFCube.reset(new cp::CubeBuilder(itsParset, nchanCube, f0, freqinc, psf_name));
