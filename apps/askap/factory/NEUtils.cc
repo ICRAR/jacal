@@ -88,6 +88,16 @@ int NEUtils::getNChan(LOFAR::ParameterSet& parset) {
 
 }
 
+double NEUtils::getChanWidth(LOFAR::ParameterSet& parset, int chan) {
+  //FIXME: Assumes all datasets have the same chanWidth
+  const vector<string> ms = getDatasets(parset);
+  const casa::MeasurementSet in(ms[0]);
+  const casa::ROMSColumns srcCols(in);
+  const casa::ROMSSpWindowColumns& sc = srcCols.spectralWindow();
+  int srow = sc.nrow()-1;
+  return sc.chanWidth()(srow)(casa::IPosition(1, chan));
+}
+
 double NEUtils::getFrequency(LOFAR::ParameterSet& parset, int chan, bool barycentre) {
 
   // Read from the configruation the list of datasets to process
@@ -139,6 +149,7 @@ double NEUtils::getFrequency(LOFAR::ParameterSet& parset, int chan, bool barycen
     return sc.chanFreq()(srow)(casa::IPosition(1, chan));
   }
   else {
+    // FIXME:
     // need to put the barycentreing in here - the logic is all in the AdviseDI
   }
 
@@ -314,7 +325,7 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
             ASKAPLOG_INFO_STR(logger, "Getting base frequency");
             casa::Double baseFrequency = NEUtils::getFrequency(parset,chan);
             ASKAPLOG_INFO_STR(logger, "Getting chanwidth");
-            casa::Double chanWidth = NEUtils::getFrequency(parset,1) - NEUtils::getFrequency(parset,0);
+            casa::Double chanWidth = NEUtils::getChanWidth(parset,chan);
             ASKAPLOG_INFO_STR(logger, "Getting chanwidth");
             std::ostringstream pstr;
             pstr<<"["<< baseFrequency <<","<<baseFrequency+chanWidth <<"]";

@@ -76,6 +76,8 @@ namespace askap {
 
         static int getNChan(LOFAR::ParameterSet& parset);
 
+        static double getChanWidth(LOFAR::ParameterSet& parset, int chan);
+
         static double getFrequency(LOFAR::ParameterSet& parset, int chan=0, bool barycentre=false);
 
         // these are from Synparallel.
