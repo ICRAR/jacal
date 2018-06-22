@@ -326,7 +326,7 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
             casa::Double baseFrequency = NEUtils::getFrequency(parset,chan);
             ASKAPLOG_INFO_STR(logger, "Getting chanwidth");
             casa::Double chanWidth = NEUtils::getChanWidth(parset,chan);
-            ASKAPLOG_INFO_STR(logger, "Getting chanwidth");
+            ASKAPLOG_INFO_STR(logger, "Setting chanwidth in parset");
             std::ostringstream pstr;
             pstr<<"["<< baseFrequency <<","<<baseFrequency+chanWidth <<"]";
             if ( parset.isDefined(param) ) {
@@ -336,7 +336,7 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
               parset.add(param, pstr.str().c_str());
             }
               //ASKAPTHROW(std::runtime_error,"Frequency not in parset");
-            ASKAPLOG_WARN_STR(logger, "Overridden");
+            ASKAPLOG_WARN_STR(logger, "Overridden frequency in parset");
 
           }
           param ="Images."+imageNames[img]+".direction";

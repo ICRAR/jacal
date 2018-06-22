@@ -273,6 +273,7 @@ namespace askap {
     {
 
         vector<string> images=itsModel->names();
+
         std::regex peak_residual("^peak_residual");
         std::regex residual("^residual");
         std::regex image("^image");
@@ -281,7 +282,7 @@ namespace askap {
         std::regex restored("restored"); // restored is at the end
 
         for (vector<string>::const_iterator it=images.begin(); it !=images.end(); it++) {
-
+          ASKAPLOG_INFO_STR(logger, "Will parse for an image name "<< *it);
           if (std::regex_search(*it,peak_residual)) {
             continue;
           }
