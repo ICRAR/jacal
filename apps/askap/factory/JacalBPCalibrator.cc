@@ -98,18 +98,19 @@ JacalBPCalibrator::JacalBPCalibrator(dlg_app_info *raw_app) : DaliugeApplication
   this->itsChan = NEUtils::getChan(raw_app->uid);
 
 
-  if (this->itsChan < 0) { // we are outside a loop
+  if (this->itsChan < 0) { // we are outside a loop we are going to do this ourselves
 
     this->isMaster = true;
-    this->isWorker = false;
+    this->isWorker = true;
+    this->isParallel =  false;
 
   }
-  else {
+  else { // we are in a loop - assume it is over frequency and all work is distributed
     this->isWorker = true;
     this->isMaster = false;
+    this->isParallel = true;
 
   }
-  this->isParallel =  true;
 
   // only beam 0 for the moment
   this->itsBeam = 0;
@@ -171,7 +172,7 @@ int JacalBPCalibrator::run() {
 
   itsModelInputs = get_inputs("Model");
 
-  
+
   char buf[64*1024];
   size_t n_read = input("Config").read(buf, 64*1024);
   if (n_read == 64*1024) {
@@ -202,7 +203,7 @@ int JacalBPCalibrator::run() {
 
       const std::string calAccType = this->itsParset.getString("calibaccess","parset");
 
-      if (calAccType == "service") {
+      if (calAccType == "service") { // this is unlikely to be used in this form
         itsSolutionSource.reset(new ServiceCalSolutionSource(this->itsParset));
         ASKAPLOG_INFO_STR(logger,"Obtaining calibration information from service source");
         ASKAPLOG_INFO_STR(logger,"SolutionID determined by ServiceSource");
@@ -258,13 +259,13 @@ int JacalBPCalibrator::run() {
           "Number of measurement sets given in the parset ("<<measurementSets().size()<<
           ") should be either 1 or equal the number of beams ("<<nBeam()<<")");
   }
-  if (!this->isParallel) { // not implemented
+  if (!this->isParallel) {
       // setup work units in the serial case - all work to be done here
       ASKAPLOG_INFO_STR(logger, "All work for "<<nBeam()<<" beams and "<<nChan()<<" channels will be handled by this rank");
       itsWorkUnitIterator.init(casa::IPosition(2, nBeam(), nChan()));
   }
 
-  if (this->isMaster) {
+  if (this->isMaster) { // only one rank does this
     ASKAPLOG_INFO_STR(logger, "About to set the solution accessor");
     if (!itsSolutionIDValid) {
         // obtain solution ID only once, the results can come in random order and the
@@ -274,12 +275,10 @@ int JacalBPCalibrator::run() {
         itsSolutionIDValid = true;
     }
     ASKAPLOG_INFO_STR(logger, "Have set solutionID");
-    itsSolAcc = itsSolutionSource->rwSolution(itsSolutionID);
-    ASKAPLOG_INFO_STR(logger, "Have set solution accessor");
-    ASKAPASSERT(itsSolAcc);
+
   }
 
-  if (this->itsChan >=0 && this->isWorker) {
+  if (this->isWorker) {
       ASKAPDEBUGASSERT(itsModel);
 
       // static std::mutex safety;
@@ -293,7 +292,7 @@ int JacalBPCalibrator::run() {
 
            const std::pair<casa::uInt, casa::uInt> indices = currentBeamAndChannel();
 
-           ASKAPLOG_INFO_STR(logger, "Initialise bandpass (unknowns) for "<<nAnt()<<" antennas for beam="<<indices.first<<
+           ASKAPLOG_INFO_STR(logger, "Initialise (unknowns gains) for "<<nAnt()<<" antennas for beam="<<indices.first<<
                              " and channel="<<indices.second);
            itsModel->reset();
            for (casa::uInt ant = 0; ant<nAnt(); ++ant) {
@@ -324,7 +323,7 @@ int JacalBPCalibrator::run() {
                 ///
                 solveNE();
            }
-           if (this->itsChan >=0) {
+           if (this->itsChan >=0) { // proxy for in a loop over channels
                // send the model to the master, add beam and channel tags first
                itsModel->add("beam",static_cast<double>(indices.first));
                itsModel->add("channel",static_cast<double>(indices.second));
@@ -340,47 +339,56 @@ int JacalBPCalibrator::run() {
            }
       }
   }
-  if (this->isMaster && this->isParallel) {
+  if (this->isMaster && this->isParallel) { // the master rank has to wait for the workers
       ASKAPLOG_INFO_STR(logger,"There are " << this->itsModelInputs.size() << " inputs to iterate over");
       for (std::vector<int>::const_iterator it =  this->itsModelInputs.begin(); it != this->itsModelInputs.end(); ++it) {
 
         const casa::uInt numberOfWorkUnits = nBeam() * nChanPerRank();
-        ASKAPLOG_INFO_STR(logger, "Master waiting for " << nBeam() << " beams " << "with " << nChan() << " channels");
+        ASKAPLOG_INFO_STR(logger, "Master waiting for " << numberOfWorkUnits << "work units on this input");
         for (casa::uInt chunk = 0; chunk < numberOfWorkUnits; ++chunk) {
            // asynchronously receive result from workers
            receiveModelFromWorker(*it);
            if (validSolution()) {
+               ASKAPLOG_INFO_STR(logger, "Writing Model from Worker");
                writeModel();
            }
          }
        }
   }
 
-  // Destroy the accessor, which should call syncCache and write the table out.
-  if (this->isMaster) {
-    ASKAPLOG_INFO_STR(logger, "Syncing the cached bandpass table to disk");
-    // begin check
-    ASKAPDEBUGASSERT(itsModel);
-    std::vector<std::string> parlist = itsModel->freeNames();
-    for (casa::uInt chan ; chan < nChan(); ++chan ) {
-
-      for (std::vector<std::string>::const_iterator it = parlist.begin(); it != parlist.end(); ++it) {
-
-         // ASKAPLOG_INFO_STR(logger,"Value " << val << " Param " << *it);
-
-         const std::pair<accessors::JonesIndex, casa::Stokes::StokesTypes> paramType =
-               accessors::CalParamNameHelper::parseParam(*it);
-         // beam is also coded in the parameters, although we don't need it because the data are partitioned
-         // just cross-check it
-         ASKAPLOG_INFO_STR(logger,"bandpass:" << itsSolAcc->bandpass(paramType.first,chan).g1() << ":" << itsSolAcc->bandpass(paramType.first,chan).g2());
-
-      }
-    }
-    // end check
-    itsSolAcc.reset();
-
-
-  }
+  // Destroy an accessor, which should call syncCache and write the table out.
+//   if (this->isMaster) {
+//     ASKAPLOG_INFO_STR(logger, "Syncing the cached bandpass table to disk");
+//     // begin check
+//     ASKAPDEBUGASSERT(itsModel);
+//     ASKAPASSERT(itsSolutionSource);
+//     itsSolAcc = itsSolutionSource->rwSolution(itsSolutionID);
+//     ASKAPLOG_INFO_STR(logger, "Have set solution accessor");
+//     ASKAPASSERT(itsSolAcc);
+//
+//     std::vector<std::string> parlist = itsModel->freeNames();
+//     for (casa::uInt chan ; chan < nChan(); ++chan ) {
+//
+//       for (std::vector<std::string>::const_iterator it = parlist.begin(); it != parlist.end(); ++it) {
+//
+//          // ASKAPLOG_INFO_STR(logger,"Value " << val << " Param " << *it);
+//
+//          const std::pair<accessors::JonesIndex, casa::Stokes::StokesTypes> paramType =
+//                accessors::CalParamNameHelper::parseParam(*it);
+//          // beam is also coded in the parameters, although we don't need it because the data are partitioned
+//          // just cross-check it
+// //         ASKAPLOG_INFO_STR(logger,"bandpass:" << itsSolAcc->bandpass(paramType.first,chan).g1() << ":" << itsSolAcc->bandpass(paramType.first,chan).g2());
+//
+//       }
+//     }
+//     // end check
+//     // the SolAcc is actually a MemCalSolutionAccessor lets see if we can cast it
+//     // it is supposed to sync when it is reset
+//     ASKAPLOG_INFO_STR(logger,"Current use_count for accessor is " << itsSolAcc.use_count());
+//     itsSolAcc.reset();
+//
+//     ASKAPLOG_INFO_STR(logger, "Table should be synced on disk");
+//}
   return 0;
 }
 
@@ -622,6 +630,10 @@ void JacalBPCalibrator::writeModel(const std::string &)
   ASKAPLOG_INFO_STR(logger, "Writing results of the calibration for beam="<<indices.first<<" channel="<<indices.second);
 
   ASKAPCHECK(itsSolutionSource, "Solution source has to be defined by this stage");
+  /// @brief solution accessor used to stage the results in memory
+  /// @details This object is initialised by the master. It provides a way to store
+  /// the solutions in memory, until we write out at the end.
+  boost::shared_ptr<accessors::ICalSolutionAccessor> itsSolAcc = itsSolutionSource->rwSolution(itsSolutionID);
 
   ASKAPASSERT(itsSolAcc);
 
@@ -629,7 +641,7 @@ void JacalBPCalibrator::writeModel(const std::string &)
   std::vector<std::string> parlist = itsModel->freeNames();
   for (std::vector<std::string>::const_iterator it = parlist.begin(); it != parlist.end(); ++it) {
        const casa::Complex val = itsModel->complexValue(*it);
-       // ASKAPLOG_INFO_STR(logger,"Value " << val << " Param " << *it);
+       ASKAPLOG_DEBUG_STR(logger,"Value " << val << " Param " << *it);
 
        const std::pair<accessors::JonesIndex, casa::Stokes::StokesTypes> paramType =
              accessors::CalParamNameHelper::parseParam(*it);

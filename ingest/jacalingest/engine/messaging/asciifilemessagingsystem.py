@@ -16,6 +16,9 @@ class AsciiFileMessagingSystem(MessagingSystem):
             self.message_providers[topic] = AsciiFileMessagingSystem.MessageProvider(topic)
         return 0
 
+    def register(self, topic):
+        pass
+
     def publish(self, topic, serialized_message):
         logging.debug("Publishing message %s to topic %s" % (serialized_message, topic))
 

@@ -3,6 +3,8 @@
 # assumes ASKAPSoft can be found under ASKAP_ROOT and that DALiuGE is installed
 # and can be loaded by the python executable
 #
+CXX=g++
+CC=gcc
 
 ifndef ASKAP_ROOT
 $(error ASKAP_ROOT is not set)
@@ -55,7 +57,7 @@ ASKAP_LIBDIRS = -L$(ASKAP_ROOT)/3rdParty/log4cxx/log4cxx-0.10.0/install/lib/ \
                 -L$(ASKAP_ROOT)/Code/Components/CP/askap_imager/current/install/lib \
                 -L$(ASKAP_ROOT)/Code/Components/Services/calibration/client-cpp/current/install/lib \
                 -L$(ASKAP_ROOT)/Code/Components/Services/cpdataservices/client-cpp/current/install/lib \
-                -L$(ASKAP_ROOT)/Code/Interfaces/cpp/current/install/lib 
+                -L$(ASKAP_ROOT)/Code/Interfaces/cpp/current/install/lib
 
 CASA_INCDIRS = -I$(ASKAP_ROOT)/3rdParty/casacore/casacore-$(CASACORE_VERSION)/install/include/
 CASA_LIBDIRS = -L$(ASKAP_ROOT)/3rdParty/casacore/casacore-$(CASACORE_VERSION)/install/lib/
@@ -88,7 +90,8 @@ OBJS = factory/DaliugeApplicationFactory.o \
 
 .PHONY: all clean
 
-all: libaskapsoft_dlg.so 
+all: libaskapsoft_dlg.so standalone
+
 
 clean:
 	rm -f factory/*.o daliuge/*.o *.o *.so standalone
@@ -101,3 +104,6 @@ standalone: standalone.o libaskapsoft_dlg.so
 
 factory/%.s: factory/%.cc
 	$(CXX) -S $< $(CXXFLAGS) -o $@
+
+standalone.o: standalone.cpp
+	$(CXX) -c $< $(CXXFLAGS) -o $@

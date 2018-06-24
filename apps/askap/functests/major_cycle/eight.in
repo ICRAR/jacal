@@ -1,4 +1,4 @@
-Cimager.dataset                                 = [../testdata/20131121_946_6.14.av.ms]
+Cimager.dataset                                 = [/Users/ord006/Soft/jacal/apps/askap/functests/testdata/20131121_946_6.14.av.ms]
 Cimager.nUVWMachines                            = 1
 Cimager.uvwMachineDirTolerance                  = 0.2arcsec
 Cimager.imagetype                               = fits
