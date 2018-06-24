@@ -49,11 +49,11 @@ export LD_LIBRARY_PATH=$JACAL_LIB_PATH:$LD_LIBRARY_PATH
 
 DALIUGE_SRC=/group/askap/sord/galaxy/daliuge
 LOG_ROOT=/group/askap/sord/galaxy/jacal_logs
-MYENV==/group/askap/sord/galaxy/env/daliuge/
+MYENV=/group/askap/sord/galaxy/daliuge_env/
 
 source ${MYENV}/bin/activate
 
-MYPYTHON=/group/askap/sord/galaxy/env/daliuge/bin/python
+MYPYTHON=/group/askap/sord/galaxy/daliuge_env/bin/python
 
 MYCLUSTER=$JACAL_HOME"/apps/askap/functests/calibration/start_dfms_cluster.py"
 
