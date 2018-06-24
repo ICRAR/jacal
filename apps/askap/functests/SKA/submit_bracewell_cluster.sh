@@ -19,7 +19,7 @@ JACAL_HOME=$SOFT_HOME/jacal
 ASKAP_HOME=$SOFT_HOME/askapsdp
 ASKAP_3RD=$ASKAP_HOME/3rdParty
 
-JACAL_LIB_PATH=$JACAL_HOME/apps/askap/askapsoft_lib:\
+JACAL_LIB_PATH=$JACAL_HOME/apps/askap/:\
 $ASKAP_3RD/cfitsio/cfitsio-3.35/install/lib:\
 $ASKAP_3RD/boost/boost-1.56.0/install/lib:\
 $ASKAP_3RD/cmdlineparser/cmdlineparser-0.1.1/install/lib:\
