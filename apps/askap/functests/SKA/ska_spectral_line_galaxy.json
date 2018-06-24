@@ -17,7 +17,7 @@
 {"category":"Comment", "text":"Config file is a standard ASKAPSoft parset. It should be completely compatible with those used in the standard pipeline", "key":-20, "loc":"-315.49034264399415 -1515.3749694824219"},
 {"category":"Comment", "text":"Complete Major and Minor Cycle imaging - plus the restore task. Currently I do not recombine the residuals", "key":-21, "loc":"-932.2294881266544 -1651.3749694824219"},
 {"category":"Comment", "text":"This iterates between gridding/degridding and solving\n", "key":-22, "loc":"-945.707651818005 -983.7662963867199", "group":-12},
-{"category":"DynlibApp", "text":"Init", "execution_time":5, "num_cpus":1, "group_start":0, "libpath":"/home/ord006/soft/jacal/apps/askap/libaskapsoft_dlg.so", "Arg01":"name=InitSpectralCube", "Arg02":"", "Arg03":"", "Arg04":"", "Arg05":"", "Arg06":"", "Arg07":"", "Arg08":"", "Arg09":"", "Arg10":"", "key":-23, "loc":"-788.2305996495891 -1525.5923919677734"},
+{"category":"DynlibApp", "text":"Init", "execution_time":5, "num_cpus":1, "group_start":0, "libpath":"/home/sord/soft/jacal/apps/askap/libaskapsoft_dlg.so", "Arg01":"name=InitSpectralCube", "Arg02":"", "Arg03":"", "Arg04":"", "Arg05":"", "Arg06":"", "Arg07":"", "Arg08":"", "Arg09":"", "Arg10":"", "key":-23, "loc":"-788.2305996495891 -1525.5923919677734"},
 {"category":"Start", "text":"Start", "key":-1, "loc":"-789.2305996495891 -1625.2010879516602"}
  ],
   "linkDataArray": [ 
