@@ -54,23 +54,31 @@ dlg_app_info *dummy_dlg_app(const std::string &input_file) {
 		return n;
 	};
 
-	dlg_input_info *input = new dlg_input_info();
-	input->read = _read;
-	input->name = new char[7];
-	strcpy(input->name, "Config");
+	dlg_input_info *input = (dlg_input_info *) calloc (2,sizeof(dlg_input_info));
+
+	input[0].read = _read;
+	input[0].name = new char[7];
+	strcpy(input[0].name, "Config");
+
+	input[1].read = _read;
+	input[1].name = new char[6];
+	strcpy(input[1].name, "Model");
+
+ 
+    
 	dlg_output_info *output = new dlg_output_info();
 	output->write = _write;
 	output->name = new char[6];
 	strcpy(output->name, "Model");
 	dlg_app_info *app = new dlg_app_info();
-	app->inputs = input;
-	app->n_inputs = 1;
+	app->inputs = &input[0];
+	app->n_inputs = 2;
 	app->outputs = output;
 	app->n_outputs = 1;
 	app->uid = new char[4];
 	app->oid = new char[4];
 	app->appname = new char[18];
-	strcpy(app->appname, "JacalBPCalibrator");
+	strcpy(app->appname, "SpectralCube");
 	strcpy(app->uid, "uid");
 	strcpy(app->oid, "oid");
 	return app;
