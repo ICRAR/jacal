@@ -55,10 +55,10 @@ source ${MYENV}"/bin/activate"
 
 MYPYTHON=${MYENV}/bin/python
 
-MYCLUSTER=$JACAL_HOME"/apps/askap/functests/calibration/start_dfms_bracewell.py"
+#MYCLUSTER=$JACAL_HOME"/apps/askap/functests/calibration/start_dfms_bracewell.py"
 
-#MYCLUSTER=" -m dlg.deploy.pawsey.start_dfms_cluster"
-LG_GRAPH=$JACAL_HOME"/apps/askap/functests/SKA/ska_spectral_line.json"
+MYCLUSTER=" -m dlg.deploy.pawsey.start_dfms_cluster -v 3"
+LG_GRAPH=$JACAL_HOME"/apps/askap/functests/SKA/ska_spectral_line_edit.json"
 
 SID=$(date +"%Y-%m-%d_%H-%M-%S")
 LOG_DIR=$LOG_ROOT"/"$SID
@@ -66,7 +66,7 @@ echo "Creating direcotry "$LOG_DIR
 mkdir $LOG_DIR
 
 #echo $LD_LIBRARY_PATH
-#ulimit -c unlimited
+ulimit -s unlimited
 echo " mpirun -np 3 $MYPYTHON $MYCLUSTER -l $LOG_DIR -L $LG_GRAPH "
 
 #dlg nm -v --no-dlm
