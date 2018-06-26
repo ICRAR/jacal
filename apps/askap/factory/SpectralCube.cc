@@ -276,12 +276,15 @@ namespace askap {
         ASKAPLOG_INFO_STR(logger,"In handleImageParams");
 
         vector<string> images=itsModel->names();
-        std::smatch m;
-        std::regex peak_residual("\\b(peak_residual)([^ ]*)");
-        std::regex residual("\\b(residual)([^ ]*)");
-        std::regex image("\\b(image)([^ ]*)");
-        std::regex psf("\\b(psf)([^ ]*)");
-        std::regex weights("\\b(weights)([^ ]*)");
+        try {
+          std::smatch m;
+          std::regex peak_residual("\\b(peak_residual)([^ ]*)");
+          std::regex residual("\\b(residual)([^ ]*)");
+          std::regex image("\\b(image)([^ ]*)");
+          std::regex psf("\\b(psf)([^ ]*)");
+          std::regex weights("\\b(weights)([^ ]*)");
+
+
 
         for (vector<string>::const_iterator it=images.begin(); it !=images.end(); it++) {
           ASKAPLOG_INFO_STR(logger, "Will parse for an image name "<< *it);
@@ -294,40 +297,40 @@ namespace askap {
           if (std::regex_search(*it,m,image))
           {
             ASKAPLOG_INFO_STR(logger, "Writing "<< *it);
-            // const casa::Array<double> imagePixels(itsModel->value(*it));
-            // casa::Array<float> floatImagePixels(imagePixels.shape());
-            // casa::convertArray<float, double>(floatImagePixels, imagePixels);
-            // itsImageCube->writeSlice(floatImagePixels, itsChan);
+            const casa::Array<double> imagePixels(itsModel->value(*it));
+            casa::Array<float> floatImagePixels(imagePixels.shape());
+            casa::convertArray<float, double>(floatImagePixels, imagePixels);
+            itsImageCube->writeSlice(floatImagePixels, itsChan);
           }
 
         // Write PSF
           if (std::regex_search(*it,m,psf))
           {
             ASKAPLOG_INFO_STR(logger,"Writing " << *it);
-            // const casa::Array<double> imagePixels(itsModel->value(*it));
-            // casa::Array<float> floatImagePixels(imagePixels.shape());
-            // casa::convertArray<float, double>(floatImagePixels, imagePixels);
-            // itsPSFCube->writeSlice(floatImagePixels, itsChan);
+            const casa::Array<double> imagePixels(itsModel->value(*it));
+            casa::Array<float> floatImagePixels(imagePixels.shape());
+            casa::convertArray<float, double>(floatImagePixels, imagePixels);
+            itsPSFCube->writeSlice(floatImagePixels, itsChan);
           }
 
         // Write residual
           if (std::regex_search(*it,m,residual))
           {
             ASKAPLOG_INFO_STR(logger,"Writing " << *it);
-            // const casa::Array<double> imagePixels(itsModel->value(*it));
-            // casa::Array<float> floatImagePixels(imagePixels.shape());
-            // casa::convertArray<float, double>(floatImagePixels, imagePixels);
-            // itsResidualCube->writeSlice(floatImagePixels, itsChan);
+            const casa::Array<double> imagePixels(itsModel->value(*it));
+            casa::Array<float> floatImagePixels(imagePixels.shape());
+            casa::convertArray<float, double>(floatImagePixels, imagePixels);
+            itsResidualCube->writeSlice(floatImagePixels, itsChan);
           }
 
         // Write weights
           if (std::regex_search(*it,m,weights))
           {
             ASKAPLOG_INFO_STR(logger,"Writing " << *it);
-            // const casa::Array<double> imagePixels(itsModel->value(*it));
-            // casa::Array<float> floatImagePixels(imagePixels.shape());
-            // casa::convertArray<float, double>(floatImagePixels, imagePixels);
-            // itsWeightsCube->writeSlice(floatImagePixels, itsChan);
+            const casa::Array<double> imagePixels(itsModel->value(*it));
+            casa::Array<float> floatImagePixels(imagePixels.shape());
+            casa::convertArray<float, double>(floatImagePixels, imagePixels);
+            itsWeightsCube->writeSlice(floatImagePixels, itsChan);
           }
           // Write restored
             // if (std::regex_search(*it,restored))
@@ -339,6 +342,13 @@ namespace askap {
             //   itsRestoredCube->writeSlice(floatImagePixels, itsChan);
             // }
         }
+      }
+      catch (std::regex_error &e) {
+        std::cout << "regex_error caught: " << e.what() << '\n';
+      }
+      catch (...) {
+        std::cout << "Unknown exception caught: " << '\n';
+      }
         /*
         if (itsParset.getBool("restore", false)) {
 
