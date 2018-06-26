@@ -193,7 +193,9 @@ namespace askap {
             return -1;
           }
         }
-
+        else {
+           this->itsModel.reset(new scimath::Params());
+        }
         //
         vector<string> images=itsModel->names();
 
@@ -271,25 +273,25 @@ namespace askap {
 
     void SpectralCube::handleImageParams()
     {
-
+        ASKAPLOG_INFO_STR(logger,"In handleImageParams");
+        
         vector<string> images=itsModel->names();
-
-        std::regex peak_residual("^peak_residual");
-        std::regex residual("^residual");
-        std::regex image("^image");
-        std::regex psf("^psf");
-        std::regex weights("^weights");
-        std::regex restored("restored"); // restored is at the end
+        std::smatch m;
+        std::regex peak_residual("\\b(peak_residual)([^ ]*)");
+        std::regex residual("\\b(residual)([^ ]*)");
+        std::regex image("\\b(image)([^ ]*)");
+        std::regex psf("\\b(psf)([^ ]*)");
+        std::regex weights("\\b(weights)([^ ]*)");
 
         for (vector<string>::const_iterator it=images.begin(); it !=images.end(); it++) {
           ASKAPLOG_INFO_STR(logger, "Will parse for an image name "<< *it);
-          if (std::regex_search(*it,peak_residual)) {
+          if (std::regex_search(*it,m,peak_residual)) {
             continue;
           }
 
 
         // Write image
-          if (std::regex_search(*it,image))
+          if (std::regex_search(*it,m,image))
           {
             ASKAPLOG_INFO_STR(logger, "Writing "<< *it);
             const casa::Array<double> imagePixels(itsModel->value(*it));
@@ -299,7 +301,7 @@ namespace askap {
           }
 
         // Write PSF
-          if (std::regex_search(*it,psf))
+          if (std::regex_search(*it,m,psf))
           {
             ASKAPLOG_INFO_STR(logger,"Writing " << *it);
             const casa::Array<double> imagePixels(itsModel->value(*it));
@@ -309,7 +311,7 @@ namespace askap {
           }
 
         // Write residual
-          if (std::regex_search(*it,residual))
+          if (std::regex_search(*it,m,residual))
           {
             ASKAPLOG_INFO_STR(logger,"Writing " << *it);
             const casa::Array<double> imagePixels(itsModel->value(*it));
@@ -319,7 +321,7 @@ namespace askap {
           }
 
         // Write weights
-          if (std::regex_search(*it,weights))
+          if (std::regex_search(*it,m,weights))
           {
             ASKAPLOG_INFO_STR(logger,"Writing " << *it);
             const casa::Array<double> imagePixels(itsModel->value(*it));
@@ -328,14 +330,14 @@ namespace askap {
             itsWeightsCube->writeSlice(floatImagePixels, itsChan);
           }
           // Write restored
-            if (std::regex_search(*it,restored))
-            {
-              ASKAPLOG_INFO_STR(logger,"Writing " << *it);
-              const casa::Array<double> imagePixels(itsModel->value(*it));
-              casa::Array<float> floatImagePixels(imagePixels.shape());
-              casa::convertArray<float, double>(floatImagePixels, imagePixels);
-              itsRestoredCube->writeSlice(floatImagePixels, itsChan);
-            }
+            // if (std::regex_search(*it,restored))
+            // {
+            //   ASKAPLOG_INFO_STR(logger,"Writing " << *it);
+            //   const casa::Array<double> imagePixels(itsModel->value(*it));
+            //   casa::Array<float> floatImagePixels(imagePixels.shape());
+            //   casa::convertArray<float, double>(floatImagePixels, imagePixels);
+            //   itsRestoredCube->writeSlice(floatImagePixels, itsChan);
+            // }
         }
         /*
         if (itsParset.getBool("restore", false)) {
