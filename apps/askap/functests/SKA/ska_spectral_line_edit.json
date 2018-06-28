@@ -16,8 +16,7 @@
 {"category":"Comment", "text":"Starting point assumes a calibrated data set listed in the configuration file.", "key":-19, "loc":"-582.4903426439942 -1577.3749694824219"},
 {"category":"Comment", "text":"Config file is a standard ASKAPSoft parset. It should be completely compatible with those used in the standard pipeline", "key":-20, "loc":"-315.49034264399415 -1515.3749694824219"},
 {"category":"Comment", "text":"Complete Major and Minor Cycle imaging - plus the restore task. Currently I do not recombine the residuals", "key":-21, "loc":"-932.2294881266544 -1651.3749694824219"},
-{"category":"Comment", "text":"This iterates between gridding/degridding and solving\n", "key":-22, "loc":"-945.707651818005 -983.7662963867199", "group":-12},
-{"category":"DynlibProcApp", "text":"Initialise", "execution_time":5, "num_cpus":1, "group_start":0, "libpath":"/home/ord006/soft/jacal/apps/askap/libaskapsoft_dlg.so", "Arg01":"name=InitSpectralCube", "Arg02":"", "Arg03":"", "Arg04":"", "Arg05":"", "Arg06":"", "Arg07":"", "Arg08":"", "Arg09":"", "Arg10":"", "key":-23, "loc":"-886.228271484375 -1531.2010879516602"}
+{"category":"Comment", "text":"This iterates between gridding/degridding and solving\n", "key":-22, "loc":"-945.707651818005 -983.7662963867199", "group":-12}
  ],
   "linkDataArray": [ 
 {"from":-7, "to":-5, "fromPort":"L", "toPort":"T", "points":[-546.5732421874994,-1439.9999999999986,-556.5732421874994,-1439.9999999999986,-556,-1439.9999999999986,-556,-1439.9999999999986,-1077.964449401337,-1439.9999999999986,-1077.964449401337,-1142.8070124332362,-1077.964449401337,-1132.8070124332362]},
