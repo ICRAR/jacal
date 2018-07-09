@@ -6,15 +6,17 @@ else
     TOPDIR=daliuge
     ENVDIR=daliuge_env
 fi
+
 #
 # first we need to build daliuge
 # via a virtualenv
 #
 # test are we on galaxy
 if [[ $(hostname -s) = galaxy-? ]]; then
+    module list
     module load virtualenv
-    module unload askapsoft/0.20.3
-    module unload askappipeline/0.20.3
+    module unload askapsoft
+    module unload askappipeline
 fi
 
 # Make sure there is nothing in the PYTHONPATH
