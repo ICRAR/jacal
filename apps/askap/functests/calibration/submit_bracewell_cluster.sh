@@ -36,7 +36,7 @@ $ASKAP_3RD/Ice/Ice-3.5.0/install/lib
 
 source ${ASKAP_HOME}/Code/Base/askap/current/init_package_env.sh
 source ${ASKAP_HOME}/Code/Components/Synthesis/synthesis/current/init_package_env.sh
-source ${ASKAP_HOME}/Code/Components/CP/pipelinetasks/current/init_package_env.sh
+#source ${ASKAP_HOME}/Code/Components/CP/pipelinetasks/current/init_package_env.sh
 #source ${ASKAP_HOME}/Code/Components/Analysis/analysis/current/init_package_env.sh
 #source ${ASKAP_HOME}/Code/Components/CP/simager/current/init_package_env.sh
 source ${ASKAP_HOME}/Code/Components/CP/askap_imager/current/init_package_env.sh
@@ -54,9 +54,9 @@ source ${MYENV}/bin/activate
 
 MYPYTHON=${MYENV}/bin/python
 
-#MYCLUSTER=$JACAL_HOME"/apps/askap/functests/calibration/start_dfms_bracewell.py"
+MYCLUSTER=$JACAL_HOME"/apps/askap/functests/calibration/start_dfms_bracewell.py"
 
-MYCLUSTER=" -m dlg.deploy.pawsey.start_dfms_cluster"
+#MYCLUSTER=" -m dlg.deploy.pawsey.start_dfms_cluster"
 LG_GRAPH=$JACAL_HOME"/apps/askap/functests/calibration/simple_calibration_bracewell.json"
 
 SID=$(date +"%Y-%m-%d_%H-%M-%S")
@@ -65,6 +65,6 @@ echo "Creating direcotry "$LOG_DIR
 mkdir $LOG_DIR
 
 echo $LD_LIBRARY_PATH
-#ulimit -c unlimited
+ulimit -c unlimited
 mpirun -np 3 $MYPYTHON $MYCLUSTER -l $LOG_DIR -L $LG_GRAPH -m $DLG_MON_HOST -o $DLG_MON_PORT
 #dlg nm -v --no-dlm

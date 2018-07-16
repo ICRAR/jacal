@@ -83,6 +83,7 @@ OBJS = factory/DaliugeApplicationFactory.o \
        factory/CalcNE.o \
        factory/OutputParams.o \
        factory/SpectralCube.o \
+       factory/NESpectralCube.o \
        factory/InitSpectralCube.o \
        factory/JacalBPCalibrator.o \
        factory/MajorCycle.o \
@@ -93,16 +94,20 @@ OBJS = factory/DaliugeApplicationFactory.o \
 all: libaskapsoft_dlg.so
 
 clean:
-	rm -f factory/*.o daliuge/*.o *.o *.so standalone
+	rm -f factory/*.o daliuge/*.o *.o *.so standalone standalone_cube
 
 libaskapsoft_dlg.so: $(OBJS)
 	$(CXX) -shared -o $@ $(OBJS) $(LDFLAGS)
 
 standalone: standalone.o libaskapsoft_dlg.so
-	$(CXX) -o $@ standalone.o -pthread -L. $(LDFLAGS) -laskapsoft_dlg
+	$(CXX) -fstack-protector -o $@ standalone.o -pthread -L. $(LDFLAGS) -laskapsoft_dlg
+standalone_cube: standalone_cube.o libaskapsoft_dlg.so
+	$(CXX) -o $@ standalone_cube.o -I$(ASKAP_ROOT)/Code/Base/scimath/current/install/include -pthread -L. $(LDFLAGS) -laskapsoft_dlg
 
-factory/%.s: factory/%.cc
-	$(CXX) -S $< $(CXXFLAGS) -o $@
+factory/%.o: factory/%.cc
+	$(CXX) -fstack-protector -c $< $(CXXFLAGS) -o $@
 
 standalone.o: standalone.cpp
-	$(CXX) -c $< $(CXXFLAGS) -o $@
+	$(CXX) -fstack-protector -c $< $(CXXFLAGS) -o $@
+standalone_cube.o: standalone_cube.cpp
+	$(CXX) -fstack-protector -c $< $(CXXFLAGS) -o $@

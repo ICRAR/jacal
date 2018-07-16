@@ -88,6 +88,16 @@ int NEUtils::getNChan(LOFAR::ParameterSet& parset) {
 
 }
 
+double NEUtils::getChanWidth(LOFAR::ParameterSet& parset, int chan) {
+  //FIXME: Assumes all datasets have the same chanWidth
+  const vector<string> ms = getDatasets(parset);
+  const casa::MeasurementSet in(ms[0]);
+  const casa::ROMSColumns srcCols(in);
+  const casa::ROMSSpWindowColumns& sc = srcCols.spectralWindow();
+  int srow = sc.nrow()-1;
+  return sc.chanWidth()(srow)(casa::IPosition(1, chan));
+}
+
 double NEUtils::getFrequency(LOFAR::ParameterSet& parset, int chan, bool barycentre) {
 
   // Read from the configruation the list of datasets to process
@@ -139,6 +149,7 @@ double NEUtils::getFrequency(LOFAR::ParameterSet& parset, int chan, bool barycen
     return sc.chanFreq()(srow)(casa::IPosition(1, chan));
   }
   else {
+    // FIXME:
     // need to put the barycentreing in here - the logic is all in the AdviseDI
   }
 
@@ -308,14 +319,14 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
               ASKAPLOG_WARN_STR(logger, "Frequency in Parset and it may need to be overridden");
           }
           casa::Int nchanCube = NEUtils::getNChan(parset);
-          if (nchanCube > 1) {
+          if (nchanCube >= 1) {
             ASKAPLOG_WARN_STR(logger, "Overridding parset frequency with channel based information from measurement set - Am I half a channel out?");
 
             ASKAPLOG_INFO_STR(logger, "Getting base frequency");
             casa::Double baseFrequency = NEUtils::getFrequency(parset,chan);
             ASKAPLOG_INFO_STR(logger, "Getting chanwidth");
-            casa::Double chanWidth = NEUtils::getFrequency(parset,1) - NEUtils::getFrequency(parset,0);
-            ASKAPLOG_INFO_STR(logger, "Getting chanwidth");
+            casa::Double chanWidth = NEUtils::getChanWidth(parset,chan);
+            ASKAPLOG_INFO_STR(logger, "Setting chanwidth in parset");
             std::ostringstream pstr;
             pstr<<"["<< baseFrequency <<","<<baseFrequency+chanWidth <<"]";
             if ( parset.isDefined(param) ) {
@@ -325,7 +336,7 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
               parset.add(param, pstr.str().c_str());
             }
               //ASKAPTHROW(std::runtime_error,"Frequency not in parset");
-            ASKAPLOG_WARN_STR(logger, "Overridden");
+            ASKAPLOG_WARN_STR(logger, "Overridden frequency in parset");
 
           }
           param ="Images."+imageNames[img]+".direction";

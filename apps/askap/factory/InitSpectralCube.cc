@@ -176,8 +176,8 @@ namespace askap {
         ASKAPLOG_INFO_STR(logger, "Getting base frequency");
         casa::Double baseFrequency = NEUtils::getFrequency(itsParset,0);
         ASKAPLOG_INFO_STR(logger, "Getting chanwidth");
-        casa::Double chanWidth = NEUtils::getFrequency(itsParset,1) - NEUtils::getFrequency(itsParset,0);
-        ASKAPLOG_INFO_STR(logger, "Getting chanwidth");
+        casa::Double chanWidth = NEUtils::getChanWidth(itsParset,0);
+        ASKAPLOG_INFO_STR(logger, "Getting nchan");
         casa::Int nchanCube = NEUtils::getNChan(itsParset);
 
 
@@ -209,7 +209,7 @@ namespace askap {
         if (itsParset.getBool("restore", false)) {
           itsRestoredCube.reset(new cp::CubeBuilder(itsParset, nchanCube, f0, freqinc, restored_name));
         }
-        
+
         return 0;
     }
 
