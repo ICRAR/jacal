@@ -83,6 +83,7 @@ OBJS = factory/DaliugeApplicationFactory.o \
        factory/CalcNE.o \
        factory/OutputParams.o \
        factory/SpectralCube.o \
+       factory/NESpectralCube.o \
        factory/InitSpectralCube.o \
        factory/JacalBPCalibrator.o \
        factory/MajorCycle.o \
@@ -101,7 +102,7 @@ libaskapsoft_dlg.so: $(OBJS)
 standalone: standalone.o libaskapsoft_dlg.so
 	$(CXX) -fstack-protector -o $@ standalone.o -pthread -L. $(LDFLAGS) -laskapsoft_dlg
 standalone_cube: standalone_cube.o libaskapsoft_dlg.so
-	$(CXX) -o $@ standalone_cube.o -pthread -L. $(LDFLAGS) -laskapsoft_dlg
+	$(CXX) -o $@ standalone_cube.o -I$(ASKAP_ROOT)/Code/Base/scimath/current/install/include -pthread -L. $(LDFLAGS) -laskapsoft_dlg
 
 factory/%.o: factory/%.cc
 	$(CXX) -fstack-protector -c $< $(CXXFLAGS) -o $@

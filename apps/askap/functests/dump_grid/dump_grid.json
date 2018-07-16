@@ -1,0 +1,16 @@
+{ "class": "go.GraphLinksModel",
+  "linkFromPortIdProperty": "fromPort",
+  "linkToPortIdProperty": "toPort",
+  "nodeDataArray": [ 
+{"category":"file", "text":"Config File", "data_volume":5, "group_end":0, "check_filepath_exists":"0", "filepath":"/Users/ord006/Soft/jacal/apps/askap/functests/dump_grid/grid.in", "dirname":"", "key":-7, "loc":"-553.3281249999998 -1242.9999999999977"},
+{"category":"SplitData", "text":"For each Channel", "isGroup":true, "num_of_copies":1, "scatter_axis":"frequency", "key":-12, "loc":"-562.9251427607156 -989.8967361450186"},
+{"category":"DynlibApp", "text":"Grid Visibilities", "execution_time":5, "num_cpus":1, "group_start":0, "libpath":"/tmp/libaskapsoft_dlg.so", "Arg01":"name=LoadVis", "Arg02":"", "Arg03":"", "Arg04":"", "Arg05":"", "Arg06":"", "Arg07":"", "Arg08":"", "Arg09":"", "Arg10":"", "key":-5, "loc":"-701.2288536982156 -989.8967361450186", "group":-12},
+{"category":"memory", "text":"Normal\n", "data_volume":5, "group_end":0, "key":-6, "loc":"-534.2288536982169 -967.8967361450191", "group":-12},
+{"category":"DynlibApp", "text":"Output Grid", "execution_time":5, "num_cpus":1, "group_start":0, "libpath":"/tmp/libaskapsoft_dlg.so", "Arg01":"name=NESpectralCube", "Arg02":"", "Arg03":"", "Arg04":"", "Arg05":"", "Arg06":"", "Arg07":"", "Arg08":"", "Arg09":"", "Arg10":"", "key":-8, "loc":"-412.22885369821563 -980.89673614502", "group":-12}
+ ],
+  "linkDataArray": [ 
+{"from":-5, "to":-6, "fromPort":"R", "toPort":"L", "points":[-638.2623009638406,-989.8967361450186,-628.2623009638406,-989.8967361450186,-607.6454796747787,-989.8967361450186,-607.6454796747787,-967.8967361450187,-587.0286583857168,-967.8967361450187,-577.0286583857168,-967.8967361450187]},
+{"from":-6, "to":-8, "fromPort":"R", "toPort":"L", "points":[-491.42904901071677,-967.8967361450187,-481.42904901071677,-967.8967361450187,-477.1159386591537,-967.8967361450187,-477.1159386591537,-980.89673614502,-472.80282830759063,-980.89673614502,-462.80282830759063,-980.89673614502]},
+{"loop_aware":"1", "from":-7, "to":-8, "fromPort":"R", "toPort":"T", "points":[-506.0830078124998,-1242.9999999999986,-496.0830078124998,-1242.9999999999986,-412.22885369821563,-1242.9999999999986,-412.22885369821563,-1142.2353553771968,-412.22885369821563,-1041.470710754395,-412.22885369821563,-1031.470710754395]},
+{"loop_aware":"1", "from":-7, "to":-5, "fromPort":"L", "toPort":"T", "points":[-600.5732421874998,-1242.9999999999977,-610.5732421874998,-1242.9999999999977,-612,-1242.9999999999977,-612,-1242.9999999999977,-701.2288536982156,-1242.9999999999977,-701.2288536982156,-1062.8632888793936,-701.2288536982156,-1052.8632888793936]}
+ ]}
