@@ -30,4 +30,4 @@ script:
  - python2.7 bootstrap.py -n
  - . initaskap.sh
  - cd Code/Systems/rialto
- - rbuild -S -a -v -p j=2 &> rbuild.log || tail -n 1000 rbuild.log
+ - rbuild -S -a -p j=2
