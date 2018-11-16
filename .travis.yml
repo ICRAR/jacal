@@ -1,0 +1,30 @@
+#
+# Travis CI configuration file
+#
+# Copyright (c)
+# The University of Western Australia (UWA) ABN 37 882 817 280,
+# Commonwealth Scientific and Industrial Research Organisation (CSIRO) ABN 41
+# 687 119 230.
+# All rights reserved.
+#
+
+language: cpp
+sudo: false
+
+# We try with both gcc/Linux and LLVM/OSX
+matrix:
+ include:
+  - os: linux
+    dist: trusty
+    compiler: gcc
+  - os: osx
+    osx_image: xcode9.3
+    env: XCODE=9.3
+
+script:
+ - git clone https://bitbucket.csiro.au/scm/casssoft/askapsoft.git
+ - cd askapsoft
+ - python2.7 bootstrap.py -n
+ - . initaskap.sh
+ - cd Code/Systems/rialto
+ - rbuild -S -a
