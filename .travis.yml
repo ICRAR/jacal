@@ -27,4 +27,4 @@ script:
  - python2.7 bootstrap.py -n
  - . initaskap.sh
  - cd Code/Systems/rialto
- - rbuild -S -a
+ - rbuild -S -a -v
