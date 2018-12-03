@@ -73,8 +73,6 @@ ASKAP_LOGGER(logger, ".parallel");
 #include <Common/ParameterSet.h>
 #include <calibaccess/CalParamNameHelper.h>
 #include <calibaccess/CalibAccessFactory.h>
-#include <calibaccess/ServiceCalSolutionSourceStub.h>
-#include <calserviceaccessor/ServiceCalSolutionSource.h>
 
 
 
@@ -197,22 +195,7 @@ int JacalBPCalibrator::run() {
           ASKAPLOG_INFO_STR(logger, "The work will be done in the serial by the current process");
       }
 
-      // This is sloppy but I need to test whether this is likely to be a service
-      // source as I need to reinstantiate the full implementation - as all we get from the factory
-      // is a stub.
-
       const std::string calAccType = this->itsParset.getString("calibaccess","parset");
-
-      if (calAccType == "service") { // this is unlikely to be used in this form
-        itsSolutionSource.reset(new ServiceCalSolutionSource(this->itsParset));
-        ASKAPLOG_INFO_STR(logger,"Obtaining calibration information from service source");
-        ASKAPLOG_INFO_STR(logger,"SolutionID determined by ServiceSource");
-        itsSolutionIDValid=true;
-        // we are only solving for bandpass
-        boost::shared_ptr<ServiceCalSolutionSource> src = boost::dynamic_pointer_cast<ServiceCalSolutionSource>(itsSolutionSource);
-        src->solveBandpass();
-
-      }
 
   }
   if (this->isWorker) {
