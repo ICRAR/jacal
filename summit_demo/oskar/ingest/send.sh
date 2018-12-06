@@ -6,3 +6,4 @@ do
    python spead_send.py ./conf/send0$i.json ./conf/aa0$i.ini &
 done
 
+wait
