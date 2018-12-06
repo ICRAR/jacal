@@ -24,6 +24,11 @@ import spead2.recv
 import simplejson as json
 import numpy as np
 
+try:
+    from mpi4py import MPI
+except:
+    pass
+
 
 class SpeadReceiver(object):
     """Receives visibility data using SPEAD and writes it to a Measurement Set.

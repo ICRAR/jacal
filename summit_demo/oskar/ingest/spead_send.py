@@ -57,6 +57,11 @@ import simplejson as json
 import spead2
 import spead2.send
 
+try:
+    from mpi4py import MPI
+except:
+    pass
+
 
 class SpeadSender(oskar.Interferometer):
     """Simulates visibility data using OSKAR and sends it using SPEAD.
