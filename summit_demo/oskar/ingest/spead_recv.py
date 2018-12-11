@@ -33,10 +33,11 @@ except:
 class SpeadReceiver(object):
     """Receives visibility data using SPEAD and writes it to a Measurement Set.
     """
-    def __init__(self, log, spead_config, file_name):
+    def __init__(self, log, spead_config, file_name, use_adios2):
         self._log = log
         self._streams = []
         self._ports = []
+        self.use_adios2 = use_adios2
         self._num_stream = len(spead_config['streams'])
 
         for recv_config in spead_config['streams']:
@@ -107,7 +108,8 @@ class SpeadReceiver(object):
                     self._measurement_set = oskar.MeasurementSet.create(
                         self._file_name, data['num_stations'],
                         data['num_channels'], data['num_pols'],
-                        data['freq_start_hz'], data['freq_inc_hz'])
+                        data['freq_start_hz'], data['freq_inc_hz'],
+                        use_adios2=self.use_adios2)
                     self._measurement_set.set_phase_centre(
                         math.radians(data['phase_centre_ra_deg']),
                         math.radians(data['phase_centre_dec_deg']))
@@ -140,7 +142,7 @@ def main():
     # Check command line arguments.
     if len(sys.argv) < 3:
         raise RuntimeError('Usage: python spead_recv.py '
-                           '<spead.json> <output_root_name>')
+                           '<spead.json> <output_root_name> [-a]')
 
     # Get logger.
     log = logging.getLogger()
@@ -148,14 +150,17 @@ def main():
     log.setLevel(logging.DEBUG)
 
     # Load SPEAD configuration from JSON file.
-    with open(sys.argv[-2]) as f:
+    with open(sys.argv[1]) as f:
         spead_config = json.load(f)
 
     # Append the port number to the output file root path.
-    file_name = sys.argv[-1] + ".ms"
+    file_name = sys.argv[2] + ".ms"
+
+    # Use ADIOS2?
+    use_adios2 = len(sys.argv) > 3 and sys.argv[3] == '-a'
 
     # Set up the SPEAD receiver and run it (see method, above).
-    receiver = SpeadReceiver(log, spead_config, file_name)
+    receiver = SpeadReceiver(log, spead_config, file_name, use_adios2)
     receiver.run()
 
 
