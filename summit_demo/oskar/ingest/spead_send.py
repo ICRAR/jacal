@@ -49,11 +49,11 @@ Launch one receiver script per SPEAD stream.
 
 from __future__ import division, print_function
 import logging
+import json
 import sys
 
 import numpy
 import oskar
-import simplejson as json
 import spead2
 import spead2.send
 

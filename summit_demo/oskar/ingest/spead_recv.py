@@ -14,6 +14,7 @@ The command line arguments are:
 
 from __future__ import division, print_function
 import logging
+import json
 import math
 import sys
 
@@ -21,7 +22,6 @@ import oskar
 import spead2
 import spead2.recv
 
-import simplejson as json
 import numpy as np
 
 try:
