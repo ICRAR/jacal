@@ -36,6 +36,8 @@ def main():
     parser.add_argument('-c', '--column-name', help='The name of the column to write', default=None)
     parser.add_argument('-e', '--even', action='store_true', help='Write only from even ranks (to check sub-communicator writing)', default=False)
     parser.add_argument('-n', '--nrows', type=int, help='Number of rows to write per rank', default=100)
+    parser.add_argument('-A', '--no-adios', action='store_true', help='Do not use ADIOS2', default=False)
+
     opts = parser.parse_args()
 
     colname = opts.column_name or 'MY_%s_COLUMN' % opts.column_type.upper()
@@ -57,7 +59,8 @@ def main():
     if opts.even:
         size = (size + 1) // 2
 
-    scd = tables.makescacoldesc(colname, ref_val, datamanagertype='Adios2StMan')
+    kwargs = {'datamanagertype': 'Adios2StMan'} if not opts.no_adios else {}
+    scd = tables.makescacoldesc(colname, ref_val, **kwargs)
     td = tables.maketabdesc([scd])
     t = tables.table(opts.output, td, nrow=opts.nrows * size)
     with t:

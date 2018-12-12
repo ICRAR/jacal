@@ -1,6 +1,6 @@
 #/bin/bash
 
-mpirun -n 10 python parallel_writer_test.py
+mpirun -n 2 python parallel_writer_test.py "$@"
 if [ ! -d my_table ]; then
 	echo "No table written, failing"
 	exit 1
