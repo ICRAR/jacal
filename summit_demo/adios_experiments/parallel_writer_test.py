@@ -70,7 +70,7 @@ def main():
         start = opts.nrows * rank
         if opts.even:
             start //= 2
-        tc[start:start + opts.nrows] = range(opts.nrows)
+        tc[start:start + opts.nrows] = list(range(opts.nrows))
 
 if __name__ == '__main__':
     main()
