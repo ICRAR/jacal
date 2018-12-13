@@ -24,11 +24,6 @@ import spead2.recv
 
 import numpy as np
 
-try:
-    from mpi4py import MPI
-except:
-    pass
-
 
 class SpeadReceiver(object):
     """Receives visibility data using SPEAD and writes it to a Measurement Set.
@@ -156,8 +151,10 @@ def main():
     # Append the port number to the output file root path.
     file_name = sys.argv[2] + ".ms"
 
-    # Use ADIOS2?
+    # Use ADIOS2? If we do we need to initialize MPI
     use_adios2 = len(sys.argv) > 3 and sys.argv[3] == '-a'
+    if use_adios2:
+        from mpi4py import MPI
 
     # Set up the SPEAD receiver and run it (see method, above).
     receiver = SpeadReceiver(log, spead_config, file_name, use_adios2)
