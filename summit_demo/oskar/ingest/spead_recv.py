@@ -100,11 +100,17 @@ class SpeadReceiver(object):
                     "Receiving {} channel(s) starting at {} MHz.".format(
                         data['num_channels'], data['freq_start_hz'] / 1e6))
                 if self._measurement_set is None:
-                    self._measurement_set = oskar.MeasurementSet.create(
-                        self._file_name, data['num_stations'],
-                        data['num_channels'], data['num_pols'],
-                        data['freq_start_hz'], data['freq_inc_hz'],
-                        use_adios2=self.use_adios2)
+                    if self.use_adios2:
+                        self._measurement_set = oskar.MeasurementSet.create(
+                            self._file_name, data['num_stations'],
+                            data['num_channels'], data['num_pols'],
+                            data['freq_start_hz'], data['freq_inc_hz'],
+                            use_adios2=self.use_adios2)
+                    else:
+                        self._measurement_set = oskar.MeasurementSet.create(
+                            self._file_name, data['num_stations'],
+                            data['num_channels'], data['num_pols'],
+                            data['freq_start_hz'], data['freq_inc_hz'])
                     self._measurement_set.set_phase_centre(
                         math.radians(data['phase_centre_ra_deg']),
                         math.radians(data['phase_centre_dec_deg']))

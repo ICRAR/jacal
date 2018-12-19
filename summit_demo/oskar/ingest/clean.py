@@ -1,0 +1,1 @@
+clean(vis="./output/summit.ms",imagename="./output/summit.cube",niter=500,imsize=[512, 512],cell=['60arcsec', '60arcsec'],weighting="natural")
