@@ -23,5 +23,3 @@ function clean() {
     casapy --nologger --agg --nogui --nologfile -c ${cmd} > /dev/null 2>&1
     return $?
 }
-
-clean $@
