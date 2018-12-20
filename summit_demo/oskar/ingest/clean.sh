@@ -20,7 +20,6 @@ function clean() {
     local image_name="${6}";
 
     local cmd="clean(vis=[${vis}],imagename=\"${image_name}\",niter=${niter},imsize=[${imsize_x},${imsize_y}],cell=['${cell_x}','${cell_y}'],weighting=\"natural\")"
-    echo $cmd
     casapy --nologger --agg --nogui --nologfile -c ${cmd} > /dev/null 2>&1
     return $?
 }
