@@ -17,12 +17,27 @@ import logging
 import json
 import math
 import sys
+import argparse
 
 import oskar
 import spead2
 import spead2.recv
 
 import numpy as np
+
+
+def parse_baseline_file(baseline_file):
+    baselines = []
+    with open(baseline_file) as f:
+        for line in f:
+            if line.startswith('#'):
+                continue
+            coord = line.strip('\n')
+            if not coord:
+                continue
+            coord = coord.split(',')
+            baselines.append((int(coord[0]), int(coord[1]), int(coord[2])))
+    return baselines
 
 
 class SpeadReceiver(object):
@@ -45,6 +60,19 @@ class SpeadReceiver(object):
         self._measurement_set = None
         self._file_name = file_name
         self._header = {}
+
+        baseline_file = spead_config['averager']['baseline_map_filename']
+        self.full_baseline_map = parse_baseline_file(baseline_file)
+        self._baseline_exclude = []
+        self._baseline_map = []
+
+        index = 0
+        for b in self.full_baseline_map:
+            if b[2] == 0:
+                self._baseline_map.append(b)
+            else:
+                self._baseline_exclude.append(index)
+            index += 1
 
     def run(self):
         """Runs the receiver."""
@@ -100,17 +128,12 @@ class SpeadReceiver(object):
                     "Receiving {} channel(s) starting at {} MHz.".format(
                         data['num_channels'], data['freq_start_hz'] / 1e6))
                 if self._measurement_set is None:
-                    if self.use_adios2:
-                        self._measurement_set = oskar.MeasurementSet.create(
-                            self._file_name, data['num_stations'],
-                            data['num_channels'], data['num_pols'],
-                            data['freq_start_hz'], data['freq_inc_hz'],
-                            use_adios2=self.use_adios2)
-                    else:
-                        self._measurement_set = oskar.MeasurementSet.create(
-                            self._file_name, data['num_stations'],
-                            data['num_channels'], data['num_pols'],
-                            data['freq_start_hz'], data['freq_inc_hz'])
+                    self._measurement_set = oskar.MeasurementSet.create(
+                        self._file_name, data['num_stations'],
+                        data['num_channels'], data['num_pols'],
+                        data['freq_start_hz'], data['freq_inc_hz'],
+                        self._baseline_map)
+
                     self._measurement_set.set_phase_centre(
                         math.radians(data['phase_centre_ra_deg']),
                         math.radians(data['phase_centre_dec_deg']))
@@ -122,43 +145,61 @@ class SpeadReceiver(object):
                 vis_array = np.array([d['vis']['amp'] for d in datum])
                 vis_array_sum = vis_array.sum(axis=0)/len(datum)
 
+                # remove unwanted baselines before storing in MS
+                num_baselines = self._header['num_baselines'] - len(self._baseline_exclude)
+
+                vis_array_sum_reduced = np.array(
+                    [i for j, i in enumerate(vis_array_sum) if j not in self._baseline_exclude])
+
                 time_inc_sec = self._header['time_inc_sec']
                 if data['channel_index'] == 0:
+
+                    uu = np.array(
+                        [i for j, i in enumerate(vis['uu']) if j not in self._baseline_exclude])
+                    vv = np.array(
+                        [i for j, i in enumerate(vis['vv']) if j not in self._baseline_exclude])
+                    ww = np.array(
+                        [i for j, i in enumerate(vis['ww']) if j not in self._baseline_exclude])
+
                     self._measurement_set.write_coords(
-                        self._header['num_baselines'] * data['time_index'],
-                        self._header['num_baselines'],
-                        vis['uu'], vis['vv'], vis['ww'],
+                        num_baselines * data['time_index'],
+                        num_baselines,
+                        uu, vv, ww,
                         self._header['time_average_sec'], time_inc_sec,
                         self._header['time_start_mjd_utc'] * 86400 +
                         time_inc_sec * (data['time_index'] + 0.5))
 
                 self._measurement_set.write_vis(
-                    self._header['num_baselines'] * data['time_index'],
+                    num_baselines * data['time_index'],
                     data['channel_index'], 1,
-                    self._header['num_baselines'], vis_array_sum)
+                    num_baselines,
+                    vis_array_sum_reduced)
 
 
 def main():
-    """Main function for OSKAR SPEAD receiver module."""
-    # Check command line arguments.
-    if len(sys.argv) < 3:
-        raise RuntimeError('Usage: python spead_recv.py '
-                           '<spead.json> <output_root_name> [-a]')
+    parser = argparse.ArgumentParser(description='Run Averager.')
+    parser.add_argument('--conf', dest='conf', required=True,
+                        help='spead configuration json file.')
+    parser.add_argument('--out', dest='output', required=True,
+                        help='output root name.')
+    parser.add_argument('-a', dest='use_adios2', type=bool, default=False,
+                        help='output root name.')
 
-    # Get logger.
+    args = parser.parse_args()
+
     log = logging.getLogger()
     log.addHandler(logging.StreamHandler(stream=sys.stdout))
     log.setLevel(logging.DEBUG)
 
-    # Load SPEAD configuration from JSON file.
-    with open(sys.argv[1]) as f:
+    with open(args.conf) as f:
+        # Load SPEAD configuration from JSON file.
         spead_config = json.load(f)
 
     # Append the port number to the output file root path.
-    file_name = sys.argv[2] + ".ms"
+    file_name = args.output + ".ms"
 
     # Use ADIOS2? If we do we need to initialize MPI
-    use_adios2 = len(sys.argv) > 3 and sys.argv[3] == '-a'
+    use_adios2 = args.use_adios2
     if use_adios2:
         from mpi4py import MPI
 

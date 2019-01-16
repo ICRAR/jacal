@@ -12,21 +12,25 @@
             "port": 41000,
             "host": "127.0.0.1"
         },
-                {
+        {
             "port": 41001,
             "host": "127.0.0.1"
         },
-                {
+        {
             "port": 41002,
             "host": "127.0.0.1"
         },
-                {
+        {
             "port": 41003,
             "host": "127.0.0.1"
         },
-                {
+        {
             "port": 41004,
             "host": "127.0.0.1"
         }
-    ]
+    ],
+    "averager":
+    {
+        "baseline_map_filename": "./conf/aa2_baselines.csv"
+    }
 }

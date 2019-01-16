@@ -51,6 +51,7 @@ from __future__ import division, print_function
 import logging
 import json
 import sys
+import argparse
 
 import numpy
 import oskar
@@ -220,23 +221,24 @@ class SpeadSender(oskar.Interferometer):
 
 
 def main():
-    """Main function for OSKAR SPEAD sender module."""
-    # Check command line arguments.
-    if len(sys.argv) < 3:
-        raise RuntimeError('Usage: python spead_send.py '
-                           '<spead.json> <oskar_sim_interferometer.ini>')
+    parser = argparse.ArgumentParser(description='Run Averager.')
+    parser.add_argument('--conf', dest='conf', required=True,
+                        help='spead configuration json file.')
+    parser.add_argument('--sim', dest='sim', required=True,
+                        help='simulation configuration.')
 
-    # Get logger.
+    args = parser.parse_args()
+
     log = logging.getLogger()
     log.addHandler(logging.StreamHandler(stream=sys.stdout))
     log.setLevel(logging.DEBUG)
 
     # Load SPEAD configuration from JSON file.
-    with open(sys.argv[-2]) as f:
+    with open(args.conf) as f:
         spead_config = json.load(f)
 
     # Load the OSKAR settings INI file for the application.
-    settings = oskar.SettingsTree('oskar_sim_interferometer', sys.argv[-1])
+    settings = oskar.SettingsTree('oskar_sim_interferometer', args.sim)
 
     # Set up the SPEAD sender and run it (see method, above).
     sender = SpeadSender(log, spead_config, oskar_settings=settings)
