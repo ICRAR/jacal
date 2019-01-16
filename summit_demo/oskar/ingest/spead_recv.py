@@ -132,7 +132,7 @@ class SpeadReceiver(object):
                         self._file_name, data['num_stations'],
                         data['num_channels'], data['num_pols'],
                         data['freq_start_hz'], data['freq_inc_hz'],
-                        self._baseline_map)
+                        self._baseline_map, use_adios2=self.use_adios2)
 
                     self._measurement_set.set_phase_centre(
                         math.radians(data['phase_centre_ra_deg']),
@@ -182,7 +182,7 @@ def main():
                         help='spead configuration json file.')
     parser.add_argument('--out', dest='output', required=True,
                         help='output root name.')
-    parser.add_argument('-a', dest='use_adios2', type=bool, default=False,
+    parser.add_argument('-a', dest='use_adios2', action='store_true', default=False,
                         help='output root name.')
 
     args = parser.parse_args()
