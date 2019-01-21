@@ -8,17 +8,21 @@
     },
     "streams":
     [
-
         {
-            "port": 42000,
+            "port": 41000,
+            "host": "127.0.0.1"
+        },
+        {
+            "port": 41001,
             "host": "127.0.0.1"
         }
+
     ],
 
     "baseline_map_filename": "./conf/aa2_baselines.csv",
 
     "relay": {
-        "relay": 0,
+        "relay": 1,
         "stream_config": {
             "max_packet_size": 1472,
             "rate": 0.0,
@@ -26,7 +30,7 @@
             "max_heaps": 4
         },
         "stream": {
-            "port": 41000,
+            "port": 42000,
             "host": "127.0.0.1"
         }
     }
