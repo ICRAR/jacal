@@ -1,53 +1,7 @@
 # -*- coding: utf-8 -*-
 """Simulates visibility data using OSKAR and sends it using SPEAD.
-
-Usage: python spead_send.py <spead_send.json> <oskar_sim_interferometer.ini>
-
-The command line arguments are:
-    - spead_send.json:              Path to a JSON file containing
-                                    the SPEAD configuration. See below.
-    - oskar_sim_interferometer.ini: Path to a settings file for the
-                                    oskar_sim_interferometer app.
-
-An example SPEAD configuration JSON file could be:
-
-    {
-        "stream_config":
-        {
-            "max_packet_size": 1472,
-            "rate": 0.0,
-            "burst_size": 8000,
-            "max_heaps": 4
-        },
-        "streams":
-        [
-            {
-                "port": 41000,
-                "host": "127.0.0.1"
-            }
-        ]
-    }
-
-- ``stream_config`` is a dictionary describing the stream configuration.
-  See ``https://spead2.readthedocs.io/en/v1.3.2/py-send.html``
-- ``streams`` is a list of dictionaries to describe where SPEAD heap data
-  should be sent.
-- Each stream dictionary can have the keys ``port``, ``host`` and ``threads``.
-- ``port`` and ``host`` are required and give the address to which
-  SPEAD heaps should be sent.
-- ``threads`` is optional (default 1) and sets the number of threads used
-  to send the heap.
-
-To send data over multiple SPEAD streams, either run this script multiple
-times with different configuration files, or specify multiple stream
-dictionaries in the list. The visibility data will be split by frequency
-channel among the specified list of streams. Note that the latter option will
-be slower than running multiple senders in parallel on different machines.
-
-Launch one receiver script per SPEAD stream.
 """
 
-from __future__ import division, print_function
 import logging
 import json
 import sys
@@ -64,17 +18,21 @@ except:
     pass
 
 
-class SpeadSender(oskar.Interferometer):
-    """Simulates visibility data using OSKAR and sends it using SPEAD.
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.StreamHandler(stream=sys.stdout))
+logger.setLevel(logging.DEBUG)
 
-    Inherits oskar.Interferometer to send data in the process_block() method.
-    SPEAD is configured using a Python dictionary passed to the constructor.
-    """
-    def __init__(self, log, spead_config, precision=None, oskar_settings=None):
+
+class SpeadSender(oskar.Interferometer):
+    # Simulates visibility data using OSKAR and sends it using SPEAD.
+    # Inherits oskar.Interferometer to send data in the process_block() method.
+    # SPEAD is configured using a Python dictionary passed to the constructor.
+
+    def __init__(self, spead_config, precision=None, oskar_settings=None):
         oskar.Interferometer.__init__(self, precision, oskar_settings)
-        self._log = log
         self._streams = []
         self._vis_pack = None
+        self._write_ms = spead_config['write_ms']
 
         # Construct UDP streams and associated item groups.
         stream_config = spead2.send.StreamConfig(
@@ -86,8 +44,8 @@ class SpeadSender(oskar.Interferometer):
         stream = spead_config['stream']
         threads = stream['threads'] if 'threads' in stream else 1
         thread_pool = spead2.ThreadPool(threads=threads)
-        log.info("Creating SPEAD stream for host {} on port {} ..."
-                 .format(stream['host'], stream['port']))
+        logger.info("Creating SPEAD stream for host {} on port {}"
+                    .format(stream['host'], stream['port']))
         udp_stream = spead2.send.TcpStream(thread_pool, stream['host'],
                                            stream['port'], stream_config)
         item_group = spead2.send.ItemGroup(
@@ -97,7 +55,7 @@ class SpeadSender(oskar.Interferometer):
         self._streams.append((udp_stream, item_group))
 
     def finalise(self):
-        """Called automatically by the base class at the end of run()."""
+        # Called automatically by the base class at the end of run().
         oskar.Interferometer.finalise(self)
         # Send the end of stream message to each stream.
         for stream, item_group in self._streams:
@@ -111,14 +69,14 @@ class SpeadSender(oskar.Interferometer):
             block_index (int):      The index of the visibility block.
         """
         # Write the block to any open files (reimplements base class method).
-        self.write_block(block, block_index)
+        if self._write_ms:
+            self.write_block(block, block_index)
 
         # Get number of streams and maximum number of channels per stream.
         num_streams = len(self._streams)
         hdr = self.vis_header()
         max_channels_per_stream = (hdr.num_channels_total +
                                    num_streams - 1) // num_streams
-
 
         # Initialise SPEAD heaps if required.
         if block_index == 0:
@@ -144,8 +102,9 @@ class SpeadSender(oskar.Interferometer):
                 heap['time_average_sec'].value = hdr.time_average_sec
 
         # Loop over all times and channels in the block.
-        self._log.info("Sending visibility block {}/{}"
-                       .format(block_index + 1, self.num_vis_blocks))
+        logger.info("Sending visibility block {}/{}"
+                    .format(block_index + 1, self.num_vis_blocks))
+
         for t in range(block.num_times):
             for c in range(block.num_channels):
                 # Get the SPEAD stream for this channel index.
@@ -224,24 +183,18 @@ def main():
     parser = argparse.ArgumentParser(description='Run Averager.')
     parser.add_argument('--conf', dest='conf', required=True,
                         help='spead configuration json file.')
-    parser.add_argument('--sim', dest='sim', required=True,
-                        help='simulation configuration.')
 
     args = parser.parse_args()
-
-    log = logging.getLogger()
-    log.addHandler(logging.StreamHandler(stream=sys.stdout))
-    log.setLevel(logging.DEBUG)
 
     # Load SPEAD configuration from JSON file.
     with open(args.conf) as f:
         spead_config = json.load(f)
 
     # Load the OSKAR settings INI file for the application.
-    settings = oskar.SettingsTree('oskar_sim_interferometer', args.sim)
+    settings = oskar.SettingsTree('oskar_sim_interferometer', spead_config["simulation"])
 
     # Set up the SPEAD sender and run it (see method, above).
-    sender = SpeadSender(log, spead_config, oskar_settings=settings)
+    sender = SpeadSender(spead_config, oskar_settings=settings)
     sender.run()
 
 

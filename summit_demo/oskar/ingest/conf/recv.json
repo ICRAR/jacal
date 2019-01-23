@@ -8,17 +8,18 @@
     },
     "streams":
     [
-
         {
             "port": 42000,
             "host": "127.0.0.1"
         }
     ],
 
+    "as_relay": 0,
+    "output_ms": "./output/summit.ms",
     "baseline_map_filename": "./conf/aa2_baselines.csv",
+    "use_adios2": 0,
 
     "relay": {
-        "relay": 0,
         "stream_config": {
             "max_packet_size": 1472,
             "rate": 0.0,

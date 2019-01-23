@@ -1,18 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Receives visibility data using SPEAD and writes it to a Measurement Set.
+# Receives visibility data using SPEAD and writes it to a Measurement Set or another SPEAD stream.
 
-To be used in conjunction with spead_send.py in `python/examples/spead/sender`.
-Launch this script before the sender to avoid missing any data.
 
-Usage: python spead_recv.py <port> <output_root_name>
-
-The command line arguments are:
-    - port:             The UDP port number on which to listen.
-    - output_root_name: The root name of the Measurement Set to write.
-                        The port number and ".ms" suffixes will be added.
-"""
-
-from __future__ import division, print_function
+import os
 import logging
 import json
 import math
@@ -32,6 +22,11 @@ except:
     pass
 
 
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.StreamHandler(stream=sys.stdout))
+logger.setLevel(logging.DEBUG)
+
+
 def parse_baseline_file(baseline_file):
     baselines = []
     with open(baseline_file) as f:
@@ -47,13 +42,12 @@ def parse_baseline_file(baseline_file):
 
 
 class SpeadReceiver(object):
-    """Receives visibility data using SPEAD and writes it to a Measurement Set.
-    """
-    def __init__(self, log, spead_config, file_name, use_adios2):
-        self._log = log
+    # Receives visibility data using SPEAD and writes it to a Measurement Set.
+
+    def __init__(self, spead_config):
         self._streams = []
         self._ports = []
-        self.use_adios2 = use_adios2
+        self.use_adios2 = spead_config['use_adios2']
         self._num_stream = len(spead_config['streams'])
 
         # Relay attributes
@@ -68,20 +62,25 @@ class SpeadReceiver(object):
             self._streams.append(stream)
 
         self._measurement_set = None
-        self._file_name = file_name
+        self._file_name = spead_config['output_ms']
         self._header = {}
+
+        try:
+            os.mkdir(os.path.dirname(self._file_name))
+        except OSError:
+            pass
 
         self._baseline_exclude = []
         self._baseline_map = []
 
         self.as_relay = False
-        if spead_config['relay']['relay'] == 1:
+        if spead_config['as_relay'] == 1:
             self.as_relay = True
 
         if self.as_relay:
-            # NOTE: If we are a relay then we dont want to do any baseline exclusion
-            # as we are sharing a codebase with the MS writer which will exclude again causing
-            # array dimension mismatches. If its a relay, just average and pass on all baselines.
+            # NOTE: Don't do baseline exclusion if its a relay  as it shares a codebase with the MS writer
+            # which will exclude baselines multiple times causing array dimension mismatches.
+            # So as a relay just average and pass on all baselines.
 
             # Construct TCP streams and associated item groups.
             stream_config = spead2.send.StreamConfig(
@@ -95,8 +94,8 @@ class SpeadReceiver(object):
             thread_pool = spead2.ThreadPool(threads=threads)
             tcp_stream = spead2.send.TcpStream(thread_pool, stream['host'],
                                                stream['port'], stream_config)
-            self._log.info("Relaying visibilities to host {} on port {}"
-                           .format(stream['host'], stream['port']))
+            logger.info("Relaying visibilities to host {} on port {}"
+                        .format(stream['host'], stream['port']))
             item_group = spead2.send.ItemGroup(
                 flavour=spead2.Flavour(4, 64, 40, 0))
 
@@ -116,7 +115,7 @@ class SpeadReceiver(object):
                     index += 1
 
     def _create_heaps(self, num_baselines):
-        """Create SPEAD heap items based on content of the visibility block."""
+        # Create SPEAD heap items based on content of the visibility block.
         self._descriptor = {
             'channel_index': {'dtype': 'i4'},
             'freq_inc_hz': {'dtype': 'f8'},
@@ -154,11 +153,11 @@ class SpeadReceiver(object):
         stream.send_heap(item_group.get_start())
 
     def run(self):
-        """Runs the receiver."""
+        # Runs the receiver.
         item_group = spead2.ItemGroup()
 
         # Iterate over all heaps in the stream.
-        self._log.info("Waiting to receive on ports {}".format(self._ports))
+        logger.info("Waiting to receive on ports {}".format(self._ports))
 
         running = True
         while running:
@@ -204,9 +203,8 @@ class SpeadReceiver(object):
                     'time_inc_sec':         data['time_inc_sec'],
                     'time_start_mjd_utc':   data['time_start_mjd_utc']
                 }
-                self._log.info(
-                    "Receiving {} channel(s) starting at {} MHz.".format(
-                        data['num_channels'], data['freq_start_hz'] / 1e6))
+                logger.info("Receiving {} channel(s) starting at {} MHz.".format(
+                    data['num_channels'], data['freq_start_hz'] / 1e6))
 
                 if self.as_relay:
                     if self._descriptor is None:
@@ -227,6 +225,16 @@ class SpeadReceiver(object):
                         heap['time_inc_sec'].value = self._header['time_inc_sec']
                         heap['time_average_sec'].value = self._header['time_average_sec']
                 else:
+                    # check that the number of baselines the user supplied is the same
+                    # as the simulation baseline count. Only need to do this on the writing of
+                    # the MS as we don't do baseline exclusion on the relay.
+
+                    supplied_baseline_count = len(self._baseline_exclude) + len(self._baseline_map)
+
+                    if supplied_baseline_count != self._header['num_baselines']:
+                        raise Exception('User baseline map != simulation baseline count {} != {}'
+                                        .format(supplied_baseline_count, self._header['num_baselines']))
+
                     if self._measurement_set is None:
                         self._measurement_set = oskar.MeasurementSet.create(
                             self._file_name, data['num_stations'],
@@ -247,8 +255,11 @@ class SpeadReceiver(object):
 
                 num_baselines = self._header['num_baselines'] - len(self._baseline_exclude)
 
-                vis_array_sum_reduced = np.array(
-                    [i for j, i in enumerate(vis_array_sum) if j not in self._baseline_exclude])
+                if len(self._baseline_exclude) == 0:
+                    vis_array_sum_reduced = vis_array_sum
+                else:
+                    vis_array_sum_reduced = np.array(
+                        [i for j, i in enumerate(vis_array_sum) if j not in self._baseline_exclude])
 
                 time_inc_sec = self._header['time_inc_sec']
 
@@ -259,12 +270,17 @@ class SpeadReceiver(object):
                                         dtype=self._descriptor['vis']['dtype'])
 
                 if data['channel_index'] == 0:
-                    uu = np.array(
-                        [i for j, i in enumerate(vis['uu']) if j not in self._baseline_exclude])
-                    vv = np.array(
-                        [i for j, i in enumerate(vis['vv']) if j not in self._baseline_exclude])
-                    ww = np.array(
-                        [i for j, i in enumerate(vis['ww']) if j not in self._baseline_exclude])
+                    if len(self._baseline_exclude) == 0:
+                        uu = vis['uu']
+                        vv = vis['vv']
+                        ww = vis['ww']
+                    else:
+                        uu = np.array(
+                            [i for j, i in enumerate(vis['uu']) if j not in self._baseline_exclude])
+                        vv = np.array(
+                            [i for j, i in enumerate(vis['vv']) if j not in self._baseline_exclude])
+                        ww = np.array(
+                            [i for j, i in enumerate(vis['ww']) if j not in self._baseline_exclude])
 
                     if self.as_relay:
                         vis_pack['uu'] = uu
@@ -298,29 +314,15 @@ def main():
     parser = argparse.ArgumentParser(description='Run Averager.')
     parser.add_argument('--conf', dest='conf', required=True,
                         help='spead configuration json file.')
-    parser.add_argument('--out', dest='output', required=True,
-                        help='output root name.')
-    parser.add_argument('-a', dest='use_adios2', action='store_true', default=False,
-                        help='output root name.')
 
     args = parser.parse_args()
 
-    log = logging.getLogger()
-    log.addHandler(logging.StreamHandler(stream=sys.stdout))
-    log.setLevel(logging.DEBUG)
-
+    # Load SPEAD configuration from JSON file.
     with open(args.conf) as f:
-        # Load SPEAD configuration from JSON file.
         spead_config = json.load(f)
 
-    # Append the port number to the output file root path.
-    file_name = args.output + ".ms"
-
-    # Use ADIOS2? If we do we need to initialize MPI
-    use_adios2 = args.use_adios2
-
     # Set up the SPEAD receiver and run it (see method, above).
-    receiver = SpeadReceiver(log, spead_config, file_name, use_adios2)
+    receiver = SpeadReceiver(spead_config)
     receiver.run()
 
 

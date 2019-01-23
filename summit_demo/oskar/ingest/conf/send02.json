@@ -8,5 +8,7 @@
     "stream": {
         "port": 41001,
         "host": "127.0.0.1"
-    }
+    },
+    "simulation": "./conf/eor02.ini",
+    "write_ms": 1
 }
