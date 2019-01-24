@@ -36,3 +36,4 @@ class TestAverager(unittest.TestCase):
                 time.sleep(1)
         finally:
             sink.close_sink()
+            relay.close_sink()

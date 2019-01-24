@@ -86,3 +86,8 @@ class AveragerRelayDrop(BarrierAppDROP):
         self.recv_thread = Thread(target=self.recv.run)
         self.recv_thread.start()
         logger.info("AveragerRelayDrop Started")
+
+    def close_sink(self):
+        if self.recv:
+            self.recv.close()
+            self.recv_thread.join()
