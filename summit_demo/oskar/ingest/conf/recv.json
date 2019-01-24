@@ -17,7 +17,7 @@
     "as_relay": 0,
     "output_ms": "./output/summit.ms",
     "baseline_map_filename": "./conf/aa2_baselines.csv",
-    "use_adios2": 0,
+    "use_adios2": 1,
 
     "relay": {
         "stream_config": {

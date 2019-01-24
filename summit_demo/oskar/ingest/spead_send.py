@@ -212,6 +212,8 @@ def main():
     # Load the OSKAR settings INI file for the application.
     ini_path = osp.join(app_root, spead_config["simulation"])
     settings = oskar.SettingsTree('oskar_sim_interferometer', ini_path)
+    spead_config["simulation"] = ini_path
+    logger.info('init path = %s' % ini_path)
 
     # Set up the SPEAD sender and run it (see method, above).
     sender = SpeadSender(spead_config, oskar_settings=settings)
