@@ -114,6 +114,10 @@ class SpeadReceiver(object):
                         self._baseline_exclude.append(index)
                     index += 1
 
+    def close(self):
+        for stream in list(self._streams):
+            stream.stop()
+
     def _create_heaps(self, num_baselines):
         # Create SPEAD heap items based on content of the visibility block.
         self._descriptor = {
