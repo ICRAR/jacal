@@ -1,0 +1,37 @@
+The EOR models are makde from the EOS 21cmFAST simulations, using the
+recommended faint galaxies model, processed with prep_box.py.
+prep_box.py averages the 1024x1024x1024 image predictions to smaller
+16x128x128 cubes, which steps in ~0.2MHz increments over a 16Mpc sky.
+That is approx 12deg (I think).
+show_box.py skips the slow conversion of the full res files, but does
+the same -- and will show you plots if show_plot=True
+
+The steps are uniform in co-moving distance, provided in redshift, and
+converted to frequency steps by me. (So could be wrong!)
+
+One file is missing from the simulation.
+
+There are 4 corner markers of low flux, point sources and zero spectral index.i
+The nominal frequency is the first freq channel (~220MHz).
+
+EOR+Foreground adds in a model from NGC1566. prep_box (or show_box) will do
+this, if it is avaliable.  The model has 0 SI and a nominal frequency of 1GHz.
+
+The models are centred on 201,-44 in degrees, span +- 6degrees. 16 models are
+made from each redshift simulation. The SI is used to extrapolate from one
+model to the next. As the changes are very abrupt using a model far from the
+nominal frequency will generate nonsense. One could set the SI to zero in this
+case.
+
+The models are gaussians of width of the 128pixels over 12 deg. Which is
+c1lose to 1 arcmin.
+
+To select the model suitable for your simulation I would find the first model which is suitable for a frequency greater than your start frequency. 
+
+eg:
+ model_list=glob.glob('EOR+Forground/sky_eor_model_f*.osm')
+ model_list.sort()
+ frq=np.zeros((len(model_list)))
+ for n in range(len(model_list)):
+    frq[n]=model_list[n][30:36]
+ use_model=model_list[np.where(frq>start_freq)[0][0]]
