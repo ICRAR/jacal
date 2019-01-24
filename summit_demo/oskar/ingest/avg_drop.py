@@ -37,6 +37,7 @@ class AveragerSinkDrop(AppDROP):
         with self.lock:
             if self.start is False:
                 logger.info("AveragerSinkDrop SpeadReceiver")
+                self.config['output_ms'] = self.outputs[0].path
                 self.recv = SpeadReceiver(self.config)
                 self.recv_thread = Thread(target=self.recv.run)
                 self.recv_thread.start()
@@ -54,6 +55,7 @@ class AveragerSinkDrop(AppDROP):
 
         if self.complete_called == len(self.streamingInputs):
             self.close_sink()
+            self.execStatus = AppDROPStates.FINISHED
 
     def close_sink(self):
         if self.recv:
