@@ -2,13 +2,13 @@
 # 
 # job array submission script
 #
-# Usage: farmoskar [RIALTO2-20]
+# Usage: rialto2-20 [RIALTO2-20]
 #
 # Markus Dolensky, ICRAR, 2019-01-24
 #
 
 # SLURMify
-#SBATCH --job-name=farmoskar
+#SBATCH --job-name=rialto2-20
 #SBATCH --time=05:00
 #SBATCH --nodes=2
 #SBATCH --ntasks-per-node=4
@@ -62,19 +62,12 @@ case "$SCENARIO" in
   RIALTO2-20)
 	  # EoR sky model partitioning test case; it's a logical expansion of the single channel setup aa4-1c
 	  DOUBLE_PRECISION="false"
-#	  START_TIME_UTC="01-01-2015 18:00:00"
-#	  OBS_LENGTH="00:01:00"
 	  START_TIME_UTC="01-01-2000 20:00:00"
 	  OBS_LENGTH="06:00:00"
 	  NUM_TIME_STEPS=60
-#	  START_FREQUENCY_HZ=(119584150 119729250 119874500 120020100 209991850 210244750 210497950 210751700)
 	  START_FREQUENCY_HZ=(210000000 211000000 212000000 213000000 214000000 215000000 216000000 217000000)
 	  NUM_CHANNELS=1
 	  FREQUENCY_INC_HZ=1000000
-	  
-#	  FREQUENCY_INCs_HZ=(29020 29050 29120 29160 252900 253200 253750 254000)
-#	  # calculate frequency increment of channels within the band
-#	  let "FREQUENCY_INC_HZ = ${FREQUENCY_INCs_HZ[$idx]} / $NUM_CHANNELS"
 	  
 	  SM_NAME=$SCENARIO
 	  POL_MODE="Scalar"
@@ -94,10 +87,10 @@ case "$SM_NAME" in
 	  PHASE_CENTRE_RA_DEG="201"
 	  PHASE_CENTRE_DEC_DEG="-44"
 	  MAX_SOURCES_PER_CHUNK=50000
-#	  SM_NAME=("sky_eor_model_f119.66" "sky_eor_model_f119.80" "sky_eor_model_f119.95" "sky_eor_model_f120.09" "sky_eor_model_f210.12" "sky_eor_model_f210.37" "sky_eor_model_f210.62" "sky_eor_model_f210.88")
-	  SM_NAME=("sky_eor_model_f210.12.osm" "sky_eor_model_f211.13.osm" "sky_eor_model_f212.16.osm" "sky_eor_model_f213.19.osm" "sky_eor_model_f214.24.osm" "sky_eor_model_f215.03.osm" "sky_eor_model_f216.09.osm" "sky_eor_model_f217.17.osm")
 	  SKY_DIR=${SKY_DIR}/EOR
-	  SM_FILE=(${SKY_DIR}/${SM_NAME[0]}.osm ${SKY_DIR}/${SM_NAME[1]}.osm ${SKY_DIR}/${SM_NAME[2]}.osm ${SKY_DIR}/${SM_NAME[3]}.osm)
+	  SM_NAME=("sky_eor_model_f210.12" "sky_eor_model_f211.13" "sky_eor_model_f212.16" "sky_eor_model_f213.19" "sky_eor_model_f214.24" "sky_eor_model_f215.03" "sky_eor_model_f216.09" "sky_eor_model_f217.17")
+	  SM_FILE=()
+	  for fidx in "${SM_NAME[@]}"; do SM_FILE+=("${SKY_DIR}/${fidx}.osm"); done
 	  ;;
   *)
 	  echo "unsupported scenario - aborting"
