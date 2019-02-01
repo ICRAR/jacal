@@ -10,7 +10,7 @@ from dlg.ddap_protocol import AppDROPStates
 from spead_recv import SpeadReceiver
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("ingest")
 
 
 class AveragerSinkDrop(AppDROP):

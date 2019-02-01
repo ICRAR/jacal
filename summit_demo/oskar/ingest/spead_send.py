@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
 """Simulates visibility data using OSKAR and sends it using SPEAD.
 """
-import os.path as osp
 import logging
-import json
-import sys
-import argparse
-
 import numpy
+
 import oskar
 import spead2
 import spead2.send
@@ -17,23 +13,9 @@ try:
 except:
     pass
 
-import six.moves.http_client as httplib
 
-logger = logging.getLogger(__name__)
-logger.addHandler(logging.StreamHandler(stream=sys.stdout))
-logger.setLevel(logging.DEBUG)
+logger = logging.getLogger("ingest")
 
-def _get_receiver_host(queue_host='sdp-dfms.ddns.net', queue_port=8096):
-    try:
-        con = httplib.HTTPConnection(queue_host, queue_port)
-        con.request('GET', '/get_receiver')
-        response = con.getresponse()
-        #print(response.status, response.reason)
-        host = response.read()
-        return host
-    except Exception as exp:
-        logger.error("Fail to get receiver ip from the queue: %s" % str(exp))
-        return 'NULL'
 
 class SpeadSender(oskar.Interferometer):
     # Simulates visibility data using OSKAR and sends it using SPEAD.
@@ -189,36 +171,3 @@ class SpeadSender(oskar.Interferometer):
 
             # Send the start of stream message to each stream.
             stream.send_heap(item_group.get_start())
-
-
-def main():
-    parser = argparse.ArgumentParser(description='Run Averager.')
-    parser.add_argument('--conf', dest='conf', required=True,
-                        help='spead configuration json file.')
-    
-    args = parser.parse_args()
-    app_root = osp.abspath(osp.join(args.conf, '..', '..'))
-
-    # Load SPEAD configuration from JSON file.
-    with open(args.conf) as f:
-        spead_config = json.load(f)
-    
-    host = _get_receiver_host()
-    if host != 'NULL':
-        old_host = spead_config['stream']['host']
-        spead_config['stream']['host'] = host
-        logger.info("Ignore the host %s in JSON, use new host %s instead" % (old_host, host))
-
-    # Load the OSKAR settings INI file for the application.
-    ini_path = osp.join(app_root, spead_config["simulation"])
-    settings = oskar.SettingsTree('oskar_sim_interferometer', ini_path)
-    spead_config["simulation"] = ini_path
-    logger.info('init path = %s' % ini_path)
-
-    # Set up the SPEAD sender and run it (see method, above).
-    sender = SpeadSender(spead_config, oskar_settings=settings)
-    sender.run()
-
-
-if __name__ == '__main__':
-    main()

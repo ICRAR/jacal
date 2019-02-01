@@ -3,7 +3,7 @@
 for i in {1..5};
 do
    echo "Running sender: $i"
-   python spead_send.py --conf ./conf/send0$i.json &
+   python simple_send.py --conf ./conf/send0$i.json &
 done
 
 wait
