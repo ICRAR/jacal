@@ -6,7 +6,7 @@
         "max_heaps": 4
     },
     "stream": {
-        "port": 42000,
+        "port": 41000,
         "host": "127.0.0.1"
     },
     "simulation": "./conf/eor01.ini",

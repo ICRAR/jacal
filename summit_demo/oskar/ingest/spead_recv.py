@@ -17,6 +17,8 @@ import spead2.send
 
 from dlg import utils
 
+from spead_send import _get_receiver_host
+
 import numpy as np
 
 try:
@@ -95,10 +97,11 @@ class SpeadReceiver(object):
             stream = spead_config['relay']['stream']
             threads = stream['threads'] if 'threads' in stream else 1
             thread_pool = spead2.ThreadPool(threads=threads)
-            tcp_stream = spead2.send.TcpStream(thread_pool, stream['host'],
-                                               stream['port'], stream_config)
             logger.info("Relaying visibilities to host {} on port {}"
                         .format(stream['host'], stream['port']))
+            tcp_stream = spead2.send.TcpStream(thread_pool, stream['host'],
+                                               stream['port'], stream_config)
+            
             item_group = spead2.send.ItemGroup(
                 flavour=spead2.Flavour(4, 64, 40, 0))
 
@@ -338,7 +341,16 @@ def main():
     bmf = osp.join(app_root, spead_config['baseline_map_filename'])
     spead_config['baseline_map_filename'] = bmf
 
-    # register IP address for sender to use (we hardcode port for now, thus one sender one receiver pair)
+    if spead_config['as_relay'] == 1:
+        # if I am a relay, obtain the non-relay receiver's IP first, before register my own IP
+        # (this behaviour is similar to a sender)
+        host = _get_receiver_host()
+        if host != 'NULL':
+            old_host = spead_config['relay']['stream']['host']
+            spead_config['relay']['stream']['host'] = host
+            logger.info("Ignore the host %s in JSON, relay to %s instead" % (old_host, host))
+
+    # register IP address for sender/relay receiver to use (we hardcode port for now, thus one sender one receiver pair)
     public_ip = get_ip_via_netifaces()
     ip_adds = '{0}{1}'.format(public_ip, "")
     origin_ip = ip_adds.split(',')[0]
