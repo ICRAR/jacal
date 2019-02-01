@@ -8,17 +8,10 @@ import json
 import sys
 import argparse
 
-
 from dlg import utils
 
 from spead_recv import SpeadReceiver
 from bw_send import _get_receiver_host
-
-
-try:
-    from mpi4py import MPI
-except:
-    pass
 
 
 logger = logging.getLogger("ingest")

@@ -8,11 +8,6 @@ import argparse
 
 from spead_recv import SpeadReceiver
 
-try:
-    from mpi4py import MPI
-except:
-    pass
-
 
 logger = logging.getLogger("ingest")
 logger.addHandler(logging.StreamHandler(stream=sys.stdout))

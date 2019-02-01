@@ -11,11 +11,6 @@ import oskar
 
 from spead_send import SpeadSender
 
-try:
-    from mpi4py import MPI
-except:
-    pass
-
 
 logger = logging.getLogger("ingest")
 logger.addHandler(logging.StreamHandler(stream=sys.stdout))
