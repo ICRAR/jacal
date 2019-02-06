@@ -10,10 +10,11 @@
 # SLURMify
 #SBATCH --job-name=rialto2-142
 #SBATCH --time=05:00
+#SBATCH --nodes=1
 #SBATCH --ntasks-per-node=6
 #SBATCH --array=0-5
 #SBATCH --gres=gpu:6
-#SBATCH --mem=30g
+#SBATCH --mem=5g
 #SBATCH --mail-type=ALL
 !!#SBATCH --mail-user=markus.dolensky@uwa.edu.au
 !!#SBATCH --output=/flush1/dol040/oskar/log/rialto2-142-mjob%A-tid%a.log
@@ -129,6 +130,7 @@ oskar_imager --set "${IMAGER_INI}.${idx}" image/root_path "$FITSROOT.${idx}"
 wait
 
 # show visibility volume
+echo "Visibility files:"
 ls -l ${VISNAME}.*
 
 # clean up run specific settings files; runtime settings are captured in the OSKAR log
