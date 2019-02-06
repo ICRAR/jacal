@@ -62,7 +62,7 @@ IMAGER_INI=summit_demo/oskar/ingest/conf/${SCENARIO}-imager.ini
 DOUBLE_PRECISION="false"
 START_TIME_UTC="01-01-2000 20:00:00"
 OBS_LENGTH="06:00:00"
-NUM_TIME_STEPS=60
+NUM_TIME_STEPS=1000
 START_FREQUENCY_HZ=(210000000 211000000 212000000 213000000 214000000 215000000)
 NUM_CHANNELS=1
 FREQUENCY_INC_HZ=1000000
@@ -128,6 +128,8 @@ oskar_imager --set "${IMAGER_INI}.${idx}" image/root_path "$FITSROOT.${idx}"
 # sync 
 wait
 
+# show visibility volume
+ls -l ${VISNAME}.*
 
 # clean up run specific settings files; runtime settings are captured in the OSKAR log
 rm ${INTER_INI}.${idx} ${IMAGER_INI}.${idx}
