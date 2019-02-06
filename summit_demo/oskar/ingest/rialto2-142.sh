@@ -27,7 +27,7 @@
 !!module swap intel-cc/16.0.4.258 intel-mkl/2017.2.174
 
 # scenario name to pick up custom config
-SCENARIO="rialtoO2-142"
+SCENARIO="rialto2-142"
 
 GPU_COUNT=6
 USE_GPUS="true"
@@ -45,7 +45,8 @@ let "gpuidx = $idx % $GPU_COUNT"
 
 # directory setup
 !!APP_ROOT="${HOME}/jacal"
-SKY_DIR=${APP_ROOT}/summit_demo/oskar/models/EOR
+SKY_DIR=${APP_ROOT}/summit_demo/oskar/models
+TM_DIR=${APP_ROOT}/summit_demo/oskar/ingest/conf/aa4.tm
 !!WRK_ROOT="/flush1/dol040/oskar"
 LOG_DIR=${WRK_ROOT}/log
 IMG_DIR=${WRK_ROOT}/img
@@ -102,10 +103,10 @@ oskar_sim_interferometer --set "${INTER_INI}.${idx}" observation/length $OBS_LEN
 oskar_sim_interferometer --set "${INTER_INI}.${idx}" observation/num_time_steps $NUM_TIME_STEPS
 
 oskar_sim_interferometer --set "${INTER_INI}.${idx}" telescope/pol_mode $POL_MODE
+oskar_sim_interferometer --set "${INTER_INI}.${idx}" telescope/input_directory $TM_DIR
 
 oskar_sim_interferometer --set "${INTER_INI}.${idx}" interferometer/oskar_vis_filename "${VISNAME}.${idx}"
 
-# settings specific to an OSKAR instance
 oskar_sim_interferometer --set "${INTER_INI}.${idx}" simulator/cuda_device_ids $gpuidx
 oskar_sim_interferometer --set "${INTER_INI}.${idx}" observation/start_frequency_hz ${START_FREQUENCY_HZ[$idx]}
 oskar_sim_interferometer --set "${INTER_INI}.${idx}" observation/frequency_inc_hz ${FREQUENCY_INC_HZ}
