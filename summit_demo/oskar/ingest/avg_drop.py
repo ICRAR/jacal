@@ -59,7 +59,7 @@ class AveragerSinkDrop(AppDROP):
 
     def close_sink(self):
         if self.recv:
-            self.recv.close()
+            #self.recv.close()
             self.recv_thread.join()
 
 
@@ -85,9 +85,11 @@ class AveragerRelayDrop(BarrierAppDROP):
 
         logger.info("AveragerRelayDrop Starting")
         self.recv = SpeadReceiver(self.config)
-        self.recv_thread = Thread(target=self.recv.run)
-        self.recv_thread.start()
-        logger.info("AveragerRelayDrop Started")
+        self.recv.run()
+        self.recv.close()
+        # self.recv_thread = Thread(target=self.recv.run)
+        # self.recv_thread.start()
+        logger.info("AveragerRelayDrop Finished")
 
     def close_sink(self):
         if self.recv:
