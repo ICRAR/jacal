@@ -131,7 +131,7 @@ def concat_images(fits_cube_output, fits_image_input):
 
         # pad with zeros if cube is not in 2880 increments
         remain = 2880 - (total_size % 2880)
-        if remain > 0:
+        if 0 < remain < 2880:
             f.write(bytes([0]*remain))
 
     # update the total number of freq channels in final image cube
