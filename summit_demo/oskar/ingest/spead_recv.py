@@ -87,7 +87,7 @@ class SpeadReceiver(object):
                         .format(stream['host'], stream['port']))
             tcp_stream = spead2.send.TcpStream(thread_pool, stream['host'],
                                                stream['port'], stream_config)
-            
+
             item_group = spead2.send.ItemGroup(
                 flavour=spead2.Flavour(4, 64, 40, 0))
 
@@ -109,6 +109,8 @@ class SpeadReceiver(object):
     def close(self):
         for stream in list(self._streams):
             stream.stop()
+        if self.as_relay:
+            self._relay_stream = None
 
     def _create_heaps(self, num_baselines):
         # Create SPEAD heap items based on content of the visibility block.
@@ -149,6 +151,13 @@ class SpeadReceiver(object):
         stream.send_heap(item_group.get_start())
 
     def run(self):
+        try:
+            self._run()
+        except:
+            logger.exception("Unexpected error while receiving data, closing")
+            self.close()
+
+    def _run(self):
         # Runs the receiver.
         item_group = spead2.ItemGroup()
 
