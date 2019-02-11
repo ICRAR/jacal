@@ -10,4 +10,4 @@ load_common
 export PYTHONPATH="$this_dir/../../oskar/ingest:$PYTHONPATH"
 cd "$outdir"
 mpirun python -m dlg.deploy.pawsey.start_dfms_cluster \
-    -l . -L $this_dir/bracewell_mvp.json
+    -l . -L $this_dir/bracewell_mvp.json --part-algo mysarkar

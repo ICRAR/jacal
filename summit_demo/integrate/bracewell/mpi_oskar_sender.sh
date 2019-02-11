@@ -11,8 +11,8 @@ load_common
 
 APP_ROOT="$this_dir/../../oskar/ingest"
 export PYTHONPATH="$APP_ROOT:$PYTHONPATH"
-cd "$outdir"
+cd "$APP_ROOT"
 
 echo "Sleeping for 10 seconds to make sure the AWS queue is valid"
-sleep 15
+sleep 10
 mpirun python "$APP_ROOT/bw_send.py" --conf $APP_ROOT"/conf/send%02d.json"
