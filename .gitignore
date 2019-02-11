@@ -3,3 +3,4 @@
 apps/askap/.clang_complete
 docs
 *.swp
+*.pyc
