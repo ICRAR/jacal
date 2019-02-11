@@ -9,8 +9,8 @@
 #BSUB -J rialto2-142
 #BSUB -W 00:05
 #BSUB -nnodes 1
-!!#BSUB --stdio_stdout ...
-!!#BSUB --stdio_stderr ...
+#BSUB --stdio_stdout /gpfs/alpine/csc303/scratch/wangj/data/log/rialto2-142-%J-%I.log
+#BSUB --stdio_stderr /gpfs/alpine/csc303/scratch/wangj/data/log/rialto2-142-%J-%I.err
 
 
 # scenario: AA4 telescope config, 1 channel per GPU with 6 GPUs running in parallel
