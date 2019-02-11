@@ -1,19 +1,18 @@
 #!/bin/bash
 
-#SBATCH --nodes=1
-#SBATCH --time=00:10:00
-#SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:4
 #SBATCH --mem=2g
-#SBATCH --job-name=MPI_Sender
 
-module use /flush1/tob020/modulefiles
-module load oskar/2.7.1-adios
-module load spead2/1.10.0
-module load casacore/3.0.0-adios
-module load adios/2.2.0
+# Common start
+this_dir=`eval "cd \$(dirname $0); echo \$PWD; cd \$OLDPWD"`
+. $this_dir/common.sh
 
-APP_ROOT="/home/wu082/proj/jacal/summit_demo/oskar/ingest"
-source /flush1/wu082/summit_env/bin/activate
-cd $APP_ROOT
-srun -n 1 python $APP_ROOT"/spead_send.py" --conf $APP_ROOT"/conf/send01.json"
+load_common
+
+APP_ROOT="$this_dir/../../oskar/ingest"
+export PYTHONPATH="$APP_ROOT:$PYTHONPATH"
+cd "$outdir"
+
+echo "Sleeping for 10 seconds to make sure the AWS queue is valid"
+sleep 15
+mpirun python "$APP_ROOT/bw_send.py" --conf $APP_ROOT"/conf/send%02d.json"
