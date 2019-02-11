@@ -9,8 +9,11 @@ from threading import Thread
 
 from dlg.drop import AppDROP, BarrierAppDROP
 from dlg.ddap_protocol import AppDROPStates
+from dlg import utils
 
 from spead_recv import SpeadReceiver
+
+import six.moves.http_client as httplib
 
 
 logger = logging.getLogger(__name__)
