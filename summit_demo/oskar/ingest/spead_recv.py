@@ -12,13 +12,10 @@ import spead2.send
 
 import numpy as np
 
-try:
-    from mpi4py import MPI
-except:
-    pass
 
 
-logger = logging.getLogger("ingest")
+
+logger = logging.getLogger(__name__)
 
 
 def parse_baseline_file(baseline_file):
@@ -90,7 +87,7 @@ class SpeadReceiver(object):
                         .format(stream['host'], stream['port']))
             tcp_stream = spead2.send.TcpStream(thread_pool, stream['host'],
                                                stream['port'], stream_config)
-            
+
             item_group = spead2.send.ItemGroup(
                 flavour=spead2.Flavour(4, 64, 40, 0))
 
@@ -112,6 +109,8 @@ class SpeadReceiver(object):
     def close(self):
         for stream in list(self._streams):
             stream.stop()
+        if self.as_relay:
+            self._relay_stream = None
 
     def _create_heaps(self, num_baselines):
         # Create SPEAD heap items based on content of the visibility block.
@@ -152,6 +151,13 @@ class SpeadReceiver(object):
         stream.send_heap(item_group.get_start())
 
     def run(self):
+        try:
+            self._run()
+        except:
+            logger.exception("Unexpected error while receiving data, closing")
+            self.close()
+
+    def _run(self):
         # Runs the receiver.
         item_group = spead2.ItemGroup()
 
@@ -160,6 +166,8 @@ class SpeadReceiver(object):
 
         running = True
         while running:
+
+            logger.info("Reading one heap from all streams")
             heaps = []
             for stream in list(self._streams):
                 try:
@@ -176,6 +184,7 @@ class SpeadReceiver(object):
             if len(heaps) != self._num_stream:
                 raise Exception('Number of streams does not match heaps read')
 
+            logger.info("Putting corresponding heaps together")
             datum = []
             for heap in heaps:
                 # Extract data from the heap into a dictionary.
@@ -207,6 +216,7 @@ class SpeadReceiver(object):
 
                 if self.as_relay:
                     if self._descriptor is None:
+                        logger.info('Relying metainformation to relay')
                         # remove unwanted baselines before storing in MS
                         self._create_heaps(data['num_baselines'] - len(self._baseline_exclude))
 
@@ -234,6 +244,7 @@ class SpeadReceiver(object):
                         raise Exception('User baseline map != simulation baseline count {} != {}'
                                         .format(supplied_baseline_count, self._header['num_baselines']))
 
+                    logger.info('Creating Measurement Set under %s', self._file_name)
                     if self._measurement_set is None:
                         self._measurement_set = oskar.MeasurementSet.create(
                             self._file_name, data['num_stations'],
@@ -244,6 +255,7 @@ class SpeadReceiver(object):
                         self._measurement_set.set_phase_centre(
                             math.radians(data['phase_centre_ra_deg']),
                             math.radians(data['phase_centre_dec_deg']))
+                    logger.info('Measurement Set created at %s', self._file_name)
 
             # Write visibility data from the SPEAD heap.
             if 'vis' in data:
@@ -301,8 +313,10 @@ class SpeadReceiver(object):
                     heap['vis'].value = vis_pack
                     heap['channel_index'].value = data['channel_index']
                     heap['time_index'].value = data['time_index']
+                    logger.info('Relaying heap to sink')
                     stream.send_heap(heap.get_heap())
                 else:
+                    logger.info('Writing visibilities to Measurement Set')
                     self._measurement_set.write_vis(
                         num_baselines * data['time_index'],
                         data['channel_index'], 1,

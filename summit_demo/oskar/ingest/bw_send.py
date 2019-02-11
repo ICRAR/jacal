@@ -34,14 +34,16 @@ def main():
     parser = argparse.ArgumentParser(description='Run Averager.')
     parser.add_argument('--conf', dest='conf', required=True,
                         help='spead configuration json file.')
-    
+
+    from mpi4py import MPI
     args = parser.parse_args()
-    app_root = osp.abspath(osp.join(args.conf, '..', '..'))
+    conf = args.conf % (MPI.COMM_WORLD.Get_rank() + 1)
+    app_root = osp.dirname(osp.dirname(osp.abspath(conf)))
 
     # Load SPEAD configuration from JSON file.
-    with open(args.conf) as f:
+    with open(conf) as f:
         spead_config = json.load(f)
-    
+
     host = _get_receiver_host()
     if host != 'NULL':
         old_host = spead_config['stream']['host']

@@ -2,20 +2,14 @@
 """Simulates visibility data using OSKAR and sends it using SPEAD.
 """
 import logging
-import numpy
 
+import numpy
 import oskar
 import spead2
 import spead2.send
 
-try:
-    from mpi4py import MPI
-except:
-    pass
 
-
-logger = logging.getLogger("ingest")
-
+logger = logging.getLogger(__name__)
 
 class SpeadSender(oskar.Interferometer):
     # Simulates visibility data using OSKAR and sends it using SPEAD.
