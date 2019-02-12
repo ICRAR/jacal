@@ -37,7 +37,7 @@ def header_size_obj(fits_input_obj):
     while True:
         row = fits_input_obj.read(row_size).decode('ascii')
         num_bytes += row_size
-        if 'END' in row.upper():
+        if row.replace(' ', '') == 'END':
             break
 
     while fits_input_obj.tell() % 2880 != 0:
@@ -66,7 +66,7 @@ def modify_header(fits_file, key, value):
         while True:
             row = fits_input_obj.read(80).decode('ascii')
 
-            if 'END' in row.upper():
+            if row.replace(' ', '') == 'END':
                 raise Exception('{0} not found'.format(key))
 
             if row.startswith(key):
