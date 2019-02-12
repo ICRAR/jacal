@@ -52,6 +52,7 @@ class AveragerSinkDrop(AppDROP):
         self.written_called = 0
         self.complete_called = 0
         self.use_aws_ip = bool(kwargs.get('use_aws_ip', 1))
+        self.disconnect_tolerance = int(kwargs.get('disconnect_tolerance', 0))
 
         with open(kwargs['config']) as f:
             self.config = json.load(f)
@@ -64,6 +65,12 @@ class AveragerSinkDrop(AppDROP):
         self.config['baseline_map_filename'] = osp.join(root_dir, ff)
         super(AveragerSinkDrop, self).initialize(**kwargs)
 
+    def _run(self):
+        try:
+            self.recv.run()
+        except:
+            self.execStatus = AppDROPStates.ERROR
+
     def dataWritten(self, uid, data):
         logger.info("AveragerSinkDrop dataWritten called")
 
@@ -73,8 +80,8 @@ class AveragerSinkDrop(AppDROP):
                 if (self.use_aws_ip):
                    register_my_ip(self.name)
                 self.config['output_ms'] = self.outputs[0].path
-                self.recv = SpeadReceiver(self.config)
-                self.recv_thread = Thread(target=self.recv.run)
+                self.recv = SpeadReceiver(self.config, self.disconnect_tolerance)
+                self.recv_thread = Thread(target=self._run)
                 self.recv_thread.start()
                 self.start = True
                 logger.info("AveragerSinkDrop Started")
@@ -111,6 +118,7 @@ class AveragerRelayDrop(BarrierAppDROP):
             raise Exception('Not running as a relay configuration.')
 
         self.use_aws_ip = bool(kwargs.get('use_aws_ip', 1))
+        self.disconnect_tolerance = int(kwargs.get('disconnect_tolerance', 0))
         super(AveragerRelayDrop, self).initialize(**kwargs)
 
     def run(self):
@@ -133,7 +141,7 @@ class AveragerRelayDrop(BarrierAppDROP):
                 register_my_ip(self.name)
 
         logger.info("AveragerRelayDrop Starting")
-        self.recv = SpeadReceiver(self.config)
+        self.recv = SpeadReceiver(self.config, self.disconnect_tolerance)
         self.recv.run()
         self.recv.close()
         # self.recv_thread = Thread(target=self.recv.run)

@@ -13,9 +13,11 @@ import spead2.send
 import numpy as np
 
 
-
-
 logger = logging.getLogger(__name__)
+
+
+class ToleranceReached(Exception):
+    pass
 
 
 def parse_baseline_file(baseline_file):
@@ -35,11 +37,13 @@ def parse_baseline_file(baseline_file):
 class SpeadReceiver(object):
     # Receives visibility data using SPEAD and writes it to a Measurement Set.
 
-    def __init__(self, spead_config):
+    def __init__(self, spead_config, disconnect_tolerance=0):
         self._streams = []
         self._ports = []
         self.use_adios2 = spead_config['use_adios2']
         self._num_stream = len(spead_config['streams'])
+        self._num_stream_disconnect = 0
+        self._disconnect_tolerance = disconnect_tolerance
 
         # Relay attributes
         self._relay_stream = None
@@ -48,6 +52,7 @@ class SpeadReceiver(object):
         for recv_config in spead_config['streams']:
             port = recv_config['port']
             stream = spead2.recv.Stream(spead2.ThreadPool(), 0)
+            stream.stop_on_stop_item = False
             stream.add_tcp_reader(port)
             self._ports.append(port)
             self._streams.append(stream)
@@ -153,8 +158,12 @@ class SpeadReceiver(object):
     def run(self):
         try:
             self._run()
+        except ToleranceReached:
+            logger.exception("Disconnect tolerance reached")
+            raise
         except:
             logger.exception("Unexpected error while receiving data, closing")
+        finally:
             self.close()
 
     def _run(self):
@@ -172,17 +181,27 @@ class SpeadReceiver(object):
             for stream in list(self._streams):
                 try:
                     heap = stream.get()
+                    if heap.is_end_of_stream():
+                        stream.stop()
+                        self._streams.remove(stream)
+                        continue
                     heaps.append(heap)
+
                 except spead2.Stopped:
+                    self._num_stream_disconnect += 1
+                    tolerance = int((self._num_stream_disconnect/self._num_stream)*100.)
+                    logger.warning("Signal stream disconnected")
                     stream.stop()
                     self._streams.remove(stream)
+
+                    if tolerance == 0 or tolerance > self._disconnect_tolerance:
+                        for end_stream in list(self._streams):
+                            end_stream.stop()
+                        raise ToleranceReached()
 
             if len(self._streams) == 0:
                 running = False
                 continue
-
-            if len(heaps) != self._num_stream:
-                raise Exception('Number of streams does not match heaps read')
 
             logger.info("Putting corresponding heaps together")
             datum = []

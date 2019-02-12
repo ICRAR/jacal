@@ -11,11 +11,14 @@ import oskar
 from spead_send import SpeadSender
 
 
-logger = logging.getLogger("ingest")
-logger.addHandler(logging.StreamHandler(stream=sys.stdout))
-logger.setLevel(logging.DEBUG)
-
 def main():
+    try:
+        from mpi4py import MPI
+    except:
+        pass
+
+    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+
     parser = argparse.ArgumentParser(description='Run Averager.')
     parser.add_argument('--conf', dest='conf', required=True,
                         help='spead configuration json file.')
