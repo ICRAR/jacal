@@ -13,8 +13,6 @@ from spead_send import SpeadSender
 
 
 logger = logging.getLogger("ingest")
-logger.addHandler(logging.StreamHandler(stream=sys.stdout))
-logger.setLevel(logging.DEBUG)
 
 
 def _get_receiver_host(queue_host='sdp-dfms.ddns.net', queue_port=8096):
@@ -34,6 +32,8 @@ def main():
     parser = argparse.ArgumentParser(description='Run Averager.')
     parser.add_argument('--conf', dest='conf', required=True,
                         help='spead configuration json file.')
+
+    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
     from mpi4py import MPI
     args = parser.parse_args()

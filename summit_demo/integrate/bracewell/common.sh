@@ -13,12 +13,13 @@ function load_common {
 }
 
 function print_usage {
-	echo "$0 [-V venv-root] [-o output-dir] [-h/-?]"
+	echo "$0 [-V venv-root] [-o output-dir] [-a apps_rootdir] [-h/-?]"
 }
 
 venv=$VIRTUAL_ENV
 outdir=.
-while getopts "V:o:" opt
+apps_rootdir=
+while getopts "V:o:a:" opt
 do
 	case "$opt" in
 		h?)
@@ -30,6 +31,9 @@ do
 			;;
 		o)
 			outdir="$OPTARG"
+			;;
+		a)
+			apps_rootdir="$OPTARG"
 			;;
 		*)
 			exit 1
