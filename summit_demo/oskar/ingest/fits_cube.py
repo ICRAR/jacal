@@ -47,19 +47,26 @@ def header_size_obj(fits_input_obj):
     return num_bytes
 
 
-def modify_header(fits_file, key, value):
+def format_card(key, value):
+    if len(key) > 8:
+        raise Exception('key is too long')
+
     if isinstance(value, str):
         val = "'{0}'".format(str(value))
-        entry = "{0}  = {1}".format(key, val)
+        val_white_space = [' ']
     else:
+        val = value
         if isinstance(value, float):
             val = eformat(value, 12, 2)
-        else:
-            val = value
-        white_space = [' ']*(21 - len(str(val)))
-        entry = "{0}  ={1}{2}".format(key, ''.join(white_space), val)
+        val_white_space = [' ']*(21-len(str(val)))
 
-    row_bytes = bytes(entry.encode('ascii')) + bytes([0x20]*(80-len(entry)))
+    key_white_space = [' ']*(8-len(key))
+    entry = "{0}{1}={2}{3}".format(key, ''.join(key_white_space), ''.join(val_white_space), val)
+    return bytes(entry.encode('ascii')) + bytes([0x20]*(80-len(entry)))
+
+
+def modify_header(fits_file, key, value):
+    row_bytes = format_card(key, value)
     read_bytes = 0
 
     with open(fits_file, 'rb+') as fits_input_obj:
@@ -72,6 +79,34 @@ def modify_header(fits_file, key, value):
             if row.startswith(key):
                 fits_input_obj.seek(read_bytes)
                 fits_input_obj.write(row_bytes)
+                break
+
+            read_bytes += 80
+
+
+def insert_header(fits_file, key, value):
+    row_bytes = format_card(key, value)
+    read_bytes = 0
+
+    with open(fits_file, 'rb+') as fits_input_obj:
+        while True:
+            row = fits_input_obj.read(80).decode('ascii')
+
+            # if entry already exists then ignore it
+            if row.startswith(key):
+                break
+
+            if row.replace(' ', '') == 'END':
+                remain = fits_input_obj.tell() % 2880
+                # TODO: extend header if needed, just except if there is not enough space for now
+                if remain < 160:
+                    raise Exception('Not enough space in the header to insert')
+
+                fits_input_obj.seek(read_bytes)
+                fits_input_obj.write(row_bytes)
+                end_val = 'END'
+                end = bytes(end_val.encode('ascii')) + bytes([0x20]*(80-len(end_val)))
+                fits_input_obj.write(end)
                 break
 
             read_bytes += 80
@@ -138,3 +173,4 @@ def concat_images(fits_cube_output, fits_image_input):
     modify_header(fits_cube_output, 'NAXIS3', total_channels)
     if delta_freq:
         modify_header(fits_cube_output, 'CDELT3', delta_freq)
+    insert_header(fits_cube_output, 'RESTFREQ', float(1420405751.786))
