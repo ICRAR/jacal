@@ -1,16 +1,16 @@
 #!/bin/bash
-# 
+#
 # OSKAR2 job submission script for parallel GPU usage on summit node
 #
 # Usage: summit-loop.sh
-# Job Submission: jsrun -n1 -a6 -g1 summit-loop.sh
+# Job Submission: jsrun -n1 -a1 -g1 summit-loop.sh
 
 #BSUB -P csc303
 #BSUB -J rialto2-142
 #BSUB -W 00:05
 #BSUB -nnodes 1
-#BSUB --stdio_stdout /gpfs/alpine/csc303/scratch/wangj/data/log/rialto2-142-%J-%I.log
-#BSUB --stdio_stderr /gpfs/alpine/csc303/scratch/wangj/data/log/rialto2-142-%J-%I.err
+#BSUB -o /gpfs/alpine/csc303/scratch/wangj/data/log/rialto2-142-%J-%I.log
+#BSUB -e /gpfs/alpine/csc303/scratch/wangj/data/log/rialto2-142-%J-%I.err
 
 
 # scenario: AA4 telescope config, 1 channel per GPU with 6 GPUs running in parallel
@@ -20,8 +20,8 @@ USE_GPUS="true"
 let "uidx = $GPU_COUNT - 1"
 
 # push some info to stdout showing that the job has started
-echo "SLURMD_NODENAME: <`hostname`>"
-echo "SLURM_ARRAY_TASK_ID: <${LSB_JOBINDEX}>"
+echo "LSB_NODENAME: <`hostname`>"
+echo "LSB_ARRAY_TASK_ID: <${LSB_JOBINDEX}>"
 echo "CUDA_VISIBLE_DEVICES: <${CUDA_VISIBLE_DEVICES}>"
 #echo "all SLURM_* variables:"
 #env | grep -i slurm[_d]
@@ -68,61 +68,53 @@ for fidx in "${SM_NAME[@]}"; do SM_FILE+=("${SKY_DIR}/${fidx}.osm"); done
 
 cd $APP_ROOT
 
+rm summit_erf
+
 for idx in $(seq 0 $uidx) ; do
 
-	# copy template settings files and then customize the copies
-	cp $INTER_INI "${INTER_INI}.${idx}"
-	cp $IMAGER_INI "${IMAGER_INI}.${idx}"
+    # copy template settings files and then customize the copies
+    cp $INTER_INI "${INTER_INI}.${idx}"
+    cp $IMAGER_INI "${IMAGER_INI}.${idx}"
 
-	# patch OSKAR settings to tune workload to given scenario
-	oskar_sim_interferometer --set "${INTER_INI}.${idx}" simulator/double_precision $DOUBLE_PRECISION
-	oskar_sim_interferometer --set "${INTER_INI}.${idx}" simulator/use_gpus $USE_GPUS
-	oskar_sim_interferometer --set "${INTER_INI}.${idx}" simulator/max_sources_per_chunk $MAX_SOURCES_PER_CHUNK
-
-	oskar_sim_interferometer --set "${INTER_INI}.${idx}" observation/phase_centre_ra_deg $PHASE_CENTRE_RA_DEG
-	oskar_sim_interferometer --set "${INTER_INI}.${idx}" observation/phase_centre_dec_deg $PHASE_CENTRE_DEC_DEG
-
-	oskar_sim_interferometer --set "${INTER_INI}.${idx}" observation/num_channels $NUM_CHANNELS
-
-	oskar_sim_interferometer --set "${INTER_INI}.${idx}" observation/start_time_utc "$START_TIME_UTC"
-	oskar_sim_interferometer --set "${INTER_INI}.${idx}" observation/length $OBS_LENGTH
-	oskar_sim_interferometer --set "${INTER_INI}.${idx}" observation/num_time_steps $NUM_TIME_STEPS
-
-	oskar_sim_interferometer --set "${INTER_INI}.${idx}" telescope/pol_mode $POL_MODE
-	oskar_sim_interferometer --set "${INTER_INI}.${idx}" telescope/input_directory $TM_DIR
+    # patch OSKAR settings to tune workload to given scenario
+    oskar_sim_interferometer --set "${INTER_INI}.${idx}" simulator/double_precision $DOUBLE_PRECISION
+    oskar_sim_interferometer --set "${INTER_INI}.${idx}" simulator/use_gpus $USE_GPUS
+    oskar_sim_interferometer --set "${INTER_INI}.${idx}" simulator/max_sources_per_chunk $MAX_SOURCES_PER_CHUNK
+    oskar_sim_interferometer --set "${INTER_INI}.${idx}" observation/phase_centre_ra_deg $PHASE_CENTRE_RA_DEG
+    oskar_sim_interferometer --set "${INTER_INI}.${idx}" observation/phase_centre_dec_deg $PHASE_CENTRE_DEC_DEG
+    oskar_sim_interferometer --set "${INTER_INI}.${idx}" observation/num_channels $NUM_CHANNELS
+    oskar_sim_interferometer --set "${INTER_INI}.${idx}" observation/start_time_utc "$START_TIME_UTC"
+    oskar_sim_interferometer --set "${INTER_INI}.${idx}" observation/length $OBS_LENGTH
+    oskar_sim_interferometer --set "${INTER_INI}.${idx}" observation/num_time_steps $NUM_TIME_STEPS
+    oskar_sim_interferometer --set "${INTER_INI}.${idx}" telescope/pol_mode $POL_MODE
+    oskar_sim_interferometer --set "${INTER_INI}.${idx}" telescope/input_directory $TM_DIR
 
     # make max samples a multiple of the GPUs; 12 is a multiple of 4 (Bracewell) as well as 6 (Summit)
     oskar_sim_interferometer --set "${INTER_INI}.${idx}" interferometer/max_time_samples_per_block 12
-	oskar_sim_interferometer --set "${INTER_INI}.${idx}" interferometer/oskar_vis_filename "${VISNAME}.${idx}"
+    oskar_sim_interferometer --set "${INTER_INI}.${idx}" interferometer/oskar_vis_filename "${VISNAME}.${idx}"
+    oskar_sim_interferometer --set "${INTER_INI}.${idx}" simulator/cuda_device_ids $idx
+    oskar_sim_interferometer --set "${INTER_INI}.${idx}" observation/start_frequency_hz ${START_FREQUENCY_HZ[$idx]}
+    oskar_sim_interferometer --set "${INTER_INI}.${idx}" observation/frequency_inc_hz ${FREQUENCY_INC_HZ}
+    oskar_sim_interferometer --set "${INTER_INI}.${idx}" sky/oskar_sky_model/file ${SM_FILE[$idx]}
 
-	oskar_sim_interferometer --set "${INTER_INI}.${idx}" simulator/cuda_device_ids $idx
-	oskar_sim_interferometer --set "${INTER_INI}.${idx}" observation/start_frequency_hz ${START_FREQUENCY_HZ[$idx]}
-	oskar_sim_interferometer --set "${INTER_INI}.${idx}" observation/frequency_inc_hz ${FREQUENCY_INC_HZ}
-	oskar_sim_interferometer --set "${INTER_INI}.${idx}" sky/oskar_sky_model/file ${SM_FILE[$idx]}
+    # FITS image settings
+    oskar_imager --set "${IMAGER_INI}.${idx}" image/double_precision $DOUBLE_PRECISION
+    oskar_imager --set "${IMAGER_INI}.${idx}" image/use_gpus $USE_GPUS
+    oskar_imager --set "${IMAGER_INI}.${idx}" image/fov_deg $FOV_DEG
+    oskar_imager --set "${IMAGER_INI}.${idx}" image/size $IMG_SIZE
+    oskar_imager --set "${IMAGER_INI}.${idx}" image/channel_snapshots $CHANNEL_SNAPSHOTS
+    oskar_imager --set "${IMAGER_INI}.${idx}" image/input_vis_data "${VISNAME}.${idx}"
+    oskar_imager --set "${IMAGER_INI}.${idx}" image/root_path "$FITSROOT.${idx}"
 
-	# FITS image settings
-	oskar_imager --set "${IMAGER_INI}.${idx}" image/double_precision $DOUBLE_PRECISION
-	oskar_imager --set "${IMAGER_INI}.${idx}" image/use_gpus $USE_GPUS
-	oskar_imager --set "${IMAGER_INI}.${idx}" image/fov_deg $FOV_DEG
-	oskar_imager --set "${IMAGER_INI}.${idx}" image/size $IMG_SIZE
-	oskar_imager --set "${IMAGER_INI}.${idx}" image/channel_snapshots $CHANNEL_SNAPSHOTS
-	oskar_imager --set "${IMAGER_INI}.${idx}" image/input_vis_data "${VISNAME}.${idx}"
-	oskar_imager --set "${IMAGER_INI}.${idx}" image/root_path "$FITSROOT.${idx}"
-
-	# run simulator
-!!#	jsrun -n1 -a1 -g1 oskar_sim_interferometer "${INTER_INI}.${idx}" &
-	oskar_sim_interferometer "${INTER_INI}.${idx}" &
+    echo "app 0: oskar_sim_interferometer \"\${INTER_INI}.\${idx}\"" >> summit_erf
 done
 
 
-# wait for OSKAR instances to terminate
-wait
+# run simulator
+jsrun -n1 -a1 -g1 oskar_sim_interferometer "${INTER_INI}.0" : -n1 -a1 -g1 oskar_sim_interferometer "${INTER_INI}.1" : -n1 -a1 -g1 oskar_sim_interferometer "${INTER_INI}.2" : -n1 -a1 -g1 oskar_sim_interferometer "${INTER_INI}.3" : -n1 -a1 -g1 oskar_sim_interferometer "${INTER_INI}.4" : -n1 -a1 -g1 oskar_sim_interferometer "${INTER_INI}.5"
 
 # create image preview
-for idx in $(seq 0 $uidx) ; do
-!!#	jsrun -n1 -a1 -g1 oskar_imager "${IMAGER_INI}.${idx}"
-	oskar_imager "${IMAGER_INI}.${idx}"
-done
+jsrun -n1 -a1 -g1 oskar_imager "${IMAGER_INI}.0" : -n1 -a1 -g1 oskar_imager "${IMAGER_INI}.1" : -n1 -a1 -g1 oskar_imager "${IMAGER_INI}.2" : -n1 -a1 -g1 oskar_imager "${IMAGER_INI}.3" : -n1 -a1 -g1 oskar_imager "${IMAGER_INI}.4" : -n1 -a1 -g1 oskar_imager "${IMAGER_INI}.5" :
 
 
 # show visibility volume

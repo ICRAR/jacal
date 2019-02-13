@@ -3,6 +3,9 @@
 #BSUB -J rialto2-142
 #BSUB -W 00:05
 #BSUB -nnodes 1
+#BSUB -o /gpfs/alpine/csc303/scratch/wangj/data/log/rialto2-142-%J-%I.log
+#BSUB -e /gpfs/alpine/csc303/scratch/wangj/data/log/rialto2-142-%J-%I.err
+
 
 # scenario name to pick up custom config
 SCENARIO="rialto2-142"
@@ -19,7 +22,7 @@ echo "CUDA_VISIBLE_DEVICES: <${CUDA_VISIBLE_DEVICES}>"
 #env | grep -i slurm[_d]
 
 idx=$LSB_JOBINDEX
-let "gpuidx = 0"
+let "gpuidx = 0,1,2,3,4,5"
 
 # directory setup
 APP_ROOT="/gpfs/alpine/csc303/scratch/wangj/jacal"
@@ -85,7 +88,7 @@ oskar_sim_interferometer --set "${INTER_INI}.${idx}" telescope/input_directory $
 
 oskar_sim_interferometer --set "${INTER_INI}.${idx}" interferometer/oskar_vis_filename "${VISNAME}.${idx}"
 
-oskar_sim_interferometer --set "${INTER_INI}.${idx}" simulator/cuda_device_ids $gpuidx
+oskar_sim_interferometer --set "${INTER_INI}.${idx}" simulator/cuda_device_ids 0
 oskar_sim_interferometer --set "${INTER_INI}.${idx}" observation/start_frequency_hz ${START_FREQUENCY_HZ[$idx]}
 oskar_sim_interferometer --set "${INTER_INI}.${idx}" observation/frequency_inc_hz ${FREQUENCY_INC_HZ}
 oskar_sim_interferometer --set "${INTER_INI}.${idx}" sky/oskar_sky_model/file ${SM_FILE[$idx]}
@@ -100,7 +103,8 @@ oskar_imager --set "${IMAGER_INI}.${idx}" image/input_vis_data "${VISNAME}.${idx
 oskar_imager --set "${IMAGER_INI}.${idx}" image/root_path "$FITSROOT.${idx}"
 
 # run simulator followed by imager
-jsrun -n1 -a1 -g1 oskar_sim_interferometer "${INTER_INI}.${idx}" && oskar_imager "${IMAGER_INI}.${idx}" &
+jsrun -n1 -a1 -g1 oskar_sim_interferometer ${INTER_INI}.${idx}
+jsrun -n1 -a1 oskar_imager ${IMAGER_INI}.${idx}
 
 # sync
 wait
