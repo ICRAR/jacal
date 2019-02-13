@@ -116,6 +116,8 @@ class SpeadReceiver(object):
             stream.stop()
         if self.as_relay:
             self._relay_stream = None
+        if self._measurement_set:
+            self._measurement_set = None
 
     def _create_heaps(self, num_baselines):
         # Create SPEAD heap items based on content of the visibility block.
