@@ -115,10 +115,12 @@ class SpeadReceiver(object):
         for stream in list(self._streams):
             stream.stop()
         if self._relay_stream:
+            logger.info("Sending end-of-stream heap through relay stream")
             stream, item_group = self._relay_stream
             stream.send_heap(item_group.get_end())
             self._relay_stream = None
         if self._measurement_set:
+            logger.info("Closing measurement set %s", self._file_name)
             self._measurement_set = None
 
     def _create_heaps(self, num_baselines):
@@ -186,6 +188,7 @@ class SpeadReceiver(object):
                 try:
                     heap = stream.get()
                     if heap.is_end_of_stream():
+                        logger.info("Successfully reached end of stream")
                         stream.stop()
                         self._streams.remove(stream)
                         continue
