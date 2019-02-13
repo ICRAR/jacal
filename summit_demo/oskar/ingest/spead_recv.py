@@ -114,7 +114,9 @@ class SpeadReceiver(object):
     def close(self):
         for stream in list(self._streams):
             stream.stop()
-        if self.as_relay:
+        if self._relay_stream:
+            stream, item_group = self._relay_stream
+            stream.send_heap(item_group.get_end())
             self._relay_stream = None
         if self._measurement_set:
             self._measurement_set = None
