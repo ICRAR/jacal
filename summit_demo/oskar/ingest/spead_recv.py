@@ -37,10 +37,11 @@ def parse_baseline_file(baseline_file):
 class SpeadReceiver(object):
     # Receives visibility data using SPEAD and writes it to a Measurement Set.
 
-    def __init__(self, spead_config, disconnect_tolerance=0):
+    def __init__(self, spead_config, disconnect_tolerance=0, mpi_comm=None):
         self._streams = []
         self._ports = []
         self.use_adios2 = spead_config['use_adios2']
+        self.mpi_comm = mpi_comm
         self._num_stream = len(spead_config['streams'])
         self._num_stream_disconnect = 0
         self._disconnect_tolerance = disconnect_tolerance
@@ -276,7 +277,8 @@ class SpeadReceiver(object):
                             self._file_name, data['num_stations'],
                             data['num_channels'], data['num_pols'],
                             data['freq_start_hz'], data['freq_inc_hz'],
-                            self._baseline_map, use_adios2=self.use_adios2)
+                            self._baseline_map, use_adios2=self.use_adios2,
+                            mpi_comm=self.mpi_comm)
 
                         self._measurement_set.set_phase_centre(
                             math.radians(data['phase_centre_ra_deg']),

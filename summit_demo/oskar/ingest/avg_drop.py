@@ -7,6 +7,7 @@ import time
 from multiprocessing import Lock
 from threading import Thread
 
+import dlg
 from dlg.drop import AppDROP, BarrierAppDROP
 from dlg.ddap_protocol import AppDROPStates
 from dlg import utils
@@ -80,7 +81,7 @@ class AveragerSinkDrop(AppDROP):
                 if (self.use_aws_ip):
                    register_my_ip(self.name)
                 self.config['output_ms'] = self.outputs[0].path
-                self.recv = SpeadReceiver(self.config, self.disconnect_tolerance)
+                self.recv = SpeadReceiver(self.config, self.disconnect_tolerance, dlg.mpi_comm)
                 self.recv_thread = Thread(target=self._run)
                 self.recv_thread.start()
                 self.start = True
