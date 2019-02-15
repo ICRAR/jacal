@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --gres=gpu:4
+#SBATCH --gres=gpu:2
 #SBATCH --mem=2g
 
 # Common start
