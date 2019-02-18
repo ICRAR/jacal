@@ -62,6 +62,8 @@ def format_card(key, value):
 
     key_white_space = [' ']*(8-len(key))
     entry = "{0}{1}={2}{3}".format(key, ''.join(key_white_space), ''.join(val_white_space), val)
+    if len(entry) > 80:
+        raise Exception('card > 80 bytes')
     return bytes(entry.encode('ascii')) + bytes([0x20]*(80-len(entry)))
 
 
@@ -99,7 +101,7 @@ def insert_header(fits_file, key, value):
             if row.replace(' ', '') == 'END':
                 remain = fits_input_obj.tell() % 2880
                 # TODO: extend header if needed, just except if there is not enough space for now
-                if remain < 160:
+                if remain < 80:
                     raise Exception('Not enough space in the header to insert')
 
                 fits_input_obj.seek(read_bytes)
