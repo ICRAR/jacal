@@ -48,10 +48,10 @@ for start_f in start_freq:
     cmd.append('oskar_sim_interferometer --set demo.ini sky/oskar_sky_model/file '+use_model)
     cmd.append('oskar_sim_interferometer --set demo.ini interferometer/ms_filename output/demo_f%08.4f.ms'%(start_f))
     cmd.append('oskar_sim_interferometer demo.ini')
-    print '%d "'%(IdCount),
+    #print '%d "'%(IdCount),
     for line in cmd:
       print '%s;'%(line),
-    print '"'
+    print #'"'
     IdCount=IdCount+1
 
 
