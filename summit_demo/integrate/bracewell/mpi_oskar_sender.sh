@@ -1,8 +1,5 @@
 #!/bin/bash
 
-#SBATCH --gres=gpu:2
-#SBATCH --mem=2g
-
 # Common start
 this_dir=`eval "cd \$(dirname $0); echo \$PWD; cd \$OLDPWD"`
 . $this_dir/common.sh

@@ -20,7 +20,8 @@ while true; do
 	echo "AWS queue not empty yet (just removed $queue_item out of it), draining will continue"
 done
 
+gpus_per_node=2
 jid1=`sbatch --ntasks-per-node=1 -o "$outdir"/dlg_receiver.log -N 2 -t 00:30:00 --parsable -J dlg_receiver $this_dir/dlg_receiver.sh -V "$venv" -o "$outdir" -a "$apps_rootdir" -g ${logical_graph}`
 echo Receiver job ID: $jid1
-jid2=`sbatch --ntasks-per-node=2 -o "$outdir"/mpi_sender.log -N 1 -t 00:10:00 --parsable --dependency=after:$jid1 -J mpi_sender $this_dir/mpi_oskar_sender.sh -V "$venv" -o "$outdir" -a "$apps_rootdir"`
+jid2=`sbatch --ntasks-per-node=${gpus_per_node} -o "$outdir"/mpi_sender.log -N 1 -t 00:10:00 --parsable --dependency=after:$jid1 --gres=gpu:${gpus_per_node} -J mpi_sender $this_dir/mpi_oskar_sender.sh -V "$venv" -o "$outdir" -a "$apps_rootdir"`
 echo Sender job ID: $jid2
