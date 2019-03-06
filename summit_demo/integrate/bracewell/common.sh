@@ -29,7 +29,11 @@ venv=$VIRTUAL_ENV
 outdir=`abspath .`
 logical_graph=
 apps_rootdir=
-while getopts "V:o:a:g:" opt
+gpus_per_node=2
+sender_nodes=1
+receiver_nodes=3
+
+while getopts "V:o:a:g:G:S:r:" opt
 do
 	case "$opt" in
 		h?)
@@ -47,6 +51,15 @@ do
 			;;
 		g)
 			logical_graph="`abspath $OPTARG`"
+			;;
+		G)
+			gpus_per_node="$OPTARG"
+			;;
+		S)
+			sender_nodes="$OPTARG"
+			;;
+		r)
+			receiver_nodes="$OPTARG"
 			;;
 		*)
 			exit 1
