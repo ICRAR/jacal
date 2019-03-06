@@ -271,7 +271,14 @@ class SpeadReceiver(object):
                         raise Exception('User baseline map != simulation baseline count {} != {}'
                                         .format(supplied_baseline_count, self._header['num_baselines']))
 
-                    logger.info('Creating Measurement Set under %s', self._file_name)
+                    msg = 'Creating standard MS under %s'
+                    args = self._file_name,
+                    if self.use_adios2:
+                        msg = 'Creating ADIOS2 MS from rank %d/%d (comm=%s) under %s'
+                        args = (self.mpi_comm.Get_rank() + 1, self.mpi_comm.Get_size(),
+                                self.mpi_comm.Get_name(), self._file_name)
+                    logger.info(msg, *args)
+
                     if self._measurement_set is None:
                         self._measurement_set = oskar.MeasurementSet.create(
                             self._file_name, data['num_stations'],
