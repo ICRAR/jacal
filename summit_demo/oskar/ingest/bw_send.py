@@ -44,11 +44,13 @@ def main():
     with open(conf) as f:
         spead_config = json.load(f)
 
-    host = _get_receiver_host()
-    if host != 'NULL':
+    endpoint = _get_receiver_host()
+    if endpoint != 'NULL':
         old_host = spead_config['stream']['host']
+        host, port = endpoint.split(':')
         spead_config['stream']['host'] = host
-        logger.info("Ignore the host %s in JSON, use new host %s instead" % (old_host, host))
+        spead_config['stream']['port'] = int(port)
+        logger.info("Ignore the host %s in JSON, use new endpoint %s instead" % (old_host, endpoint))
 
     # Load the OSKAR settings INI file for the application.
     ini_path = osp.join(app_root, spead_config["simulation"])

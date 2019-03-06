@@ -22,13 +22,13 @@ logger = logging.getLogger(__name__)
 def get_ip_via_netifaces(loc=''):
     return utils.get_local_ip_addr()[1][0]
 
-def register_my_ip(mydrop_name):
+def register_my_ip(mydrop_name, port):
      # register IP address for sender/relay receiver to use (we hardcode port for now, thus one sender one receiver pair)
     public_ip = get_ip_via_netifaces()
     ip_adds = '{0}{1}'.format(public_ip, "")
-    origin_ip = ip_adds.split(',')[0]
-    logger.info('%s Register IP address %s to AWS' % (mydrop_name, origin_ip))
-    cmd_ip='curl http://sdp-dfms.ddns.net:8096/reg_receiver?ip=%s' % origin_ip
+    endpoint = '%s:%d' % (ip_adds.split(',')[0], port)
+    logger.info('%s Register IP address %s to AWS' % (mydrop_name, endpoint))
+    cmd_ip='curl http://sdp-dfms.ddns.net:8096/reg_receiver?ip=%s' % endpoint
     os.system(cmd_ip)
 
 def _get_receiver_host(queue_host='sdp-dfms.ddns.net', queue_port=8096):
@@ -79,7 +79,7 @@ class AveragerSinkDrop(AppDROP):
             if self.start is False:
                 logger.info("AveragerSinkDrop SpeadReceiver")
                 if (self.use_aws_ip):
-                   register_my_ip(self.name)
+                   register_my_ip(self.name, self.config['streams'][0]['port'])
                 self.config['output_ms'] = self.outputs[0].path
                 self.recv = SpeadReceiver(self.config, self.disconnect_tolerance, dlg.mpi_comm)
                 self.recv_thread = Thread(target=self._run)
@@ -118,6 +118,15 @@ class AveragerRelayDrop(BarrierAppDROP):
         if self.config['as_relay'] == 0:
             raise Exception('Not running as a relay configuration.')
 
+        # Misuse translator-generated drop uid to generate unique set of ports
+        # for these drops, which sit within a "scatter" LG component, and therefore
+        # get a final "/n" suffix different for each instantiation
+        offset = int(self.uid.split('/')[-1])
+        n_streams = int(kwargs.get('n_streams', 6))
+        base_port = int(kwargs.get('base_port', 41000)) + n_streams * offset
+        self.recv_ports = [base_port + i for i in range(n_streams)]
+        logger.info("Will receive %d streams in TCP ports %r", n_streams, self.recv_ports)
+
         self.use_aws_ip = bool(kwargs.get('use_aws_ip', 1))
         self.disconnect_tolerance = int(kwargs.get('disconnect_tolerance', 0))
         super(AveragerRelayDrop, self).initialize(**kwargs)
@@ -130,19 +139,21 @@ class AveragerRelayDrop(BarrierAppDROP):
         logger.debug("AveragerSinkDrop started")
 
         if (self.use_aws_ip):
-            host = _get_receiver_host()
-            if host != 'NULL':
+            endpoint = _get_receiver_host()
+            if endpoint != 'NULL':
                 old_host = self.config['relay']['stream']['host']
+                host, port = endpoint.split(':')
                 self.config['relay']['stream']['host'] = host
-                logger.info("Ignore the host %s in JSON, relay to %s instead" % (old_host, host))
+                self.config['relay']['stream']['port'] = int(port)
+                logger.info("Ignore the host %s in JSON, relay to %s instead" % (old_host, endpoint))
             else:
                 raise Exception("Could not get AveragerSinkDrop IP from AWS!")
             # registering my IP for sender too
-            for _ in self.config['streams']:
-                register_my_ip(self.name)
+            for port in self.recv_ports:
+                register_my_ip(self.name, port)
 
         logger.info("AveragerRelayDrop Starting")
-        self.recv = SpeadReceiver(self.config, self.disconnect_tolerance)
+        self.recv = SpeadReceiver(self.config, self.disconnect_tolerance, ports=self.recv_ports)
         self.recv.run()
         self.recv.close()
         # self.recv_thread = Thread(target=self.recv.run)
