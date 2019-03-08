@@ -1,11 +1,5 @@
 #!/bin/bash
 
-# Common start
-cmd="cd \$(dirname $0); echo \$PWD; cd \$OLDPWD"
-this_dir=`eval "$cmd"`
-
-. $this_dir/common.sh
-
 apps_rootdir="`abspath $this_dir/../../oskar/ingest`"
 outdir="$outdir/`date -u +%Y-%m-%dT%H-%M-%S`"
 mkdir -p "$outdir"
