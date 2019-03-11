@@ -15,14 +15,13 @@
 
 # scenario: AA4 telescope config, 1 channel per GPU with 6 GPUs running in parallel
 SCENARIO="rialto2-142"
-GPU_COUNT=2
+GPU_COUNT=1
 USE_GPUS="true"
-let "uidx = $GPU_COUNT - 1"
+
+let "gcount = $GPU_COUNT - 1"
 
 # push some info to stdout showing that the job has started
 echo "LSB_NODENAME: <`hostname`>"
-
-idx=$LSB_JOBINDEX
 
 # directory setup
 APP_ROOT="/gpfs/alpine/csc303/scratch/wangj/jacal"
@@ -47,7 +46,6 @@ NUM_TIME_STEPS=1000
 START_FREQUENCY_HZ=(210000000 211000000 212000000 213000000 214000000 215000000)
 NUM_CHANNELS=1
 FREQUENCY_INC_HZ=1000000
-#SM_NAME=$SCENARIO
 POL_MODE="Full"
 IMG_SIZE=512
 FOV_DEG=6
@@ -58,91 +56,82 @@ PHASE_CENTRE_RA_DEG="201"
 PHASE_CENTRE_DEC_DEG="-44"
 MAX_SOURCES_PER_CHUNK=50000
 SKY_DIR=${SKY_DIR}/EOR
-#SM_NAME=("sky_eor_model_f210.12" "sky_eor_model_f211.13" "sky_eor_model_f212.16" "sky_eor_model_f213.19" "sky_eor_model_f214.24" "sky_eor_model_f215.03")
-SM_NAME=("sky_eor_model_f210.12" "sky_eor_model_f210.12" "sky_eor_model_f212.16" "sky_eor_model_f213.19" "sky_eor_model_f214.24" "sky_eor_model_f215.03")
+SM_NAME=("sky_eor_model_f210.12" "sky_eor_model_f211.13" "sky_eor_model_f212.16" "sky_eor_model_f213.19" "sky_eor_model_f214.24" "sky_eor_model_f215.03")
 SM_FILE=()
 for fidx in "${SM_NAME[@]}"; do SM_FILE+=("${SKY_DIR}/${fidx}.osm"); done
 
 cd $APP_ROOT
 
-rm -f summit_simulator_erf
-rm -f summit_imager_erf
-
-for idx in $(seq 0 $uidx) ; do
+for gidx in $(seq 0 $gcount) ; do
 
     # copy template settings files and then customize the copies
-    cp $INTER_INI "${INTER_INI}.${idx}"
-    cp $IMAGER_INI "${IMAGER_INI}.${idx}"
+    cp $INTER_INI "${INTER_INI}.${LSB_JOBID}.${gidx}"
+    cp $IMAGER_INI "${IMAGER_INI}.${LSB_JOBID}.${gidx}"
 
     # patch OSKAR settings to tune workload to given scenario
-    oskar_sim_interferometer --set "${INTER_INI}.${idx}" simulator/double_precision $DOUBLE_PRECISION
-    oskar_sim_interferometer --set "${INTER_INI}.${idx}" simulator/use_gpus $USE_GPUS
-    oskar_sim_interferometer --set "${INTER_INI}.${idx}" simulator/max_sources_per_chunk $MAX_SOURCES_PER_CHUNK
-    oskar_sim_interferometer --set "${INTER_INI}.${idx}" observation/phase_centre_ra_deg $PHASE_CENTRE_RA_DEG
-    oskar_sim_interferometer --set "${INTER_INI}.${idx}" observation/phase_centre_dec_deg $PHASE_CENTRE_DEC_DEG
-    oskar_sim_interferometer --set "${INTER_INI}.${idx}" observation/num_channels $NUM_CHANNELS
-    oskar_sim_interferometer --set "${INTER_INI}.${idx}" observation/start_time_utc "$START_TIME_UTC"
-    oskar_sim_interferometer --set "${INTER_INI}.${idx}" observation/length $OBS_LENGTH
-    oskar_sim_interferometer --set "${INTER_INI}.${idx}" observation/num_time_steps $NUM_TIME_STEPS
-    oskar_sim_interferometer --set "${INTER_INI}.${idx}" telescope/pol_mode $POL_MODE
-    oskar_sim_interferometer --set "${INTER_INI}.${idx}" telescope/input_directory $TM_DIR
+    oskar_sim_interferometer --set "${INTER_INI}.${LSB_JOBID}.${gidx}" simulator/double_precision $DOUBLE_PRECISION
+    oskar_sim_interferometer --set "${INTER_INI}.${LSB_JOBID}.${gidx}" simulator/use_gpus $USE_GPUS
+    oskar_sim_interferometer --set "${INTER_INI}.${LSB_JOBID}.${gidx}" simulator/max_sources_per_chunk $MAX_SOURCES_PER_CHUNK
+    oskar_sim_interferometer --set "${INTER_INI}.${LSB_JOBID}.${gidx}" observation/phase_centre_ra_deg $PHASE_CENTRE_RA_DEG
+    oskar_sim_interferometer --set "${INTER_INI}.${LSB_JOBID}.${gidx}" observation/phase_centre_dec_deg $PHASE_CENTRE_DEC_DEG
+    oskar_sim_interferometer --set "${INTER_INI}.${LSB_JOBID}.${gidx}" observation/num_channels $NUM_CHANNELS
+    oskar_sim_interferometer --set "${INTER_INI}.${LSB_JOBID}.${gidx}" observation/start_time_utc "$START_TIME_UTC"
+    oskar_sim_interferometer --set "${INTER_INI}.${LSB_JOBID}.${gidx}" observation/length $OBS_LENGTH
+    oskar_sim_interferometer --set "${INTER_INI}.${LSB_JOBID}.${gidx}" observation/num_time_steps $NUM_TIME_STEPS
+    oskar_sim_interferometer --set "${INTER_INI}.${LSB_JOBID}.${gidx}" telescope/pol_mode $POL_MODE
+    oskar_sim_interferometer --set "${INTER_INI}.${LSB_JOBID}.${gidx}" telescope/input_directory $TM_DIR
 
     # make max samples a multiple of the GPUs; 12 is a multiple of 4 (Bracewell) as well as 6 (Summit)
-    oskar_sim_interferometer --set "${INTER_INI}.${idx}" interferometer/max_time_samples_per_block 12
-    oskar_sim_interferometer --set "${INTER_INI}.${idx}" interferometer/oskar_vis_filename ${VISNAME}.${idx}
-    oskar_sim_interferometer --set "${INTER_INI}.${idx}" simulator/cuda_device_ids $idx
-    oskar_sim_interferometer --set "${INTER_INI}.${idx}" observation/start_frequency_hz ${START_FREQUENCY_HZ[$idx]}
-    oskar_sim_interferometer --set "${INTER_INI}.${idx}" observation/frequency_inc_hz ${FREQUENCY_INC_HZ}
-    oskar_sim_interferometer --set "${INTER_INI}.${idx}" sky/oskar_sky_model/file ${SM_FILE[$idx]}
+    oskar_sim_interferometer --set "${INTER_INI}.${LSB_JOBID}.${gidx}" interferometer/max_time_samples_per_block 12
+    oskar_sim_interferometer --set "${INTER_INI}.${LSB_JOBID}.${gidx}" interferometer/oskar_vis_filename ${VISNAME}.${LSB_JOBID}.${gidx}
+    oskar_sim_interferometer --set "${INTER_INI}.${LSB_JOBID}.${gidx}" simulator/cuda_device_ids 0
+    oskar_sim_interferometer --set "${INTER_INI}.${LSB_JOBID}.${gidx}" observation/start_frequency_hz ${START_FREQUENCY_HZ[$gidx]}
+    oskar_sim_interferometer --set "${INTER_INI}.${LSB_JOBID}.${gidx}" observation/frequency_inc_hz ${FREQUENCY_INC_HZ}
+    oskar_sim_interferometer --set "${INTER_INI}.${LSB_JOBID}.${gidx}" sky/oskar_sky_model/file ${SM_FILE[$gidx]}
 
     # FITS image settings
-    oskar_imager --set "${IMAGER_INI}.${idx}" image/double_precision $DOUBLE_PRECISION
-    oskar_imager --set "${IMAGER_INI}.${idx}" image/use_gpus $USE_GPUS
-    oskar_imager --set "${IMAGER_INI}.${idx}" image/fov_deg $FOV_DEG
-    oskar_imager --set "${IMAGER_INI}.${idx}" image/size $IMG_SIZE
-    oskar_imager --set "${IMAGER_INI}.${idx}" image/channel_snapshots $CHANNEL_SNAPSHOTS
-    oskar_imager --set "${IMAGER_INI}.${idx}" image/input_vis_data ${VISNAME}.${idx}
-    oskar_imager --set "${IMAGER_INI}.${idx}" image/root_path $FITSROOT.${idx}
+    oskar_imager --set "${IMAGER_INI}.${LSB_JOBID}.${gidx}" image/double_precision $DOUBLE_PRECISION
+    oskar_imager --set "${IMAGER_INI}.${LSB_JOBID}.${gidx}" image/use_gpus $USE_GPUS
+    oskar_imager --set "${IMAGER_INI}.${LSB_JOBID}.${gidx}" image/fov_deg $FOV_DEG
+    oskar_imager --set "${IMAGER_INI}.${LSB_JOBID}.${gidx}" image/size $IMG_SIZE
+    oskar_imager --set "${IMAGER_INI}.${LSB_JOBID}.${gidx}" image/channel_snapshots $CHANNEL_SNAPSHOTS
+    oskar_imager --set "${IMAGER_INI}.${LSB_JOBID}.${gidx}" image/input_vis_data ${VISNAME}.${LSB_JOBID}.${gidx}
+    oskar_imager --set "${IMAGER_INI}.${LSB_JOBID}.${gidx}" image/root_path $FITSROOT.${LSB_JOBID}.${gidx}
 
-    echo "app ${idx}: oskar_sim_interferometer ${INTER_INI}.${idx}" >> summit_simulator_erf
-    echo "app ${idx}: oskar_imager ${IMAGER_INI}.${idx}" >> summit_imager_erf
+    echo "app ${gidx}: oskar_sim_interferometer ${INTER_INI}.${LSB_JOBID}.${gidx}" >> summit_simulator_erf.${LSB_JOBID}
+    echo "app ${gidx}: oskar_imager ${IMAGER_INI}.${LSB_JOBID}.${gidx}" >> summit_imager_erf.${LSB_JOBID}
 done
 
+echo "overlapping-rs: warn" >> summit_simulator_erf.${LSB_JOBID}
+echo "overlapping-rs: warn" >> summit_imager_erf.${LSB_JOBID}
 
+echo "oversubscribe_cpu: warn" >> summit_simulator_erf.${LSB_JOBID}
+echo "oversubscribe_cpu: warn" >> summit_imager_erf.${LSB_JOBID}
 
+echo "oversubscribe_mem: allow" >> summit_simulator_erf.${LSB_JOBID}
+echo "oversubscribe_mem: allow" >> summit_imager_erf.${LSB_JOBID}
 
+echo "oversubscribe_gpu: allow" >> summit_simulator_erf.${LSB_JOBID}
+echo "oversubscribe_gpu: allow" >> summit_imager_erf.${LSB_JOBID}
 
-echo "overlapping-rs: warn" >> summit_simulator_erf
-echo "overlapping-rs: warn" >> summit_imager_erf
+echo "launch_distribution : packed" >> summit_simulator_erf.${LSB_JOBID}
+echo "launch_distribution : packed" >> summit_imager_erf.${LSB_JOBID}
 
-echo "oversubscribe_cpu: warn" >> summit_simulator_erf
-echo "oversubscribe_cpu: warn" >> summit_imager_erf
-
-echo "oversubscribe_mem: allow" >> summit_simulator_erf
-echo "oversubscribe_mem: allow" >> summit_imager_erf
-
-echo "oversubscribe_gpu: allow" >> summit_simulator_erf
-echo "oversubscribe_gpu: allow" >> summit_imager_erf
-
-echo "launch_distribution : packed" >> summit_simulator_erf
-echo "launch_distribution : packed" >> summit_imager_erf
-
-for idx in $(seq 0 $uidx) ; do
-    echo "rank: ${idx} : {host: 1; cpu: {${idx}}; gpu :{${idx}} } : app ${idx}" >> summit_simulator_erf
-    echo "rank: ${idx} : {host: 1; cpu: {${idx}}; gpu :{${idx}} } : app ${idx}" >> summit_imager_erf
+for gidx in $(seq 0 $gcount) ; do
+    echo "rank: ${gidx} : {host: 1; cpu: {${gidx}}; gpu :{${gidx}} } : app ${gidx}" >> summit_simulator_erf.${LSB_JOBID}
+    echo "rank: ${gidx} : {host: 1; cpu: {${gidx}}; gpu :{${gidx}} } : app ${gidx}" >> summit_imager_erf.${LSB_JOBID}
 done
 
 # run simulator
-jsrun --erf_input summit_simulator_erf | sort
+jsrun --erf_input summit_simulator_erf.${LSB_JOBID} | sort
 
 # create image preview
-jsrun --erf_input summit_imager_erf | sort
-
+jsrun --erf_input summit_imager_erf.${LSB_JOBID} | sort
 
 # show visibility volume
 echo "Visibility files:"
 ls -l ${VISNAME}.*
 
 # clean up run specific settings files; runtime settings are captured in the OSKAR log
-rm ${INTER_INI}.? ${IMAGER_INI}.?
+rm ${INTER_INI}.${LSB_JOBID}.? ${IMAGER_INI}.${LSB_JOBID}.?
 
