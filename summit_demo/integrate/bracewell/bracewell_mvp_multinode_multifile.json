@@ -378,7 +378,7 @@
                 {
                     "name": "num_of_copies",
                     "text": "Number of copies",
-                    "value": "2"
+                    "value": "4"
                 },
                 {
                     "name": "scatter_axis",
@@ -468,7 +468,7 @@
                 {
                     "name": "Arg02",
                     "text": "Arg02",
-                    "value": "n_streams=2"
+                    "value": "n_streams=1"
                 },
                 {
                     "name": "Arg03",
