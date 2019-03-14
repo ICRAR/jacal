@@ -19,9 +19,9 @@ class TestAverager(unittest.TestCase):
                                               stream_port=51000,
                                               start_freq=210200000,
                                               freq_step=4000,
-                                              num_freq_steps=2,
+                                              num_freq_steps=3,
                                               telescope_model_path='./conf/aa2.tm',
-                                              sky_model_directory="")
+                                              sky_model_file_path="./conf/eor_model_list.csv")
 
         sink = AveragerSinkDrop('2', '2',
                                 stream_listen_port_start=51000,

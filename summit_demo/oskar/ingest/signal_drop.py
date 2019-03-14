@@ -1,4 +1,5 @@
-import tempfile
+import os
+import csv
 import copy
 import logging
 import configparser
@@ -28,9 +29,10 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
         self.num_freq_steps = int(kwargs.get('num_freq_steps'))
         self.use_gpus = int(kwargs.get('use_gpus', 0))
         self.telescope_model_path = kwargs.get('telescope_model_path')
-        self.sky_model_directory = kwargs.get('sky_model_directory')
+        self.sky_model_file_path = kwargs.get('sky_model_file_path')
         self.obs_length = kwargs.get('obs_length', '06:00:00.0')
         self.num_time_steps = int(kwargs.get('num_time_steps', 5))
+        self.use_adios = int(kwargs.get('use_adios', 0))
 
         # SPEAD send config template
         self.spead_send_conf = {
@@ -64,7 +66,7 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
             "as_relay": 1,
             "output_ms": "",
             "baseline_map_filename": "",
-            "use_adios2": 0,
+            "use_adios2": self.use_adios,
 
             "relay":
                 {
@@ -101,7 +103,7 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
                     },
                 "sky":
                     {
-                        "oskar_sky_model/file": "./conf/sky_eor_model_f210.12.osm"
+                        "oskar_sky_model/file": ""
                     },
                 "observation":
                     {
@@ -127,16 +129,28 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
         self.spead_send = []
         self.spead_avg_local = []
 
+        sky_model_file_list = self._load_sky_model_file_list(self.sky_model_file_path)
+
         for i in range(self.num_freq_steps):
             # creating N number of oskar and spead send configs
             spead_conf = copy.deepcopy(self.spead_send_conf)
             spead_conf["stream"]["port"] = 41000+i
 
+            freq = self.start_freq+(self.freq_step*i)
             oskar_conf = copy.deepcopy(self.oskar_conf)
-            oskar_conf["observation"]["start_frequency_hz"] = self.start_freq+(self.freq_step*i)
+            oskar_conf["observation"]["start_frequency_hz"] = freq
             oskar_conf["observation"]["frequency_inc_hz"] = self.freq_step
             oskar_conf["simulator"]["cuda_device_ids"] = i
             oskar_conf["simulator"]["use_gpus"] = bool(self.use_gpus)
+
+            # set model file for specific freq
+            for key, value in sky_model_file_list:
+                if key >= freq:
+                    oskar_conf["sky"]["oskar_sky_model/file"] = value
+                    break
+
+            if not oskar_conf["sky"]["oskar_sky_model/file"]:
+                raise Exception(f"Could not find sky model for freq {freq}")
 
             self.spead_send.append({"spead": spead_conf, "oskar": oskar_conf})
 
@@ -146,6 +160,15 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
         self.spead_avg_conf["streams"] = self.spead_avg_local
 
         super(SignalGenerateAndAverageDrop, self).initialize(**kwargs)
+
+    # list of csv values, each line is freq, abs_path_model_file
+    def _load_sky_model_file_list(self, file_path):
+        file_map = []
+        with open(file_path) as csvfile:
+            read_csv = csv.reader(csvfile, delimiter=',')
+            for row in read_csv:
+                file_map.append((int(row[0]), row[1]))
+        return sorted(file_map, key=lambda kv: kv[0])
 
     def _start_oskar_process(self, spead_config, oskar_config_path):
         oskar = SpeadSender(spead_config=spead_config,
