@@ -43,6 +43,7 @@ def _get_receiver_host(queue_host='sdp-dfms.ddns.net', queue_port=8096):
         logger.error("Fail to get receiver ip from the queue: %s" % str(exp))
         return 'NULL'
 
+
 class AveragerSinkDrop(AppDROP):
 
     def initialize(self, **kwargs):
@@ -52,18 +53,29 @@ class AveragerSinkDrop(AppDROP):
         self.recv_thread = None
         self.written_called = 0
         self.complete_called = 0
-        self.use_aws_ip = bool(kwargs.get('use_aws_ip', 1))
+
         self.disconnect_tolerance = int(kwargs.get('disconnect_tolerance', 0))
+        self.baseline_exclusion_map_path = kwargs.get('baseline_exclusion_map_path')
+        start_listen_port = int(kwargs.get('stream_listen_port_start', 51000))
+        num_listen_ports = int(kwargs.get('num_stream_listen_ports', 6))
 
-        with open(kwargs['config']) as f:
-            self.config = json.load(f)
+        self.config = {
+            "stream_config":
+                {
+                    "max_packet_size": 1472,
+                    "rate": 0.0,
+                    "burst_size": 8000,
+                    "max_heaps": 4
+                },
+            "streams":
+                [{"host": "0.0.0.0", "port": start_listen_port+i} for i in range(num_listen_ports)],
 
-        if self.config['as_relay'] == 1:
-            raise Exception('Running as a relay configuration.')
-        self.config_dir = osp.dirname(kwargs['config'])
-        root_dir = osp.abspath(osp.join(self.config_dir, '..'))
-        ff = self.config['baseline_map_filename']
-        self.config['baseline_map_filename'] = osp.join(root_dir, ff)
+            "as_relay": 0,
+            "output_ms": "",
+            "baseline_map_filename": self.baseline_exclusion_map_path,
+            "use_adios2": 0,
+            }
+
         super(AveragerSinkDrop, self).initialize(**kwargs)
 
     def _run(self):
@@ -75,13 +87,19 @@ class AveragerSinkDrop(AppDROP):
     def dataWritten(self, uid, data):
         logger.info("AveragerSinkDrop dataWritten called")
 
+        try:
+            comm = dlg.mpi_comm
+        except AttributeError:
+            comm = None
+
         with self.lock:
             if self.start is False:
                 logger.info("AveragerSinkDrop SpeadReceiver")
-                if (self.use_aws_ip):
-                   register_my_ip(self.name, self.config['streams'][0]['port'])
+
                 self.config['output_ms'] = self.outputs[0].path
-                self.recv = SpeadReceiver(self.config, self.disconnect_tolerance, dlg.mpi_comm)
+                self.recv = SpeadReceiver(spead_config=self.config,
+                                          disconnect_tolerance=self.disconnect_tolerance,
+                                          mpi_comm=comm)
                 self.recv_thread = Thread(target=self._run)
                 self.recv_thread.start()
                 self.start = True
@@ -102,7 +120,6 @@ class AveragerSinkDrop(AppDROP):
 
     def close_sink(self):
         if self.recv:
-            #self.recv.close()
             self.recv_thread.join()
 
 
@@ -127,7 +144,7 @@ class AveragerRelayDrop(BarrierAppDROP):
         self.recv_ports = [base_port + i for i in range(n_streams)]
         logger.info("Will receive %d streams in TCP ports %r", n_streams, self.recv_ports)
 
-        self.use_aws_ip = bool(kwargs.get('use_aws_ip', 1))
+        self.use_aws_ip = bool(kwargs.get('use_aws_ip', 0))
         self.disconnect_tolerance = int(kwargs.get('disconnect_tolerance', 0))
         super(AveragerRelayDrop, self).initialize(**kwargs)
 

@@ -4,8 +4,9 @@ import logging
 import unittest
 
 from dlg.ddap_protocol import AppDROPStates
-from dlg.drop import InMemoryDROP
+from dlg.drop import InMemoryDROP, FileDROP
 from avg_drop import AveragerSinkDrop, AveragerRelayDrop
+from signal_drop import SignalGenerateAndAverageDrop
 
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
@@ -14,13 +15,25 @@ logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 class TestAverager(unittest.TestCase):
 
     def test_basic_run(self):
-        relay = AveragerRelayDrop('1', '1', config='conf/recv_relay.json')
-        sink = AveragerSinkDrop('2', '2', config='conf/recv.json')
+        signal = SignalGenerateAndAverageDrop('1', '1',
+                                              stream_port=51000,
+                                              start_freq=210200000,
+                                              freq_step=4000,
+                                              num_freq_steps=2,
+                                              telescope_model_path='./conf/aa2.tm',
+                                              sky_model_directory="")
+
+        sink = AveragerSinkDrop('2', '2',
+                                stream_listen_port_start=51000,
+                                num_stream_listen_ports=1,
+                                baseline_exclusion_map_path='./conf/aa2_baselines.csv',
+                                node='localhost')
         drop = InMemoryDROP('3', '3')
         drop.addStreamingConsumer(sink)
-        relay.addOutput(drop)
+        signal.addOutput(drop)
+        sink.addOutput(FileDROP('4', '4', filepath='/tmp/test.ms'))
 
-        relay.async_execute()
+        signal.async_execute()
 
         try:
             tries = 10
@@ -36,4 +49,3 @@ class TestAverager(unittest.TestCase):
                 time.sleep(1)
         finally:
             sink.close_sink()
-            relay.close_sink()
