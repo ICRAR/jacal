@@ -7,7 +7,7 @@ this_dir=`eval "$cmd"`
 . $this_dir/common.sh
 
 logical_graph=`abspath bracewell_mvp_multinode_multifile.json`
-receiver_nodes=3
+receiver_nodes=5
 sender_nodes=2
 gpus_per_node=2
 
