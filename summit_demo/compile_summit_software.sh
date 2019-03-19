@@ -26,18 +26,54 @@
 # MA 02111-1307  USA
 #
 
-if [ $# -lt 3 ]; then
-	echo "Usage: $0 <system> <num-jobs> <prefix>" 1>&2
+print_usage() {
+	echo "Usage: $0 [options]"
+	echo
+	echo "Options:"
+	echo " -s system. Supported values are centos and ubuntu"
+	echo " -c compiler. Supported values are gcc and clang"
+	echo " -j jobs. Number of parallel compilation jobs"
+	echo " -p prefix. Prefix for installation, defaults to /usr/local"
+}
+
+jobs=1
+prefix=/usr/local
+
+while getopts "h?s:c:j:p:" opt
+do
+	case "$opt" in
+		[h?])
+			print_usage
+			exit 0
+			;;
+		s)
+			system="$OPTARG"
+			;;
+		c)
+			compiler="$OPTARG"
+			;;
+		j)
+			jobs="$OPTARG"
+			;;
+		p)
+			prefix="$OPTARG"
+			;;
+		*)
+			print_usage 1>&2
+			exit 1
+			;;
+	esac
+done
+
+if [ "$system" != centos -a "$system" != ubuntu ]; then
+	echo "Unsupported system: $system" 1>&2
+	echo "Supported systems are centos and ubuntu" 1>&2
 	exit 1
 fi
 
-SYSTEM=$1
-NUM_JOBS=$2
-PREFIX=$3
-
-if [ $SYSTEM != centos -a $SYSTEM != ubuntu ]; then
-	echo "Unsupported system: $SYSTEM" 1>&2
-	echo "Supported systems are centos and ubuntu" 1>&2
+if [ "$compiler" != gcc -a "$compiler" != clang ]; then
+	echo "Unsupported compiler: $SYSTEM" 1>&2
+	echo "Supported compilers are gcc and clang" 1>&2
 	exit 1
 fi
 
@@ -48,46 +84,49 @@ else
 fi
 
 install_dependencies() {
-	if [ $SYSTEM == ubuntu ]; then
+	if [ $system == ubuntu ]; then
 		$SUDO apt install -y \
-		    boost-devel \    # casacore
-		    cfitsio-devel \  # casacore
-		    cmake3 \         # adios, casacore, oskar
-		    fftw3-devel \    # casacore
-		    flex bison \     # casascore
-		    git \            # many
-		    libffi-devel \   # cryptography (python) -> paramiko -> daliuge
-		    openblas-devel \ # casacore
-		    openmpi-devel \  # adios, casacore, oskar
-		    openssl-devel \  # cryptography (see above)
-		    patch \          # lofar-common
-		    python-devel \   # casacore, few python packages
-		    python-pip \     # so we can pip install virtualenv
-		    python2-numpy \  # casacore, oskar, few python packages
-		    svn \            # lofar-blob, lofar-common
-		    wcslib-devel     # casacore
+		    boost-devel     `# casacore` \
+		    cfitsio-devel   `# casacore` \
+		    cmake3          `# many` \
+		    fftw3-devel     `# casacore` \
+		    flex bison      `# casacore` \
+		    git             `# many` \
+		    libffi-devel    `# cryptography (python) -> paramiko -> daliuge` \
+		    openblas-devel  `# casacore` \
+		    openmpi-devel   `# adios, casacore, oskar` \
+		    openssl-devel   `# cryptography (see above)` \
+		    patch           `# lofar-common` \
+		    python-devel    `# casacore, few python packages` \
+		    python-pip      `# so we can pip install virtualenv` \
+		    python2-numpy   `# casacore, oskar, few python packages` \
+		    svn             `# lofar-blob, lofar-common` \
+		    wcslib-devel    `# casacore`
 		CMAKE=cmake
 	else
 		$SUDO yum --assumeyes install \
-		    boost-devel \
-		    cfitsio-devel \
-		    cmake3 \
-		    fftw3-devel \
-		    flex bison \
-		    gcc-c++ \
-		    git \
-		    gsl-devel \
-		    libffi-devel \
-		    log4cxx-devel \
-		    make \
-		    openblas-devel \
-		    openmpi-devel \
-		    openssl-devel \
-		    patch \
-		    python-devel \
-		    python-pip \
-		    svn \
-		    wcslib-devel
+		    boost-devel    `# casacore` \
+		    cfitsio-devel  `# casacore` \
+		    cmake3         `# many` \
+		    fftw3-devel    `# casacore` \
+		    flex bison     `# casacore, lofar-common` \
+		    gcc-c++        `# many, including clang itself` \
+		    git            `# many` \
+		    gsl-devel      `# casacore, yandasoft` \
+		    libffi-devel   `# cryptography (python) -> paramiko -> daliuge` \
+		    log4cxx-devel  `# yandasoft` \
+		    make           `# many` \
+		    openblas-devel `# casacore` \
+		    openmpi-devel  `# adios, casacore, oskar, yandasoft` \
+		    openssl-devel  `# cryptography (see above)` \
+		    patch          `# lofar-common` \
+		    python-devel   `# casacore, oskar, few python packages` \
+		    python-pip     `# so we can pip install virtualenv` \
+		    svn            `# lofar-blob, lofar-common` \
+		    wcslib-devel   `# casacore`
+		if [ $compiler == clang ]; then
+			$SUDO yum --assumeyes install clang
+		fi
 		CMAKE=cmake3
 	fi
 }
@@ -104,7 +143,12 @@ build_and_install() {
 	shift; shift
 	mkdir build
 	cd build
-	${CMAKE} .. -DCMAKE_INSTALL_PREFIX="$PREFIX" "$@"
+	if [ $compiler == clang ]; then
+		comp_opts="-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang"
+	else
+		comp_opts="-DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc"
+	fi
+	${CMAKE} .. -DCMAKE_INSTALL_PREFIX="$prefix" $comp_opts "$@"
 	make all -j${NUM_JOBS}
 	make install -j${NUM_JOBS}
 	cd ../..
@@ -113,18 +157,18 @@ build_and_install() {
 install_dependencies
 
 # CentOS, you cheecky...
-if [ $SYSTEM == centos ]; then
+if [ $system == centos ]; then
 	source /etc/profile.d/modules.sh
 	module load mpi
 fi
 
 # Setup our environment
-export LD_LIBRARY_PATH=$PREFIX/lib64:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$prefix/lib64:$LD_LIBRARY_PATH
 
 # Let's work with a virtualenv from now on
 pip install --user virtualenv
-~/.local/bin/virtualenv $PREFIX
-source $PREFIX/bin/activate
+~/.local/bin/virtualenv $prefix
+source $prefix/bin/activate
 pip install numpy
 
 # Go, go, go!
@@ -145,7 +189,7 @@ build_and_install https://bitbucket.csiro.au/scm/askapsdp/yandasoft.git compilat
 # Python stuff
 pip install git+https://github.com/ICRAR/daliuge
 cd OSKAR/python
-sed -i "s|include_dirs.*\$|\\0:$PREFIX/include|" setup.cfg
-sed -i "s|library_dirs.*\$|\\0:$PREFIX/lib:$PREFIX/lib64|" setup.cfg
+sed -i "s|include_dirs.*\$|\\0:$prefix/include|" setup.cfg
+sed -i "s|library_dirs.*\$|\\0:$prefix/lib:$prefix/lib64|" setup.cfg
 pip install
 cd ../..
