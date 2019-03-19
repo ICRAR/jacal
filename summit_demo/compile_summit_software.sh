@@ -149,8 +149,8 @@ build_and_install() {
 		comp_opts="-DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc"
 	fi
 	${CMAKE} .. -DCMAKE_INSTALL_PREFIX="$prefix" $comp_opts "$@"
-	make all -j${NUM_JOBS}
-	make install -j${NUM_JOBS}
+	make all -j${jobs}
+	make install -j${jobs}
 	cd ../..
 }
 
