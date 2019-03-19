@@ -69,11 +69,12 @@ install_dependencies() {
 		CMAKE=cmake
 	else
 		$SUDO yum --assumeyes install \
-		    boost-devel \ cfitsio-devel \
+		    boost-devel \
+		    cfitsio-devel \
 		    cmake3 \
 		    fftw3-devel \
 		    flex bison \
-		    gcc-g++ \
+		    gcc-c++ \
 		    git \
 		    gsl-devel \
 		    libffi-devel \
