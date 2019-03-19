@@ -191,5 +191,5 @@ pip install git+https://github.com/ICRAR/daliuge
 cd OSKAR/python
 sed -i "s|include_dirs.*\$|\\0:$prefix/include|" setup.cfg
 sed -i "s|library_dirs.*\$|\\0:$prefix/lib:$prefix/lib64|" setup.cfg
-pip install
+pip install .
 cd ../..
