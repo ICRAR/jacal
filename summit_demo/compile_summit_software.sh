@@ -123,7 +123,7 @@ export LD_LIBRARY_PATH=$PREFIX/lib64:$LD_LIBRARY_PATH
 
 # Let's work with a virtualenv from now on
 pip install --user virtualenv
-virtualenv $PREFIX
+~/.local/bin/virtualenv $PREFIX
 source $PREFIX/bin/activate
 pip install numpy
 
