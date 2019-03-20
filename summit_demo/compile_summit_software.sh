@@ -30,10 +30,14 @@ print_usage() {
 	echo "Usage: $0 [options]"
 	echo
 	echo "Options:"
-	echo " -s system. Supported values are centos and ubuntu"
-	echo " -c compiler. Supported values are gcc and clang"
-	echo " -j jobs. Number of parallel compilation jobs"
-	echo " -p prefix. Prefix for installation, defaults to /usr/local"
+	echo " -s <system>   Supported values are centos and ubuntu"
+	echo " -c <compiler> Supported values are gcc and clang"
+	echo " -j <jobs>     Number of parallel compilation jobs"
+	echo " -p <prefix>   Prefix for installation, defaults to /usr/local"
+	echo " -o            Do *not* build OSKAR"
+	echo " -a            Do *not* build ADIOS2, implies -C 2.4.0"
+	echo " -C <version>  Casacore version to build, values are master (default), 2.4.0 and 2.1.0"
+	echo " -O <opts>     Extra OSKAR cmake options"
 }
 
 try() {
@@ -45,10 +49,28 @@ try() {
 	fi
 }
 
+check_supported_values() {
+	val_name=$1
+	given_val=$2
+	shift; shift
+	for supported in "$@"; do
+		if [ "$given_val" == "$supported" ]; then
+			return
+		fi
+	done
+	echo "Unsupported $val_name: $given_val" 1>&2
+	echo "Supported $val_name values are: $@" 1>&2
+	exit 1
+}
+
 jobs=1
 prefix=/usr/local
+oskar_opts=
+build_oskar=yes
+build_adios=yes
+casacore_version=master
 
-while getopts "h?s:c:j:p:" opt
+while getopts "h?s:c:j:p:oaC:O:" opt
 do
 	case "$opt" in
 		[h?])
@@ -67,6 +89,19 @@ do
 		p)
 			prefix="$OPTARG"
 			;;
+		o)
+			build_oskar=no
+			;;
+		a)
+			build_adios=no
+			casacore_version=2.4.0
+			;;
+		C)
+			casacore_version="$OPTARG"
+			;;
+		O)
+			oskar_opts="$OPTARG"
+			;;
 		*)
 			print_usage 1>&2
 			exit 1
@@ -74,17 +109,9 @@ do
 	esac
 done
 
-if [ "$system" != centos -a "$system" != ubuntu ]; then
-	echo "Unsupported system: $system" 1>&2
-	echo "Supported systems are centos and ubuntu" 1>&2
-	exit 1
-fi
-
-if [ "$compiler" != gcc -a "$compiler" != clang ]; then
-	echo "Unsupported compiler: $SYSTEM" 1>&2
-	echo "Supported compilers are gcc and clang" 1>&2
-	exit 1
-fi
+check_supported_values system $system centos ubuntu
+check_supported_values compiler $compiler gcc clang
+check_supported_values casacore_version $casacore_version master 2.4.0 2.0.3
 
 if [ $EUID == 0 ]; then
 	SUDO=
@@ -182,30 +209,53 @@ if [ ! -f $prefix/bin/activate ]; then
 	try pip install numpy
 fi
 
-# Go, go, go!
-build_and_install https://github.com/ornladios/ADIOS2 master -DADIOS2_BUILD_TESTING=OFF
-build_and_install https://github.com/casacore/casacore master -DUSE_ADIOS2=ON -DBUILD_TESTING=OFF
-build_and_install https://github.com/casacore/casarest master -DBUILD_TESTING=OFF
-build_and_install https://bitbucket.csiro.au/scm/askapsdp/lofar-common.git cmake-improvements -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
-build_and_install https://bitbucket.csiro.au/scm/askapsdp/lofar-blob.git cmake-improvements -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
-build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-askap.git operator-overload-fix -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
-build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-logfilters.git cmake-improvements -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
-build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-imagemath.git compilation-fixes -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
-build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-scimath.git cmake-improvements -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
-build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-askapparallel.git cmake-improvements -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
-build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-accessors.git compilation_fixes -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
-build_and_install https://bitbucket.csiro.au/scm/askapsdp/yandasoft.git compilation-fixes -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
-
-# Required when building with clang on centos
-if [ $system == centos -a $compiler == clang ]; then
-	oskar_opts="-DFORCE_LIBSTDC++=ON"
+# ADIOS2, casacore and casarest
+if [ $build_adios == yes ]; then
+	build_and_install https://github.com/ornladios/ADIOS2 master -DADIOS2_BUILD_TESTING=OFF
 fi
-build_and_install https://github.com/ICRAR/OSKAR master $oskar_opts
 
-# Python stuff
+if [ $casacore_version == master -a $build_adios == yes ]; then
+	casacore_opts="-DUSE_ADIOS2=ON"
+fi
+if [ $casacore_version != master ]; then
+	casacore_version=v$casacore_version
+fi
+build_and_install https://github.com/casacore/casacore $casacore_version -DBUILD_TESTING=OFF $casacore_opts
+
+if [ $casacore_version == master ]; then
+	casarest_version=master
+elif [ $casacore_version == v2.4.0 ]; then
+	casarest_version=v1.4.2
+else
+	casarest_version=v1.4.1
+fi
+build_and_install https://github.com/casacore/casarest $casarest_version -DBUILD_TESTING=OFF
+
+# Go, go, go, yandasoft!
+build_and_install https://bitbucket.csiro.au/scm/askapsdp/lofar-common.git master -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
+build_and_install https://bitbucket.csiro.au/scm/askapsdp/lofar-blob.git master -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
+build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-askap.git operator-overload-fix -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
+build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-logfilters.git refactor -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
+build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-imagemath.git refactor -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
+build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-scimath.git refactor -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
+build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-askapparallel.git refactor -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
+build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-accessors.git refactor -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
+build_and_install https://bitbucket.csiro.au/scm/askapsdp/yandasoft.git cmake-improvements -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
+
+# OSKAR
+if [ $build_oskar == yes ]; then
+	# Required when building with clang on centos
+	if [ $system == centos -a $compiler == clang ]; then
+		oskar_opts+=" -DFORCE_LIBSTDC++=ON"
+	fi
+	build_and_install https://github.com/ICRAR/OSKAR master $oskar_opts
+
+	cd OSKAR/python
+	sed -i "s|include_dirs.*\$|\\0:$prefix/include|" setup.cfg
+	sed -i "s|library_dirs.*\$|\\0:$prefix/lib:$prefix/lib64|" setup.cfg
+	try pip install .
+	cd ../..
+fi
+
+# DALiuGE
 try pip install git+https://github.com/ICRAR/daliuge
-cd OSKAR/python
-sed -i "s|include_dirs.*\$|\\0:$prefix/include|" setup.cfg
-sed -i "s|library_dirs.*\$|\\0:$prefix/lib:$prefix/lib64|" setup.cfg
-try pip install .
-cd ../..
