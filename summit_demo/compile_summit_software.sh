@@ -36,6 +36,15 @@ print_usage() {
 	echo " -p prefix. Prefix for installation, defaults to /usr/local"
 }
 
+try() {
+	"$@"
+	status=$?
+	if [ ! $status ]; then
+		echo "Command exited with status $status, aborting build now: $@" 1>&2
+		exit 1
+	fi
+}
+
 jobs=1
 prefix=/usr/local
 
@@ -148,9 +157,9 @@ build_and_install() {
 	else
 		comp_opts="-DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc"
 	fi
-	${CMAKE} .. -DCMAKE_INSTALL_PREFIX="$prefix" $comp_opts "$@"
-	make all -j${jobs}
-	make install -j${jobs}
+	try ${CMAKE} .. -DCMAKE_INSTALL_PREFIX="$prefix" $comp_opts "$@"
+	try make all -j${jobs}
+	try make install -j${jobs}
 	cd ../..
 }
 
@@ -166,10 +175,10 @@ fi
 export LD_LIBRARY_PATH=$prefix/lib64:$LD_LIBRARY_PATH
 
 # Let's work with a virtualenv from now on
-pip install --user virtualenv
-~/.local/bin/virtualenv $prefix
+try pip install --user virtualenv
+try ~/.local/bin/virtualenv $prefix
 source $prefix/bin/activate
-pip install numpy
+try pip install numpy
 
 # Go, go, go!
 build_and_install https://github.com/ornladios/ADIOS2 master
@@ -187,9 +196,9 @@ build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-accessors.git com
 build_and_install https://bitbucket.csiro.au/scm/askapsdp/yandasoft.git compilation-fixes -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
 
 # Python stuff
-pip install git+https://github.com/ICRAR/daliuge
+try pip install git+https://github.com/ICRAR/daliuge
 cd OSKAR/python
 sed -i "s|include_dirs.*\$|\\0:$prefix/include|" setup.cfg
 sed -i "s|library_dirs.*\$|\\0:$prefix/lib:$prefix/lib64|" setup.cfg
-pip install .
+try pip install .
 cd ../..
