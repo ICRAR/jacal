@@ -35,8 +35,12 @@ print_usage() {
 	echo " -j <jobs>     Number of parallel compilation jobs"
 	echo " -p <prefix>   Prefix for installation, defaults to /usr/local"
 	echo " -o            Do *not* build OSKAR"
+	echo " -i            Do *not* install system dependencies"
 	echo " -a            Do *not* build ADIOS2, implies -C 2.4.0"
 	echo " -C <version>  Casacore version to build, values are master (default), 2.4.0 and 2.1.0"
+	echo " -A <opts>     Extra casacore cmake options"
+	echo " -r <opts>     Extra casarest cmake options"
+	echo " -y <opts>     Extra yandasoft common cmake options"
 	echo " -O <opts>     Extra OSKAR cmake options"
 }
 
@@ -65,12 +69,16 @@ check_supported_values() {
 
 jobs=1
 prefix=/usr/local
-oskar_opts=
 build_oskar=yes
+install_dependencies=yes
 build_adios=yes
 casacore_version=master
+casacore_opts=
+casarest_opts=
+yandasoft_opts=
+oskar_opts=
 
-while getopts "h?s:c:j:p:oaC:O:" opt
+while getopts "h?s:c:j:p:oiaC:A:r:y:O:" opt
 do
 	case "$opt" in
 		[h?])
@@ -92,12 +100,24 @@ do
 		o)
 			build_oskar=no
 			;;
+		i)
+			install_dependencies=no
+			;;
 		a)
 			build_adios=no
 			casacore_version=2.4.0
 			;;
 		C)
 			casacore_version="$OPTARG"
+			;;
+		A)
+			casacore_opts="$OPTARG"
+			;;
+		r)
+			casarest_opts="$OPTARG"
+			;;
+		y)
+			yandasoft_opts="$OPTARG"
 			;;
 		O)
 			oskar_opts="$OPTARG"
@@ -110,13 +130,19 @@ do
 done
 
 check_supported_values system $system centos ubuntu
-check_supported_values compiler $compiler gcc clang
+check_supported_values compiler $compiler gcc clang cray
 check_supported_values casacore_version $casacore_version master 2.4.0 2.0.3
 
 if [ $EUID == 0 ]; then
 	SUDO=
 else
 	SUDO=sudo
+fi
+
+if [ $system == centos ]; then
+	CMAKE=cmake3
+else
+	CMAKE=cmake
 fi
 
 install_dependencies() {
@@ -138,7 +164,6 @@ install_dependencies() {
 		    python2-numpy   `# casacore, oskar, few python packages` \
 		    svn             `# lofar-blob, lofar-common` \
 		    wcslib-devel    `# casacore`
-		CMAKE=cmake
 	else
 		$SUDO yum --assumeyes install \
 		    boost-devel    `# casacore` \
@@ -163,7 +188,6 @@ install_dependencies() {
 		if [ $compiler == clang ]; then
 			$SUDO yum --assumeyes install clang
 		fi
-		CMAKE=cmake3
 	fi
 }
 
@@ -186,14 +210,19 @@ build_and_install() {
 		if [ $is_branch == yes ]; then
 			git checkout -b $ref origin/$ref
 		else
-			git checkout -b working_copy $ref
+			git checkout -b working_copy
+			git reset --hard $ref
 		fi
+	else
+		cd `repo2dir $1`
 	fi
 	shift; shift
 	test -d build || try mkdir build
 	cd build
 	if [ $compiler == clang ]; then
 		comp_opts="-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang"
+	elif [ $compiler == cray ]; then
+		comp_opts="-DCMAKE_CXX_COMPILER=CC -DCMAKE_C_COMPILER=cc"
 	else
 		comp_opts="-DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc"
 	fi
@@ -203,7 +232,9 @@ build_and_install() {
 	cd ../..
 }
 
-install_dependencies
+if [ $install_dependencies == yes ]; then
+	install_dependencies
+fi
 
 # CentOS, you cheecky...
 if [ $system == centos ]; then
@@ -218,9 +249,9 @@ export LD_LIBRARY_PATH=$prefix/lib64:$LD_LIBRARY_PATH
 if [ ! -f $prefix/bin/activate ]; then
 	try pip install --user virtualenv
 	try ~/.local/bin/virtualenv $prefix
-	source $prefix/bin/activate
-	try pip install numpy
 fi
+source $prefix/bin/activate
+try pip install numpy
 
 # ADIOS2, casacore and casarest
 if [ $build_adios == yes ]; then
@@ -228,10 +259,10 @@ if [ $build_adios == yes ]; then
 fi
 
 if [ $casacore_version == master -a $build_adios == yes ]; then
-	casacore_opts="-DUSE_ADIOS2=ON"
+	casacore_opts+=" -DUSE_ADIOS2=ON"
 fi
 if [ $casacore_version != master ]; then
-	casacore_version=v$casacore_version
+	casacore_version=COMMIT-v$casacore_version
 fi
 build_and_install https://github.com/casacore/casacore $casacore_version -DBUILD_TESTING=OFF $casacore_opts
 
@@ -242,18 +273,21 @@ elif [ $casacore_version == v2.4.0 ]; then
 else
 	casarest_version=COMMIT-v1.4.1
 fi
-build_and_install https://github.com/casacore/casarest $casarest_version -DBUILD_TESTING=OFF
+build_and_install https://github.com/casacore/casarest $casarest_version -DBUILD_TESTING=OFF $casarest_opts
 
 # Go, go, go, yandasoft!
-build_and_install https://bitbucket.csiro.au/scm/askapsdp/lofar-common.git master -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
-build_and_install https://bitbucket.csiro.au/scm/askapsdp/lofar-blob.git master -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
-build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-askap.git operator-overload-fix -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
-build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-logfilters.git refactor -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
-build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-imagemath.git refactor -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
-build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-scimath.git refactor -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
-build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-askapparallel.git refactor -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
-build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-accessors.git refactor -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
-build_and_install https://bitbucket.csiro.au/scm/askapsdp/yandasoft.git cmake-improvements -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
+if [ $casacore_version == master ]; then
+	yandasoft_opts+=" -DCMAKE_CXX_FLAGS=-Dcasa=casacore"
+fi
+build_and_install https://bitbucket.csiro.au/scm/askapsdp/lofar-common.git master $yandasoft_opts
+build_and_install https://bitbucket.csiro.au/scm/askapsdp/lofar-blob.git master $yandasoft_opts
+build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-askap.git operator-overload-fix $yandasoft_opts
+build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-logfilters.git refactor $yandasoft_opts
+build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-imagemath.git refactor $yandasoft_opts
+build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-scimath.git refactor $yandasoft_opts
+build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-askapparallel.git refactor $yandasoft_opts
+build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-accessors.git refactor $yandasoft_opts
+build_and_install https://bitbucket.csiro.au/scm/askapsdp/yandasoft.git cmake-improvements $yandasoft_opts
 
 # OSKAR
 if [ $build_oskar == yes ]; then
