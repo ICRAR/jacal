@@ -174,8 +174,21 @@ repo2dir() {
 
 # Nice-to-use macro
 build_and_install() {
-	test -d `repo2dir $1` || try git clone --branch $2 $1
-	cd `repo2dir $1`
+	ref=$2
+	is_branch=yes
+	if [[ "$ref" =~ COMMIT-(.*) ]]; then
+		ref=${BASH_REMATCH[1]}
+		is_branch=no
+	fi
+	if [ ! -d `repo2dir $1` ]; then
+		try git clone $1
+		cd `repo2dir $1`
+		if [ $is_branch == yes ]; then
+			git checkout -b $ref origin/$ref
+		else
+			git checkout -b working_copy $ref
+		fi
+	fi
 	shift; shift
 	test -d build || try mkdir build
 	cd build
@@ -225,9 +238,9 @@ build_and_install https://github.com/casacore/casacore $casacore_version -DBUILD
 if [ $casacore_version == master ]; then
 	casarest_version=master
 elif [ $casacore_version == v2.4.0 ]; then
-	casarest_version=v1.4.2
+	casarest_version=COMMIT-467ed6d
 else
-	casarest_version=v1.4.1
+	casarest_version=COMMIT-v1.4.1
 fi
 build_and_install https://github.com/casacore/casarest $casarest_version -DBUILD_TESTING=OFF
 
