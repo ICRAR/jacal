@@ -186,7 +186,6 @@ fi
 build_and_install https://github.com/ornladios/ADIOS2 master -DADIOS2_BUILD_TESTING=OFF
 build_and_install https://github.com/casacore/casacore master -DUSE_ADIOS2=ON -DBUILD_TESTING=OFF
 build_and_install https://github.com/casacore/casarest master -DBUILD_TESTING=OFF
-build_and_install https://github.com/ICRAR/OSKAR master -DCMAKE_CXX_FLAGS="-std=c++11"
 build_and_install https://bitbucket.csiro.au/scm/askapsdp/lofar-common.git cmake-improvements -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
 build_and_install https://bitbucket.csiro.au/scm/askapsdp/lofar-blob.git cmake-improvements -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
 build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-askap.git operator-overload-fix -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
@@ -196,6 +195,12 @@ build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-scimath.git cmake
 build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-askapparallel.git cmake-improvements -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
 build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-accessors.git compilation_fixes -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
 build_and_install https://bitbucket.csiro.au/scm/askapsdp/yandasoft.git compilation-fixes -DCMAKE_CXX_FLAGS="-Dcasa=casacore"
+
+# Required when building with clang on centos
+if [ $system == centos -a $compiler == clang ]; then
+	oskar_opts="-DFORCE_LIBSTDC++=ON"
+fi
+build_and_install https://github.com/ICRAR/OSKAR master $oskar_opts
 
 # Python stuff
 try pip install git+https://github.com/ICRAR/daliuge
