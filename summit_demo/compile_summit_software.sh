@@ -39,7 +39,7 @@ print_usage() {
 try() {
 	"$@"
 	status=$?
-	if [ ! $status ]; then
+	if [ $status -ne 0 ]; then
 		echo "Command exited with status $status, aborting build now: $@" 1>&2
 		exit 1
 	fi
