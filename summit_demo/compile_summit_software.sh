@@ -147,10 +147,10 @@ repo2dir() {
 
 # Nice-to-use macro
 build_and_install() {
-	git clone --branch $2 $1
+	test -d `repo2dir $1` || try git clone --branch $2 $1
 	cd `repo2dir $1`
 	shift; shift
-	mkdir build
+	test -d build || try mkdir build
 	cd build
 	if [ $compiler == clang ]; then
 		comp_opts="-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang"
@@ -175,10 +175,12 @@ fi
 export LD_LIBRARY_PATH=$prefix/lib64:$LD_LIBRARY_PATH
 
 # Let's work with a virtualenv from now on
-try pip install --user virtualenv
-try ~/.local/bin/virtualenv $prefix
-source $prefix/bin/activate
-try pip install numpy
+if [ ! -f $prefix/bin/activate ]; then
+	try pip install --user virtualenv
+	try ~/.local/bin/virtualenv $prefix
+	source $prefix/bin/activate
+	try pip install numpy
+fi
 
 # Go, go, go!
 build_and_install https://github.com/ornladios/ADIOS2 master
