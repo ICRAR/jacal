@@ -1,0 +1,25 @@
+python -m dlg.dropmake.dropmake_api -l summit_oskar2_xxx_nodes.json    -p /tmp -i 1 -r -c 6
+
+MacOS (python 3.7)
+
+algo:Edge Zero - min_exec_time:15 - total_data_movement:2.5 - exec_time:15.5 - num_islands:1 - num_parts:6 - unroll_time:0.002 - schedule_time:0.252
+
+algo:Edge Zero - min_exec_time:15 - total_data_movement:10.0 - exec_time:15.5 - num_islands:1 - num_parts:24 - unroll_time:0.007 - schedule_time:1.087
+
+algo:Edge Zero - min_exec_time:15 - total_data_movement:272.5 - exec_time:16.0 - num_islands:1 - num_parts:96 - unroll_time:0.020 - schedule_time:72.825
+
+algo:Edge Zero - min_exec_time:15 - total_data_movement:1136.5 - exec_time:16.0 - num_islands:1 - num_parts:384 - unroll_time:0.083 - schedule_time:2846.557
+
+===================================================
+
+Bracewell (python 2.7.3) - the result is actually not optimal due to the difference between python 2.7 and python 3.7.	
+
+exec_time:15.5 - unroll_time:0.012 - total_data_movement:15.0 - schedule_time:0.686 - algo:Edge Zero - num_parts:6 - min_exec_time:15 - num_islands:1 - num_drops:93
+
+exec_time:15.5 - unroll_time:0.017 - total_data_movement:60.0 - schedule_time:6.541 - algo:Edge Zero - num_parts:24 - min_exec_time:15 - num_islands:1 - num_drops:369
+
+exec_time:15.5 - unroll_time:0.034 - total_data_movement:285.0 - schedule_time:100.005 - algo:Edge Zero - num_parts:96 - min_exec_time:15 - num_islands:1 - num_drops:1173
+
+exec_time:15.5 - unroll_time:0.142 - total_data_movement:1149.0 - schedule_time:1798.166 - algo:Edge Zero - num_parts:384 - min_exec_time:15 - num_islands:1 - num_drops:4629
+
+exec_time:15.5 - unroll_time:0.620 - total_data_movement:4605.0 - schedule_time:26543.359 - algo:Edge Zero - num_parts:1536 - min_exec_time:15 - num_islands:1 - num_drops: 18453
