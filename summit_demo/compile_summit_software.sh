@@ -183,7 +183,7 @@ if [ ! -f $prefix/bin/activate ]; then
 fi
 
 # Go, go, go!
-build_and_install https://github.com/ornladios/ADIOS2 master
+build_and_install https://github.com/ornladios/ADIOS2 master -DADIOS2_BUILD_TESTING=OFF
 build_and_install https://github.com/casacore/casacore master -DUSE_ADIOS2=ON -DBUILD_TESTING=OFF
 build_and_install https://github.com/casacore/casarest master -DBUILD_TESTING=OFF
 build_and_install https://github.com/ICRAR/OSKAR master -DCMAKE_CXX_FLAGS="-std=c++11"
