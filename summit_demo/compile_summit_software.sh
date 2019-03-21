@@ -279,7 +279,7 @@ build_and_install https://github.com/casacore/casacore $casacore_version -DBUILD
 
 if [ $casacore_version == master ]; then
 	casarest_version=master
-elif [ $casacore_version == v2.4.0 ]; then
+elif [ $casacore_version == COMMIT-v2.4.0 ]; then
 	casarest_version=COMMIT-467ed6d
 else
 	casarest_version=COMMIT-v1.4.1
