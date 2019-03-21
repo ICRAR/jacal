@@ -122,7 +122,6 @@ do
 			;;
 		a)
 			build_adios=no
-			casacore_version=2.4.0
 			;;
 		C)
 			casacore_version="$OPTARG"
@@ -149,6 +148,9 @@ done
 check_supported_values system $system centos ubuntu
 check_supported_values compiler $compiler gcc clang cray
 check_supported_values casacore_version $casacore_version master 2.4.0 2.0.3
+if [ $casacore_version != master ]; then
+	build_adios=no
+fi
 
 if [ $EUID == 0 ]; then
 	SUDO=
