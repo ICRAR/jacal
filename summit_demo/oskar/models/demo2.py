@@ -1,7 +1,7 @@
 import glob,os,sys
 import numpy as np
 
-def_par=[0.0,1500.0,100,'EOR+Foreground/sky_eor_model_f*.osm']
+def_par=[0.0,1500.0,100,'./EOR+Foreground/sky_eor_model_f*.osm']
 for n in range(1,len(sys.argv)):
     def_par[n-1]=sys.argv[n]
 
@@ -48,7 +48,8 @@ for start_f in start_freq:
     cmd.append('oskar_sim_interferometer --set demo.ini sky/oskar_sky_model/file '+use_model)
     cmd.append('oskar_sim_interferometer --set demo.ini interferometer/ms_filename output/demo_f%08.4f.ms'%(start_f))
     cmd.append('oskar_sim_interferometer demo.ini')
-    print '%d "'%(IdCount),
+    #print '%d "'%(IdCount),
+    print '"',
     for line in cmd:
       print '%s;'%(line),
     print '"'
