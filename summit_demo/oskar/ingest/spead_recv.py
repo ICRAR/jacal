@@ -37,7 +37,7 @@ def parse_baseline_file(baseline_file):
 class SpeadReceiver(object):
     # Receives visibility data using SPEAD and writes it to a Measurement Set.
 
-    def __init__(self, spead_config, disconnect_tolerance=0, mpi_comm=None):
+    def __init__(self, spead_config, disconnect_tolerance=0, mpi_comm=None, ports=None):
         self._streams = []
         self._ports = []
         self.use_adios2 = spead_config['use_adios2']
@@ -50,8 +50,11 @@ class SpeadReceiver(object):
         self._relay_stream = None
         self._descriptor = None
 
-        for recv_config in spead_config['streams']:
-            port = recv_config['port']
+        # Ports can be given explicitly or taken from the config file
+        if not ports:
+            ports = (c['port'] for c in spead_config['streams'])
+        for port in ports:
+            logger.info('Adding TCP stream reader in port %d', port)
             stream = spead2.recv.Stream(spead2.ThreadPool(), 0)
             stream.stop_on_stop_item = False
             stream.add_tcp_reader(port)
@@ -271,7 +274,14 @@ class SpeadReceiver(object):
                         raise Exception('User baseline map != simulation baseline count {} != {}'
                                         .format(supplied_baseline_count, self._header['num_baselines']))
 
-                    logger.info('Creating Measurement Set under %s', self._file_name)
+                    msg = 'Creating standard MS under %s'
+                    args = self._file_name,
+                    if self.use_adios2:
+                        msg = 'Creating ADIOS2 MS from rank %d/%d (comm=%s) under %s'
+                        args = (self.mpi_comm.Get_rank() + 1, self.mpi_comm.Get_size(),
+                                self.mpi_comm.Get_name(), self._file_name)
+                    logger.info(msg, *args)
+
                     if self._measurement_set is None:
                         self._measurement_set = oskar.MeasurementSet.create(
                             self._file_name, data['num_stations'],

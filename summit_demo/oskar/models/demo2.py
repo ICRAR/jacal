@@ -52,7 +52,7 @@ for start_f in start_freq:
     print '"',
     for line in cmd:
       print '%s;'%(line),
-    print '"'
+    print #'"'
     IdCount=IdCount+1
 
 

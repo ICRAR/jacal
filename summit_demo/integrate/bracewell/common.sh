@@ -12,14 +12,28 @@ function load_common {
 	fi
 }
 
+function abspath {
+	p="$1"
+	dirname="`dirname $p`"
+	basename="`basename $p`"
+	cd $dirname
+	echo "$PWD/$basename"
+	cd $OLDPWD
+}
+
 function print_usage {
-	echo "$0 [-V venv-root] [-o output-dir] [-a apps_rootdir] [-h/-?]"
+	echo "$0 -g logical-graph [-V venv-root] [-o output-dir] [-a apps_rootdir] [-h/-?]"
 }
 
 venv=$VIRTUAL_ENV
-outdir=.
+outdir=`abspath .`
+logical_graph=
 apps_rootdir=
-while getopts "V:o:a:" opt
+gpus_per_node=2
+sender_nodes=1
+receiver_nodes=3
+
+while getopts "V:o:a:g:G:S:r:" opt
 do
 	case "$opt" in
 		h?)
@@ -30,10 +44,22 @@ do
 			venv="$OPTARG"
 			;;
 		o)
-			outdir="$OPTARG"
+			outdir="`abspath $OPTARG`"
 			;;
 		a)
-			apps_rootdir="$OPTARG"
+			apps_rootdir="`abspath $OPTARG`"
+			;;
+		g)
+			logical_graph="`abspath $OPTARG`"
+			;;
+		G)
+			gpus_per_node="$OPTARG"
+			;;
+		S)
+			sender_nodes="$OPTARG"
+			;;
+		r)
+			receiver_nodes="$OPTARG"
 			;;
 		*)
 			exit 1

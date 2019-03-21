@@ -9,8 +9,9 @@ load_common
 # Make sure our node managers see our drops
 export PYTHONPATH="${apps_rootdir}:$PYTHONPATH"
 cd "$outdir"
-mpirun python -m dlg.deploy.pawsey.start_dfms_cluster \
+mpirun --report-bindings --bind-to core --hetero-nodes \
+    python -m dlg.deploy.pawsey.start_dfms_cluster \
     -l . \
-    -L $this_dir/bracewell_mvp.json \
+    -L $logical_graph \
     --part-algo mysarkar \
     -M

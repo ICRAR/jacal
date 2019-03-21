@@ -1,0 +1,730 @@
+{
+    "class": "go.GraphLinksModel",
+    "copiesArrayObjects": true,
+    "copiesArrays": true,
+    "linkDataArray": [
+        {
+            "from": -12,
+            "fromPort": "9de24943-9151-4e7c-9f1c-aee635b7fb7f",
+            "points": [
+                382.5819531249997,
+                318.75,
+                372.5819531249997,
+                318.75,
+                372,
+                318.75,
+                372,
+                348,
+                522.4012890624997,
+                348,
+                522.4012890624997,
+                348.6208984375,
+                522.4012890624997,
+                358.6208984375
+            ],
+            "to": -4,
+            "toPort": "e410937f-7b2f-456a-acd7-20b124a54f53"
+        },
+        {
+            "from": -7,
+            "fromPort": "a195ee3d-01ac-4a0a-96f0-81a62763f57d",
+            "points": [
+                333.068359375,
+                185.7808984375,
+                333.068359375,
+                195.7808984375,
+                333.068359375,
+                196,
+                333.068359375,
+                196,
+                333.068359375,
+                228,
+                316.0428906249997,
+                228,
+                316.0428906249997,
+                265.75,
+                316.0428906249997,
+                275.75
+            ],
+            "to": -12,
+            "toPort": "3c32a003-7baf-441d-9de9-78606c783954"
+        },
+        {
+            "from": -4,
+            "fromPort": "b2907ead-c5b8-4672-b601-95f2dcbf4a44",
+            "points": [
+                683.7596874999997,
+                374.6208984375,
+                683.7596874999997,
+                384.6208984375,
+                683.7596874999997,
+                388,
+                683.7596874999997,
+                388,
+                683.7596874999997,
+                420,
+                698.8986301397264,
+                420,
+                698.8986301397264,
+                621.8982964160335,
+                698.8986301397264,
+                631.8982964160335
+            ],
+            "to": -8,
+            "toPort": "04d29cdb-b1ab-4f6b-a1d7-2167a3419ac7"
+        },
+        {
+            "from": -8,
+            "fromPort": "f34cc7bf-1916-470c-983c-b7f29e3beb29",
+            "points": [
+                863.2482395147264,
+                631.8982964160335,
+                863.2482395147264,
+                621.8982964160335,
+                863.2482395147264,
+                620,
+                916,
+                620,
+                916,
+                580,
+                827.3924999999997,
+                580,
+                827.3924999999997,
+                421.1208984375,
+                827.3924999999997,
+                411.1208984375
+            ],
+            "to": -9,
+            "toPort": "21789d51-a9b7-476a-af7d-1786d0e3b0a4"
+        },
+        {
+            "from": -9,
+            "fromPort": "6bc3e992-9c7a-4bf3-8e33-7a273f63b886",
+            "points": [
+                1003.7362499999997,
+                411.1208984375,
+                1003.7362499999997,
+                421.1208984375,
+                1003.7362499999997,
+                421.1208984375,
+                1337.5490207647263,
+                421.1208984375,
+                1337.5490207647263,
+                532.0273979785335,
+                1337.5490207647263,
+                542.0273979785335
+            ],
+            "to": -10,
+            "toPort": "6ba850f4-c177-4ff8-9df8-d332ef0ae905"
+        },
+        {
+            "from": -10,
+            "fromPort": "a24edd10-216f-435f-8488-0afb5f0ac36e",
+            "points": [
+                1381.8986301397263,
+                593.0273979785335,
+                1381.8986301397263,
+                583.0273979785335,
+                1381.8986301397263,
+                580,
+                1413.3141021728516,
+                580,
+                1413.3141021728516,
+                683.8989719374624,
+                1413.3141021728516,
+                693.8989719374624
+            ],
+            "to": -5,
+            "toPort": "95f57710-0864-4981-8893-f7c60f9a667d"
+        }
+    ],
+    "linkFromPortIdProperty": "fromPort",
+    "linkToPortIdProperty": "toPort",
+    "modelData": {
+        "filePath": "Bracewell_MVP.graph",
+        "fileType": "graph",
+        "git_url": "https://api.github.com/repos/ICRAR/EAGLE/git/blobs/44fff4ea5fbb3973f80c41c8f3c4212c624e67db",
+        "repo": "ICRAR/EAGLE",
+        "sha": "44fff4ea5fbb3973f80c41c8f3c4212c624e67db"
+    },
+    "nodeDataArray": [
+        {
+            "canHaveInputs": true,
+            "canHaveOutputs": true,
+            "category": "memory",
+            "categoryType": "DataDrop",
+            "colour": " #394BB2",
+            "fields": [
+                {
+                    "name": "data_volume",
+                    "text": "Data volume",
+                    "value": "5"
+                },
+                {
+                    "name": "group_end",
+                    "text": "Group end",
+                    "value": "0"
+                }
+            ],
+            "group": -12,
+            "inputPorts": [
+                {
+                    "Id": "c4294fd2-80aa-42c4-a030-080194dd2532",
+                    "IdText": "event"
+                },
+                {
+                    "Id": "e410937f-7b2f-456a-acd7-20b124a54f53",
+                    "IdText": "ConnList"
+                }
+            ],
+            "isData": true,
+            "isGroup": false,
+            "key": -4,
+            "loc": "497.2206249999997 337.75",
+            "outputPorts": [
+                {
+                    "Id": "b2907ead-c5b8-4672-b601-95f2dcbf4a44",
+                    "IdText": "event"
+                },
+                {
+                    "Id": "02ca7acc-a366-4533-9a0a-bd375f3fd591",
+                    "IdText": "ConnList"
+                }
+            ],
+            "shape": "Card",
+            "text": "ConnList",
+            "type": "Memory Drop"
+        },
+        {
+            "canHaveInputs": true,
+            "canHaveOutputs": true,
+            "category": "file",
+            "categoryType": "DataDrop",
+            "colour": " #394BB2",
+            "fields": [
+                {
+                    "name": "data_volume",
+                    "text": "Data volume",
+                    "value": "5"
+                },
+                {
+                    "name": "group_end",
+                    "text": "Group end",
+                    "value": "0"
+                },
+                {
+                    "name": "check_filepath_exists",
+                    "text": "Check file path exists",
+                    "value": "1"
+                },
+                {
+                    "name": "filepath",
+                    "text": "File path",
+                    "value": ""
+                },
+                {
+                    "name": "dirname",
+                    "text": "Directory name",
+                    "value": ""
+                }
+            ],
+            "inputPorts": [],
+            "isData": true,
+            "isGroup": false,
+            "key": -7,
+            "loc": "196.890625 148.91",
+            "outputPorts": [
+                {
+                    "Id": "a195ee3d-01ac-4a0a-96f0-81a62763f57d",
+                    "IdText": "event"
+                }
+            ],
+            "shape": "Card",
+            "text": "ConnList",
+            "type": "File Drop"
+        },
+        {
+            "canHaveInputs": true,
+            "canHaveOutputs": true,
+            "category": "memory",
+            "categoryType": "DataDrop",
+            "colour": " #394BB2",
+            "fields": [
+                {
+                    "name": "data_volume",
+                    "text": "Data volume",
+                    "value": "100"
+                },
+                {
+                    "name": "group_end",
+                    "text": "Group end",
+                    "value": "0"
+                }
+            ],
+            "group": -12,
+            "inputPorts": [
+                {
+                    "Id": "c4294fd2-80aa-42c4-a030-080194dd2532",
+                    "IdText": "event"
+                },
+                {
+                    "Id": "21789d51-a9b7-476a-af7d-1786d0e3b0a4",
+                    "IdText": "visStream"
+                }
+            ],
+            "isData": true,
+            "isGroup": false,
+            "key": -9,
+            "loc": "799.2206249999997 374.25",
+            "outputPorts": [
+                {
+                    "Id": "b2907ead-c5b8-4672-b601-95f2dcbf4a44",
+                    "IdText": "event"
+                },
+                {
+                    "Id": "6bc3e992-9c7a-4bf3-8e33-7a273f63b886",
+                    "IdText": "visStream"
+                }
+            ],
+            "shape": "Card",
+            "text": "visStream",
+            "type": "Memory Drop"
+        },
+        {
+            "appFields": [
+                {
+                    "name": "execution_time",
+                    "text": "Execution time",
+                    "value": "5"
+                },
+                {
+                    "name": "num_cpus",
+                    "text": "Num CPUs",
+                    "value": "1"
+                },
+                {
+                    "name": "group_start",
+                    "text": "Group start",
+                    "value": "0"
+                },
+                {
+                    "name": "appclass",
+                    "text": "Appclass",
+                    "value": "dlg.apps.simple.SleepApp"
+                },
+                {
+                    "name": "Arg01",
+                    "text": "Arg01",
+                    "value": ""
+                },
+                {
+                    "name": "Arg02",
+                    "text": "Arg02",
+                    "value": ""
+                },
+                {
+                    "name": "Arg03",
+                    "text": "Arg03",
+                    "value": ""
+                },
+                {
+                    "name": "Arg04",
+                    "text": "Arg04",
+                    "value": ""
+                },
+                {
+                    "name": "Arg05",
+                    "text": "Arg05",
+                    "value": ""
+                },
+                {
+                    "name": "Arg06",
+                    "text": "Arg06",
+                    "value": ""
+                },
+                {
+                    "name": "Arg07",
+                    "text": "Arg07",
+                    "value": ""
+                },
+                {
+                    "name": "Arg08",
+                    "text": "Arg08",
+                    "value": ""
+                },
+                {
+                    "name": "Arg09",
+                    "text": "Arg09",
+                    "value": ""
+                },
+                {
+                    "name": "Arg10",
+                    "text": "Arg10",
+                    "value": ""
+                }
+            ],
+            "application": "Component",
+            "canHaveInputs": true,
+            "canHaveOutputs": true,
+            "category": "SplitData",
+            "categoryType": "GroupComponent",
+            "colour": " #DDAD00",
+            "desiredSize": {
+                "class": "go.Size",
+                "height": 634,
+                "width": 935
+            },
+            "fields": [
+                {
+                    "name": "num_of_copies",
+                    "text": "Number of copies",
+                    "value": "4"
+                },
+                {
+                    "name": "scatter_axis",
+                    "text": "Scatter axis",
+                    "value": "Connections"
+                }
+            ],
+            "inputLocalPorts": [
+                {
+                    "Id": "5b1390dd-d1a5-4dbc-b062-3964b4a43ed0",
+                    "IdText": "event"
+                },
+                {
+                    "Id": "c148466c-b33c-4128-805f-1b995163cf75",
+                    "IdText": "visStream"
+                }
+            ],
+            "inputPorts": [
+                {
+                    "Id": "3c32a003-7baf-441d-9de9-78606c783954",
+                    "IdText": "event"
+                },
+                {
+                    "Id": "eb8fd670-f123-4616-a0e8-43bbc55b724b",
+                    "IdText": "ConnList"
+                }
+            ],
+            "isData": false,
+            "isGroup": true,
+            "key": -12,
+            "loc": "332.2206249999997 309.75",
+            "outputLocalPorts": [
+                {
+                    "Id": "18c23deb-ae4f-42ea-aeed-91060888d02c",
+                    "IdText": "event"
+                },
+                {
+                    "Id": "9de24943-9151-4e7c-9f1c-aee635b7fb7f",
+                    "IdText": "ConnList"
+                }
+            ],
+            "outputPorts": [
+                {
+                    "Id": "9f9d4c84-9db3-4d5a-97b5-cdd6d5edddc4",
+                    "IdText": "event"
+                },
+                {
+                    "Id": "9c9e26af-fc57-4b69-a48b-7a7d1c6ce1ab",
+                    "IdText": "subMS"
+                }
+            ],
+            "text": "ClusterScatterAverager",
+            "type": "Scatter"
+        },
+        {
+            "canHaveInputs": true,
+            "canHaveOutputs": true,
+            "category": "Component",
+            "categoryType": "ApplicationDrop",
+            "colour": " #3498DB",
+            "fields": [
+                {
+                    "name": "execution_time",
+                    "text": "Execution time",
+                    "value": "5"
+                },
+                {
+                    "name": "num_cpus",
+                    "text": "Num CPUs",
+                    "value": "1"
+                },
+                {
+                    "name": "group_start",
+                    "text": "Group start",
+                    "value": "0"
+                },
+                {
+                    "name": "appclass",
+                    "text": "Appclass",
+                    "value": "avg_drop.AveragerRelayDrop"
+                },
+                {
+                    "name": "Arg01",
+                    "text": "Arg01",
+                    "value": "config=/home/tob020/scm/git/jacal/summit_demo/oskar/ingest/conf/recv_relay.json"
+                },
+                {
+                    "name": "Arg02",
+                    "text": "Arg02",
+                    "value": "n_streams=1"
+                },
+                {
+                    "name": "Arg03",
+                    "text": "Arg03",
+                    "value": ""
+                },
+                {
+                    "name": "Arg04",
+                    "text": "Arg04",
+                    "value": ""
+                },
+                {
+                    "name": "Arg05",
+                    "text": "Arg05",
+                    "value": ""
+                },
+                {
+                    "name": "Arg06",
+                    "text": "Arg06",
+                    "value": ""
+                },
+                {
+                    "name": "Arg07",
+                    "text": "Arg07",
+                    "value": ""
+                },
+                {
+                    "name": "Arg08",
+                    "text": "Arg08",
+                    "value": ""
+                },
+                {
+                    "name": "Arg09",
+                    "text": "Arg09",
+                    "value": ""
+                },
+                {
+                    "name": "Arg10",
+                    "text": "Arg10",
+                    "value": ""
+                }
+            ],
+            "group": -12,
+            "inputPorts": [
+                {
+                    "Id": "04d29cdb-b1ab-4f6b-a1d7-2167a3419ac7",
+                    "IdText": "event"
+                },
+                {
+                    "Id": "7e69b687-7961-48a7-a7ea-3f37af7dece6",
+                    "IdText": "visStream"
+                }
+            ],
+            "isData": false,
+            "isGroup": false,
+            "key": -8,
+            "loc": "682.7208957647264 611.0273979785335",
+            "outputPorts": [
+                {
+                    "Id": "afb25fd2-bb5a-4a25-aaad-ddf62c497927",
+                    "IdText": "event"
+                },
+                {
+                    "Id": "f34cc7bf-1916-470c-983c-b7f29e3beb29",
+                    "IdText": "visStream"
+                }
+            ],
+            "text": "Combine_6_Streams",
+            "type": "Python App"
+        },
+        {
+            "appFields": [
+                {
+                    "name": "execution_time",
+                    "text": "Execution time",
+                    "value": "5"
+                },
+                {
+                    "name": "num_cpus",
+                    "text": "Num CPUs",
+                    "value": "6"
+                },
+                {
+                    "name": "group_start",
+                    "text": "Group start",
+                    "value": "0"
+                },
+                {
+                    "name": "appclass",
+                    "text": "Appclass",
+                    "value": "avg_drop.AveragerSinkDrop"
+                },
+                {
+                    "name": "Arg01",
+                    "text": "Arg01",
+                    "value": "config=/home/tob020/scm/git/jacal/summit_demo/oskar/ingest/conf/recv.json"
+                },
+                {
+                    "name": "Arg02",
+                    "text": "Arg02",
+                    "value": ""
+                },
+                {
+                    "name": "Arg03",
+                    "text": "Arg03",
+                    "value": ""
+                },
+                {
+                    "name": "Arg04",
+                    "text": "Arg04",
+                    "value": ""
+                },
+                {
+                    "name": "Arg05",
+                    "text": "Arg05",
+                    "value": ""
+                },
+                {
+                    "name": "Arg06",
+                    "text": "Arg06",
+                    "value": ""
+                },
+                {
+                    "name": "Arg07",
+                    "text": "Arg07",
+                    "value": ""
+                },
+                {
+                    "name": "Arg08",
+                    "text": "Arg08",
+                    "value": ""
+                },
+                {
+                    "name": "Arg09",
+                    "text": "Arg09",
+                    "value": ""
+                },
+                {
+                    "name": "Arg10",
+                    "text": "Arg10",
+                    "value": ""
+                }
+            ],
+            "application": "Component",
+            "canHaveInputs": true,
+            "canHaveOutputs": true,
+            "category": "DataGather",
+            "categoryType": "GroupComponent",
+            "colour": " #D35400",
+            "fields": [
+                {
+                    "name": "num_of_inputs",
+                    "text": "Number of inputs",
+                    "value": "1"
+                },
+                {
+                    "name": "gather_axis",
+                    "text": "Gather axis",
+                    "value": "frequency"
+                }
+            ],
+            "inputLocalPorts": [
+                {
+                    "Id": "403b41c7-aec2-4135-91bc-14d290331ea3",
+                    "IdText": "event"
+                },
+                {
+                    "Id": "97a7ed79-a219-47d4-8425-1608d77cd2ae",
+                    "IdText": "subMS"
+                }
+            ],
+            "inputPorts": [
+                {
+                    "Id": "2a77de3b-5c2e-42ea-84f3-facf2618a4c4",
+                    "IdText": "event"
+                },
+                {
+                    "Id": "6ba850f4-c177-4ff8-9df8-d332ef0ae905",
+                    "IdText": "visStream"
+                }
+            ],
+            "isData": false,
+            "isGroup": true,
+            "key": -10,
+            "loc": "1365.7208957647263 576.0273979785335",
+            "outputLocalPorts": [
+                {
+                    "Id": "a24edd10-216f-435f-8488-0afb5f0ac36e",
+                    "IdText": "event"
+                },
+                {
+                    "Id": "21eb0971-e285-4f06-9994-2d171cdefbad",
+                    "IdText": "visStream"
+                }
+            ],
+            "outputPorts": [
+                {
+                    "Id": "7e1d0c8f-5648-4ffd-a72d-6490441daec5",
+                    "IdText": "event"
+                },
+                {
+                    "Id": "7ff6ecc0-2208-43cd-906e-0fe0bde0f56b",
+                    "IdText": "subMS"
+                }
+            ],
+            "text": "Averager",
+            "type": "Gather"
+        },
+        {
+            "canHaveInputs": true,
+            "canHaveOutputs": true,
+            "category": "file",
+            "categoryType": "DataDrop",
+            "colour": " #394BB2",
+            "fields": [
+                {
+                    "name": "data_volume",
+                    "text": "Data volume",
+                    "value": "5"
+                },
+                {
+                    "name": "group_end",
+                    "text": "Group end",
+                    "value": "0"
+                },
+                {
+                    "name": "check_filepath_exists",
+                    "text": "Check file path exists",
+                    "value": "1"
+                },
+                {
+                    "name": "filepath",
+                    "text": "File path",
+                    "value": ""
+                },
+                {
+                    "name": "dirname",
+                    "text": "Directory name",
+                    "value": ""
+                }
+            ],
+            "group": -10,
+            "inputPorts": [
+                {
+                    "Id": "95f57710-0864-4981-8893-f7c60f9a667d",
+                    "IdText": "event"
+                }
+            ],
+            "isData": true,
+            "isGroup": false,
+            "key": -5,
+            "loc": "1397.1363677978516 673.0280734999624",
+            "outputPorts": [],
+            "shape": "Card",
+            "text": "SubMS",
+            "type": "File Drop"
+        }
+    ]
+}
