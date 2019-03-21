@@ -35,6 +35,8 @@ print_usage() {
 	echo " -m <cmake>    Cmake binary to use, must be >= 3.1, defaults to cmake"
 	echo " -j <jobs>     Number of parallel compilation jobs, defaults to 1"
 	echo " -p <prefix>   Prefix for installation, defaults to /usr/local"
+	echo " -w <workdir>  Working directory, defaults to ."
+	echo " -W            Remove the working directory at the end of the build"
 	echo " -o            Do *not* build OSKAR"
 	echo " -i            Do *not* install system dependencies"
 	echo " -a            Do *not* build ADIOS2, implies -C 2.4.0"
@@ -73,6 +75,8 @@ compiler=gcc
 cmake=cmake
 jobs=1
 prefix=/usr/local
+workdir=.
+remove_workdir=no
 build_oskar=yes
 install_dependencies=yes
 build_adios=yes
@@ -82,7 +86,7 @@ casarest_opts=
 yandasoft_opts=
 oskar_opts=
 
-while getopts "h?s:c:m:j:p:oiaC:A:r:y:O:" opt
+while getopts "h?s:c:m:j:p:w:WoiaC:A:r:y:O:" opt
 do
 	case "$opt" in
 		[h?])
@@ -103,6 +107,12 @@ do
 			;;
 		p)
 			prefix="$OPTARG"
+			;;
+		w)
+			workdir="$OPTARG"
+			;;
+		W)
+			remove_workdir=yes
 			;;
 		o)
 			build_oskar=no
@@ -239,6 +249,12 @@ build_and_install() {
 	cd ../..
 }
 
+original_dir="$PWD"
+if [ -d "$workdir" ]; then
+	try mkdir -p "$workdir"
+fi
+cd "$workdir"
+
 if [ $install_dependencies == yes ]; then
 	install_dependencies
 fi
@@ -317,3 +333,8 @@ fi
 
 # DALiuGE
 try pip install git+https://github.com/ICRAR/daliuge
+
+if [ $remove_workdir == yes ]; then
+	cd $original_dir
+	rm -rf "$workdir"
+fi
