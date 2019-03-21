@@ -249,8 +249,20 @@ build_and_install() {
 	cd ../..
 }
 
+source_venv() {
+	if [ ! -f $prefix/bin/activate ]; then
+		if [ -n "`command -v virtualenv 2> /dev/null`" ]; then
+			try virtualenv $prefix
+		else
+			try pip install --user virtualenv
+			try ~/.local/bin/virtualenv $prefix
+		fi
+	fi
+	source $prefix/bin/activate
+}
+
 original_dir="$PWD"
-if [ -d "$workdir" ]; then
+if [ ! -d "$workdir" ]; then
 	try mkdir -p "$workdir"
 fi
 cd "$workdir"
@@ -268,16 +280,8 @@ fi
 # Setup our environment
 export LD_LIBRARY_PATH=$prefix/lib64:$LD_LIBRARY_PATH
 
-# Let's work with a virtualenv from now on
-if [ ! -f $prefix/bin/activate ]; then
-	if [ -n `command -v virtualenv 2> /dev/null` ]; then
-		try virtualenv $prefix
-	else
-		try pip install --user virtualenv
-		try ~/.local/bin/virtualenv $prefix
-	fi
-fi
-source $prefix/bin/activate
+# Let's work with a virtualenv
+source_venv
 try pip install numpy
 
 # ADIOS2, casacore and casarest
