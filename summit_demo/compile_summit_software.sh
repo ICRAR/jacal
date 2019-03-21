@@ -164,26 +164,36 @@ fi
 
 install_dependencies() {
 	if [ $system == ubuntu ]; then
+		$SUDO apt update
 		$SUDO apt install -y \
-		    cmake           `# many` \
-		    flex bison      `# casacore` \
-		    git             `# many` \
-		    g++             `# many` \
-		    libboost-dev    `# casacore` \
-		    libcfitsio-dev  `# casacore` \
-		    libffi-dev      `# cryptography (python) -> paramiko -> daliuge` \
-		    libfftw3-dev    `# casacore` \
-		    libgsl-dev      `# many` \
-		    liblog4cxx-dev  `# yandasoft` \
-		    libopenblas-dev `# casacore` \
-		    libopenmpi-dev  `# adios, casacore, oskar` \
-		    libpython-dev   `# casacore, few python packages` \
-		    make            `# many` \
-		    patch           `# lofar-common` \
-		    python-pip      `# so we can pip install virtualenv` \
-		    subversion      `# lofar-blob, lofar-common` \
-		    wcslib-dev      `# casacore`
+		    cmake                         `# many` \
+		    flex bison                    `# casacore` \
+		    gfortran                      `# many` \
+		    git                           `# many` \
+		    g++                           `# many` \
+		    libboost-dev                  `# casacore` \
+		    libboost-filesystem-dev       `# yandasoft` \
+		    libboost-program-options-dev  `# base-askap` \
+		    libboost-signals-dev          `# base-askap` \
+		    libboost-system-dev           `# casarest` \
+		    libboost-thread-dev           `# casarest` \
+		    libcfitsio-dev                `# casacore` \
+		    libffi-dev                    `# cryptography (python) -> paramiko -> daliuge` \
+		    libfftw3-dev                  `# casacore` \
+		    libgsl-dev                    `# many` \
+		    liblog4cxx-dev                `# yandasoft` \
+		    libopenblas-dev               `# casacore` \
+		    libopenmpi-dev                `# adios, casacore, oskar` \
+		    libpython-dev                 `# casacore, few python packages` \
+		    make                          `# many` \
+		    patch                         `# lofar-common` \
+		    python-pip                    `# so we can pip install virtualenv` \
+		    subversion                    `# lofar-blob, lofar-common` \
+		    wcslib-dev                    `# casacore`
 		$SUDO apt clean
+		if [ $compiler == clang ]; then
+			$SUDO apt install -y clang
+		fi
 	else
 		$SUDO yum --assumeyes install \
 		    boost-devel    `# casacore` \
