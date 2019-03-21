@@ -183,6 +183,7 @@ install_dependencies() {
 		    python-pip      `# so we can pip install virtualenv` \
 		    subversion      `# lofar-blob, lofar-common` \
 		    wcslib-dev      `# casacore`
+		$SUDO apt clean
 	else
 		$SUDO yum --assumeyes install \
 		    boost-devel    `# casacore` \
@@ -207,6 +208,7 @@ install_dependencies() {
 		if [ $compiler == clang ]; then
 			$SUDO yum --assumeyes install clang
 		fi
+		$SUDO yum clean all
 	fi
 }
 
