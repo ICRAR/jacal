@@ -254,8 +254,12 @@ export LD_LIBRARY_PATH=$prefix/lib64:$LD_LIBRARY_PATH
 
 # Let's work with a virtualenv from now on
 if [ ! -f $prefix/bin/activate ]; then
-	try pip install --user virtualenv
-	try ~/.local/bin/virtualenv $prefix
+	if [ -n `command -v virtualenv 2> /dev/null` ]; then
+		try virtualenv $prefix
+	else
+		try pip install --user virtualenv
+		try ~/.local/bin/virtualenv $prefix
+	fi
 fi
 source $prefix/bin/activate
 try pip install numpy
