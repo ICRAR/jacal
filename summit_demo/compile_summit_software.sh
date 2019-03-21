@@ -30,9 +30,10 @@ print_usage() {
 	echo "Usage: $0 [options]"
 	echo
 	echo "Options:"
-	echo " -s <system>   Supported values are centos and ubuntu"
-	echo " -c <compiler> Supported values are gcc and clang"
-	echo " -j <jobs>     Number of parallel compilation jobs"
+	echo " -s <system>   Target system, supported values are centos (default) and ubuntu"
+	echo " -c <compiler> Compiler suite to use, supported values are gcc (default) and clang"
+	echo " -m <cmake>    Cmake binary to use, must be >= 3.1, defaults to cmake"
+	echo " -j <jobs>     Number of parallel compilation jobs, defaults to 1"
 	echo " -p <prefix>   Prefix for installation, defaults to /usr/local"
 	echo " -o            Do *not* build OSKAR"
 	echo " -i            Do *not* install system dependencies"
@@ -67,6 +68,9 @@ check_supported_values() {
 	exit 1
 }
 
+system=centos
+compiler=gcc
+cmake=cmake
 jobs=1
 prefix=/usr/local
 build_oskar=yes
@@ -78,7 +82,7 @@ casarest_opts=
 yandasoft_opts=
 oskar_opts=
 
-while getopts "h?s:c:j:p:oiaC:A:r:y:O:" opt
+while getopts "h?s:c:m:j:p:oiaC:A:r:y:O:" opt
 do
 	case "$opt" in
 		[h?])
@@ -90,6 +94,9 @@ do
 			;;
 		c)
 			compiler="$OPTARG"
+			;;
+		m)
+			cmake="$OPTARG"
 			;;
 		j)
 			jobs="$OPTARG"
@@ -140,9 +147,7 @@ else
 fi
 
 if [ $system == centos ]; then
-	CMAKE=cmake3
-else
-	CMAKE=cmake
+	cmake=cmake3
 fi
 
 install_dependencies() {
@@ -226,7 +231,7 @@ build_and_install() {
 	else
 		comp_opts="-DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc"
 	fi
-	try ${CMAKE} .. -DCMAKE_INSTALL_PREFIX="$prefix" $comp_opts "$@"
+	try ${cmake} .. -DCMAKE_INSTALL_PREFIX="$prefix" $comp_opts "$@"
 	try make all -j${jobs}
 	try make install -j${jobs}
 	cd ../..
