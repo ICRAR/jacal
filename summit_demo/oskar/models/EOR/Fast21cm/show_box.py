@@ -63,13 +63,15 @@ for n1 in range(len(fq)):
    else:
        pl.savefig('sky_eor_model_f%06.2f.png'%(fq[n1]))
 
+sum=np.zeros(len(sall))
 for n1 in range(1,len(sall)): # recalculate SI.
     #   As there is a bug in previous calc which I can not both searching for :)
     #   si=-np.log(a/b)/np.log(fq[-1]/(df+fq[-1]))
     sall[n1]=-np.log(ball[n1]/ball[n1-1])/np.log(fq[n1-1]/fq[n1])
+    sum[n1]=np.mean(ball[n1]) #[np.where(np.isnan(ball[n1])==False)])
     for n2 in range(N2):
         sall[n1][n2][np.where(np.isnan(sall[n1][n2])==True)]=0
-
+    ball[n1]=ball[n1]-sum[n1]
 #sall[np.where(np.isnan(sall)==True)]=0
 #ball[np.where(np.isnan(ball)==True)]=0
 
@@ -80,10 +82,10 @@ print '##  RA,    Dec,   I,    Q,    U,    V,   freq0, spix,  RM,      maj,     
 print '## (deg), (deg), (Jy), (Jy), (Jy), (Jy), (Hz), (-), (rad/m^2), (arcsec), (arcsec), (deg)'
 print '##'
 #201 -44 1.000 0.000000 0.000000 0.000000 1.000000e+08 0.000000 0.000000 54.347520 54.347520 0.000000
-corn_markers.append('%10.8f %10.8f %10.8e 0.0 0.0 0.0 %e %6.3f 0.0 %6.4f %6.4f 0.0\n'%(crval[0]+(N2*-0.45)*crdel[0],crval[1]+(N3*-0.45)*crdel[1],1e-3,fq[0]*1e6,0,0,0))
-corn_markers.append('%10.8f %10.8f %10.8e 0.0 0.0 0.0 %e %6.3f 0.0 %6.4f %6.4f 0.0\n'%(crval[0]+(N2*-0.45)*crdel[0],crval[1]+(N3*0.45)*crdel[1],1e-3,fq[0]*1e6,0,0,0))
-corn_markers.append('%10.8f %10.8f %10.8e 0.0 0.0 0.0 %e %6.3f 0.0 %6.4f %6.4f 0.0\n'%(crval[0]+(N2*0.45)*crdel[0],crval[1]+(N3*-0.45)*crdel[1],1e-3,fq[0]*1e6,0,0,0))
-corn_markers.append('%10.8f %10.8f %10.8e 0.0 0.0 0.0 %e %6.3f 0.0 %6.4f %6.4f 0.0\n'%(crval[0]+(N2*0.45)*crdel[0],crval[1]+(N3*0.45)*crdel[1],1e-3,fq[0]*1e6,0,0,0))
+corn_markers.append('%10.8f %10.8f %10.8e 0.0 0.0 0.0 %e %6.3f 0.0 %6.4f %6.4f 0.0\n'%(crval[0]+(N2*-0.45)*crdel[0],crval[1]+(N3*-0.45)*crdel[1],1e-3,1e6,0,0,0))
+corn_markers.append('%10.8f %10.8f %10.8e 0.0 0.0 0.0 %e %6.3f 0.0 %6.4f %6.4f 0.0\n'%(crval[0]+(N2*-0.45)*crdel[0],crval[1]+(N3*0.45)*crdel[1],1e-3,1e6,0,0,0))
+corn_markers.append('%10.8f %10.8f %10.8e 0.0 0.0 0.0 %e %6.3f 0.0 %6.4f %6.4f 0.0\n'%(crval[0]+(N2*0.45)*crdel[0],crval[1]+(N3*-0.45)*crdel[1],1e-3,1e6,0,0,0))
+corn_markers.append('%10.8f %10.8f %10.8e 0.0 0.0 0.0 %e %6.3f 0.0 %6.4f %6.4f 0.0\n'%(crval[0]+(N2*0.45)*crdel[0],crval[1]+(N3*0.45)*crdel[1],1e-3,1e6,0,0,0))
 
 #std_dev=np.std(ball,axis=(1,2))*0
 n=ball.shape
@@ -95,9 +97,10 @@ if (show_plots==False):
     for n2 in range(n[1]):
         for n3 in range(n[2]):
             if (np.abs(ball[n1][n2][n3])>std_dev):
-                l.append('%10.8f %10.8f %10.8e 0.0 0.0 0.0 %e %6.3f 0.0 %6.4f %6.4f 0.0\n'%(crval[0]+(n2-N2/2)*crdel[0],crval[1]+(n3-N3/2)*crdel[1],ball[n1][n2][n3]/1e3,fq[n1]*1e6,sall[n1][n2][n3],crdel[0]/3600,crdel[1]/3600))
+                l.append('%10.8f %10.8f %10.8e 0.0 0.0 0.0 %e %6.3f 0.0 %6.4f %6.4f 0.0\n'%(crval[0]+(n2-N2/2)*crdel[0],crval[1]+(n3-N3/2)*crdel[1],ball[n1][n2][n3]/1e3,fq[n1]*1e6,sall[n1][n2][n3],crdel[0]*3600.,crdel[1]*3600.))
             #if (n1<len(a)): ## Now a is added to ball
             #    l.append('%10.8f %10.8f %10.8e 0.0 0.0 0.0 %e %6.3f 0.0 %6.4f %6.4f 0.0\n'%(crval[0]+(n2-N2/2)*crdel[0],crval[1]+(n3-N3/2)*crdel[1],a[n1][n2][n3],1e9,0,crdel[0]/3600,crdel[1]/3600))
+    l.append('%10.8f %10.8f %10.8e 0.0 0.0 0.0 %e %6.3f 0.0 %6.4f %6.4f 0.0\n'%(crval[0],crval[1],sum[n1]/1e3,fq[n1]*1e6,0,crdel[0]*N2*3600.,crdel[1]*N3*3600.))
     fp=open('sky_eor_model_f%06.2f.osm'%(fq[n1]),'w')
     fp.writelines(corn_markers)
     if (len(l)):
