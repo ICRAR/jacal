@@ -153,22 +153,24 @@ fi
 install_dependencies() {
 	if [ $system == ubuntu ]; then
 		$SUDO apt install -y \
-		    boost-devel     `# casacore` \
-		    cfitsio-devel   `# casacore` \
-		    cmake3          `# many` \
-		    fftw3-devel     `# casacore` \
+		    cmake           `# many` \
 		    flex bison      `# casacore` \
 		    git             `# many` \
-		    libffi-devel    `# cryptography (python) -> paramiko -> daliuge` \
-		    openblas-devel  `# casacore` \
-		    openmpi-devel   `# adios, casacore, oskar` \
-		    openssl-devel   `# cryptography (see above)` \
+		    g++             `# many` \
+		    libboost-dev    `# casacore` \
+		    libcfitsio-dev  `# casacore` \
+		    libffi-dev      `# cryptography (python) -> paramiko -> daliuge` \
+		    libfftw3-dev    `# casacore` \
+		    libgsl-dev      `# many` \
+		    liblog4cxx-dev  `# yandasoft` \
+		    libopenblas-dev `# casacore` \
+		    libopenmpi-dev  `# adios, casacore, oskar` \
+		    libpython-dev   `# casacore, few python packages` \
+		    make            `# many` \
 		    patch           `# lofar-common` \
-		    python-devel    `# casacore, few python packages` \
 		    python-pip      `# so we can pip install virtualenv` \
-		    python2-numpy   `# casacore, oskar, few python packages` \
-		    svn             `# lofar-blob, lofar-common` \
-		    wcslib-devel    `# casacore`
+		    subversion      `# lofar-blob, lofar-common` \
+		    wcslib-dev      `# casacore`
 	else
 		$SUDO yum --assumeyes install \
 		    boost-devel    `# casacore` \
