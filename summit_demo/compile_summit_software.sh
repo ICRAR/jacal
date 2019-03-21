@@ -30,9 +30,9 @@ print_usage() {
 	echo "Usage: $0 [options]"
 	echo
 	echo "Options:"
-	echo " -s <system>   Supported values are centos and ubuntu"
-	echo " -c <compiler> Supported values are gcc and clang"
-	echo " -j <jobs>     Number of parallel compilation jobs"
+	echo " -s <system>   Target system, supported values are centos (default) and ubuntu"
+	echo " -c <compiler> Compiler suite to use, supported values are gcc (default) and clang"
+	echo " -j <jobs>     Number of parallel compilation jobs, defaults to 1"
 	echo " -p <prefix>   Prefix for installation, defaults to /usr/local"
 	echo " -o            Do *not* build OSKAR"
 	echo " -i            Do *not* install system dependencies"
@@ -67,6 +67,8 @@ check_supported_values() {
 	exit 1
 }
 
+system=centos
+compiler=gcc
 jobs=1
 prefix=/usr/local
 build_oskar=yes
