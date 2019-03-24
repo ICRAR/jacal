@@ -35,6 +35,8 @@ print_usage() {
 	echo " -m <cmake>    Cmake binary to use, must be >= 3.1, defaults to cmake"
 	echo " -j <jobs>     Number of parallel compilation jobs, defaults to 1"
 	echo " -p <prefix>   Prefix for installation, defaults to /usr/local"
+	echo " -w <workdir>  Working directory, defaults to ."
+	echo " -W            Remove the working directory at the end of the build"
 	echo " -o            Do *not* build OSKAR"
 	echo " -i            Do *not* install system dependencies"
 	echo " -a            Do *not* build ADIOS2, implies -C 2.4.0"
@@ -73,6 +75,8 @@ compiler=gcc
 cmake=cmake
 jobs=1
 prefix=/usr/local
+workdir=.
+remove_workdir=no
 build_oskar=yes
 install_dependencies=yes
 build_adios=yes
@@ -82,7 +86,7 @@ casarest_opts=
 yandasoft_opts=
 oskar_opts=
 
-while getopts "h?s:c:m:j:p:oiaC:A:r:y:O:" opt
+while getopts "h?s:c:m:j:p:w:WoiaC:A:r:y:O:" opt
 do
 	case "$opt" in
 		[h?])
@@ -104,6 +108,12 @@ do
 		p)
 			prefix="$OPTARG"
 			;;
+		w)
+			workdir="$OPTARG"
+			;;
+		W)
+			remove_workdir=yes
+			;;
 		o)
 			build_oskar=no
 			;;
@@ -112,7 +122,6 @@ do
 			;;
 		a)
 			build_adios=no
-			casacore_version=2.4.0
 			;;
 		C)
 			casacore_version="$OPTARG"
@@ -139,6 +148,9 @@ done
 check_supported_values system $system centos ubuntu
 check_supported_values compiler $compiler gcc clang cray
 check_supported_values casacore_version $casacore_version master 2.4.0 2.0.3
+if [ $casacore_version != master ]; then
+	build_adios=no
+fi
 
 if [ $EUID == 0 ]; then
 	SUDO=
@@ -152,23 +164,36 @@ fi
 
 install_dependencies() {
 	if [ $system == ubuntu ]; then
+		$SUDO apt update
 		$SUDO apt install -y \
-		    boost-devel     `# casacore` \
-		    cfitsio-devel   `# casacore` \
-		    cmake3          `# many` \
-		    fftw3-devel     `# casacore` \
-		    flex bison      `# casacore` \
-		    git             `# many` \
-		    libffi-devel    `# cryptography (python) -> paramiko -> daliuge` \
-		    openblas-devel  `# casacore` \
-		    openmpi-devel   `# adios, casacore, oskar` \
-		    openssl-devel   `# cryptography (see above)` \
-		    patch           `# lofar-common` \
-		    python-devel    `# casacore, few python packages` \
-		    python-pip      `# so we can pip install virtualenv` \
-		    python2-numpy   `# casacore, oskar, few python packages` \
-		    svn             `# lofar-blob, lofar-common` \
-		    wcslib-devel    `# casacore`
+		    cmake                         `# many` \
+		    flex bison                    `# casacore` \
+		    gfortran                      `# many` \
+		    git                           `# many` \
+		    g++                           `# many` \
+		    libboost-dev                  `# casacore` \
+		    libboost-filesystem-dev       `# yandasoft` \
+		    libboost-program-options-dev  `# base-askap` \
+		    libboost-signals-dev          `# base-askap` \
+		    libboost-system-dev           `# casarest` \
+		    libboost-thread-dev           `# casarest` \
+		    libcfitsio-dev                `# casacore` \
+		    libffi-dev                    `# cryptography (python) -> paramiko -> daliuge` \
+		    libfftw3-dev                  `# casacore` \
+		    libgsl-dev                    `# many` \
+		    liblog4cxx-dev                `# yandasoft` \
+		    libopenblas-dev               `# casacore` \
+		    libopenmpi-dev                `# adios, casacore, oskar` \
+		    libpython-dev                 `# casacore, few python packages` \
+		    make                          `# many` \
+		    patch                         `# lofar-common` \
+		    python-pip                    `# so we can pip install virtualenv` \
+		    subversion                    `# lofar-blob, lofar-common` \
+		    wcslib-dev                    `# casacore`
+		$SUDO apt clean
+		if [ $compiler == clang ]; then
+			$SUDO apt install -y clang
+		fi
 	else
 		$SUDO yum --assumeyes install \
 		    boost-devel    `# casacore` \
@@ -193,6 +218,7 @@ install_dependencies() {
 		if [ $compiler == clang ]; then
 			$SUDO yum --assumeyes install clang
 		fi
+		$SUDO yum clean all
 	fi
 }
 
@@ -237,6 +263,24 @@ build_and_install() {
 	cd ../..
 }
 
+source_venv() {
+	if [ ! -f $prefix/bin/activate ]; then
+		if [ -n "`command -v virtualenv 2> /dev/null`" ]; then
+			try virtualenv $prefix
+		else
+			try pip install --user virtualenv
+			try ~/.local/bin/virtualenv $prefix
+		fi
+	fi
+	source $prefix/bin/activate
+}
+
+original_dir="$PWD"
+if [ ! -d "$workdir" ]; then
+	try mkdir -p "$workdir"
+fi
+cd "$workdir"
+
 if [ $install_dependencies == yes ]; then
 	install_dependencies
 fi
@@ -250,12 +294,8 @@ fi
 # Setup our environment
 export LD_LIBRARY_PATH=$prefix/lib64:$LD_LIBRARY_PATH
 
-# Let's work with a virtualenv from now on
-if [ ! -f $prefix/bin/activate ]; then
-	try pip install --user virtualenv
-	try ~/.local/bin/virtualenv $prefix
-fi
-source $prefix/bin/activate
+# Let's work with a virtualenv
+source_venv
 try pip install numpy
 
 # ADIOS2, casacore and casarest
@@ -273,7 +313,7 @@ build_and_install https://github.com/casacore/casacore $casacore_version -DBUILD
 
 if [ $casacore_version == master ]; then
 	casarest_version=master
-elif [ $casacore_version == v2.4.0 ]; then
+elif [ $casacore_version == COMMIT-v2.4.0 ]; then
 	casarest_version=COMMIT-467ed6d
 else
 	casarest_version=COMMIT-v1.4.1
@@ -311,3 +351,8 @@ fi
 
 # DALiuGE
 try pip install git+https://github.com/ICRAR/daliuge
+
+if [ $remove_workdir == yes ]; then
+	cd $original_dir
+	rm -rf "$workdir"
+fi
