@@ -45,6 +45,7 @@ print_usage() {
 	echo " -r <opts>     Extra casarest cmake options"
 	echo " -y <opts>     Extra yandasoft common cmake options"
 	echo " -O <opts>     Extra OSKAR cmake options"
+	echo " -P            Use Python 3 - NOTE: Only tested with CentOS7 on POWER9"
 }
 
 try() {
@@ -78,6 +79,7 @@ prefix=/usr/local
 workdir=.
 remove_workdir=no
 build_oskar=yes
+use_python3=no
 install_dependencies=yes
 build_adios=yes
 casacore_version=master
@@ -86,7 +88,7 @@ casarest_opts=
 yandasoft_opts=
 oskar_opts=
 
-while getopts "h?s:c:m:j:p:w:WoiaC:A:r:y:O:" opt
+while getopts "h?s:c:m:j:p:w:WPoiaC:A:r:y:O:" opt
 do
 	case "$opt" in
 		[h?])
@@ -137,6 +139,9 @@ do
 			;;
 		O)
 			oskar_opts="$OPTARG"
+			;;
+		P)
+			use_python3=yes
 			;;
 		*)
 			print_usage 1>&2
@@ -218,6 +223,9 @@ install_dependencies() {
 		if [ $compiler == clang ]; then
 			$SUDO yum --assumeyes install clang
 		fi
+		if [ $use_python3 == yes ]; then
+			$SUDO yum --assumeyes install python34 python34-devel python34-pip boost-python34-devel
+		fi
 		$SUDO yum clean all
 	fi
 }
@@ -231,15 +239,24 @@ repo2dir() {
 build_and_install() {
 	ref=$2
 	is_branch=yes
+	is_merge=no
 	if [[ "$ref" =~ COMMIT-(.*) ]]; then
 		ref=${BASH_REMATCH[1]}
 		is_branch=no
+	elif [[ "$ref" =~ MERGE-(.*) ]]; then
+		ref=${BASH_REMATCH[1]}
+		is_branch=no
+		is_merge=yes
 	fi
 	if [ ! -d `repo2dir $1` ]; then
 		try git clone $1
 		cd `repo2dir $1`
 		if [ $is_branch == yes ]; then
 			git checkout -b $ref origin/$ref
+		elif [ $is_merge == yes ]; then
+			git config user.email "you@example.com"
+			git config user.name "Your Name"
+			git merge --no-edit remotes/origin/$ref
 		else
 			git checkout -b working_copy
 			git reset --hard $ref
@@ -265,11 +282,15 @@ build_and_install() {
 
 source_venv() {
 	if [ ! -f $prefix/bin/activate ]; then
-		if [ -n "`command -v virtualenv 2> /dev/null`" ]; then
-			try virtualenv $prefix
+		if [ $use_python3 == yes ]; then
+			python3 -m venv $prefix
 		else
-			try pip install --user virtualenv
-			try ~/.local/bin/virtualenv $prefix
+			if [ -n "`command -v virtualenv 2> /dev/null`" ]; then
+				try virtualenv $prefix
+			else
+				try pip install --user virtualenv
+				try ~/.local/bin/virtualenv $prefix
+			fi
 		fi
 	fi
 	source $prefix/bin/activate
@@ -309,7 +330,14 @@ fi
 if [ $casacore_version != master ]; then
 	casacore_version=COMMIT-v$casacore_version
 fi
+if [ $use_python3 == yes ]; then
+	casacore_version=MERGE-fix_boost_python
+fi
 build_and_install https://github.com/casacore/casacore $casacore_version -DBUILD_TESTING=OFF $casacore_opts
+if [ $casacore_version == MERGE-fix_boost_python ]; then
+	# Lets reset this back to master to save handling lots os special cases below!
+	casacore_version=master
+fi
 
 if [ $casacore_version == master ]; then
 	casarest_version=master
@@ -350,6 +378,15 @@ if [ $build_oskar == yes ]; then
 fi
 
 # DALiuGE
+# 'centos' here means 'power9', where we need to build pyzmq ourselves
+# since the src dist from PyPI fails to build
+if [ $system == centos -a $use_python3 == yes ]; then
+	try pip install cython
+	try git clone https://github.com/zeromq/pyzmq
+	cd pyzmq
+	try python setup.py install
+	cd ..
+fi
 try pip install git+https://github.com/ICRAR/daliuge
 
 if [ $remove_workdir == yes ]; then
