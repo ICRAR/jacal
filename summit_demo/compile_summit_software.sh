@@ -389,6 +389,9 @@ if [ $system == centos -a $use_python3 == yes ]; then
 fi
 try pip install git+https://github.com/ICRAR/daliuge
 
+# spead2
+try pip install spead2==1.10
+
 if [ $remove_workdir == yes ]; then
 	cd $original_dir
 	rm -rf "$workdir"
