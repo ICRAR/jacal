@@ -62,12 +62,7 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
                 },
             "streams":
                 [],
-
             "as_relay": 1,
-            "output_ms": "",
-            "baseline_map_filename": "",
-            "use_adios2": self.use_adios,
-
             "relay":
                 {
                 "stream_config":
