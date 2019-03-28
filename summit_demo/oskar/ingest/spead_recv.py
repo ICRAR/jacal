@@ -40,7 +40,6 @@ class SpeadReceiver(object):
     def __init__(self, spead_config, disconnect_tolerance=0, mpi_comm=None, ports=None):
         self._streams = []
         self._ports = []
-        self.use_adios2 = spead_config['use_adios2']
         self.mpi_comm = mpi_comm
         self._num_stream = len(spead_config['streams'])
         self._num_stream_disconnect = 0
@@ -62,20 +61,21 @@ class SpeadReceiver(object):
             self._streams.append(stream)
 
         self._measurement_set = None
-        self._file_name = spead_config['output_ms']
         self._header = {}
-
-        try:
-            os.mkdir(os.path.dirname(self._file_name))
-        except OSError:
-            pass
 
         self._baseline_exclude = []
         self._baseline_map = []
 
-        self.as_relay = False
         if spead_config['as_relay'] == 1:
             self.as_relay = True
+        else:
+            self.as_relay = False
+            self.use_adios2 = spead_config.get('use_adios2', False)
+            self._file_name = spead_config.get('output_ms', 'output.ms')
+            try:
+                os.mkdir(os.path.dirname(self._file_name))
+            except OSError:
+                pass
 
         if self.as_relay:
             # NOTE: Don't do baseline exclusion if its a relay  as it shares a codebase with the MS writer
