@@ -27,7 +27,7 @@ class TestAverager(unittest.TestCase):
                                 stream_listen_port_start=51000,
                                 num_stream_listen_ports=1,
                                 baseline_exclusion_map_path='./conf/aa2_baselines.csv',
-                                node='localhost')
+                                node='127.0.0.1')
         drop = InMemoryDROP('3', '3')
         drop.addStreamingConsumer(sink)
         signal.addOutput(drop)

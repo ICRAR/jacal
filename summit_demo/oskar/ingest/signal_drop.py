@@ -46,7 +46,7 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
             "stream":
                 {
                     "port": 0,
-                    "host": "localhost"
+                    "host": "127.0.0.1"
                 },
             "write_ms": 0
         }
@@ -155,7 +155,7 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
             self.spead_send.append({"spead": spead_conf, "oskar": oskar_conf})
 
             # Setting relay incoming streams
-            self.spead_avg_local.append({"host": "localhost", "port": 41000+i})
+            self.spead_avg_local.append({"host": "127.0.0.1", "port": 41000+i})
 
         self.spead_avg_conf["streams"] = self.spead_avg_local
 
