@@ -130,9 +130,9 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
         for i in range(self.num_freq_steps):
             # creating N number of oskar and spead send configs
             spead_conf = copy.deepcopy(self.spead_send_conf)
-            spead_conf["stream"]["port"] = 41000+i
+            spead_conf["stream"]["port"] = 41000 + i
 
-            freq = self.start_freq+(self.freq_step*i)
+            freq = self.start_freq + (self.freq_step * i)
             oskar_conf = copy.deepcopy(self.oskar_conf)
             oskar_conf["observation"]["start_frequency_hz"] = freq
             oskar_conf["observation"]["frequency_inc_hz"] = self.freq_step
