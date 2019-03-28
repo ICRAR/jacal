@@ -21,7 +21,7 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
     def initialize(self, **kwargs):
 
         # spead inputs
-        self.stream_port = int(kwargs.get('stream_port', 0))
+        self.stream_port = int(kwargs.get('stream_port', 51000))
         self.disconnect_tolerance = int(kwargs.get('disconnect_tolerance', 0))
 
         # oskar inputs
