@@ -57,7 +57,7 @@ class AveragerSinkDrop(AppDROP):
         self.disconnect_tolerance = int(kwargs.get('disconnect_tolerance', 0))
         self.baseline_exclusion_map_path = kwargs.get('baseline_exclusion_map_path')
         self.start_listen_port = int(kwargs.get('stream_listen_port_start', 51000))
-        use_adios2 = int(kwargs.get('use_adios2', 0))
+        self.use_adios2 = int(kwargs.get('use_adios2', 0))
 
         self.config = {
             "stream_config":
@@ -70,7 +70,7 @@ class AveragerSinkDrop(AppDROP):
             "as_relay": 0,
             "output_ms": "",
             "baseline_map_filename": self.baseline_exclusion_map_path,
-            "use_adios2": use_adios2,
+            "use_adios2": self.use_adios2,
             }
 
         super(AveragerSinkDrop, self).initialize(**kwargs)
@@ -84,13 +84,16 @@ class AveragerSinkDrop(AppDROP):
     def dataWritten(self, uid, data):
         logger.info("AveragerSinkDrop dataWritten called")
 
-        try:
-            comm = dlg.mpi_comm
-        except AttributeError:
-            comm = None
-
         with self.lock:
             if self.start is False:
+
+               try:
+                   comm = dlg.mpi_comm
+               except AttributeError:
+                   comm = None
+                   if self.use_adios2:
+                       import mpi4py
+                       comm = mpi4py.COMM_WORLD
 
                 # Only now we know the correct number of inputs
                 self.config['streams'] = [{'host': '0.0.0.0', 'port': self.start_listen_port + i} for i in range(len(self.streamingInputs))]
