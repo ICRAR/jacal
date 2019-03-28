@@ -2,7 +2,8 @@ import os
 import csv
 import copy
 import logging
-import configparser
+
+from six.moves import configparser
 
 from oskar import SettingsTree
 from threading import Thread
@@ -145,7 +146,7 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
                     break
 
             if not oskar_conf["sky"]["oskar_sky_model/file"]:
-                raise Exception(f"Could not find sky model for freq {freq}")
+                raise Exception("Could not find sky model for freq %f" % freq)
 
             self.spead_send.append({"spead": spead_conf, "oskar": oskar_conf})
 
@@ -191,7 +192,7 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
         self.relay_thread.start()
 
         for i, conf in enumerate(self.spead_send):
-            conf_path = f"/tmp/sim{i}.ini"
+            conf_path = "/tmp/sim%d.ini" % i
             parser = configparser.ConfigParser()
             parser.read_dict(conf['oskar'])
             with open(conf_path, 'w') as conf_file:
