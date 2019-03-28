@@ -25,7 +25,7 @@ class TestAverager(unittest.TestCase):
 
         sink = AveragerSinkDrop('2', '2',
                                 stream_listen_port_start=51000,
-                                num_stream_listen_ports=1,
+                                use_adios2=0,
                                 baseline_exclusion_map_path='./conf/aa2_baselines.csv',
                                 node='127.0.0.1')
         drop = InMemoryDROP('3', '3')
