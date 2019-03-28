@@ -331,11 +331,8 @@ fi
 if [ $casacore_version != master ]; then
 	casacore_version=COMMIT-v$casacore_version
 fi
-if [ $use_python3 == yes ]; then
-	casacore_version=MERGE-fix_boost_python
-fi
 build_and_install https://github.com/rtobar/casacore $casacore_version -DBUILD_TESTING=OFF $casacore_opts
-if [ $casacore_version == MERGE-fix_boost_python -o $casacore_version == summit_demo ]; then
+if [ $casacore_version == summit_demo ]; then
 	# Lets reset this back to master to save handling lots os special cases below!
 	casacore_version=master
 fi
