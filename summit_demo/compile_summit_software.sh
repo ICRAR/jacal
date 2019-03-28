@@ -373,6 +373,10 @@ if [ $build_oskar == yes ]; then
 	cd OSKAR/python
 	sed -i "s|include_dirs.*\$|\\0:$prefix/include|" setup.cfg
 	sed -i "s|library_dirs.*\$|\\0:$prefix/lib:$prefix/lib64|" setup.cfg
+	if [ $system == centos -a $compiler == clang ]; then
+		sed -i "s|library_dirs.*\$|\\0:$MPI_HOME/lib|" setup.cfg
+	fi
+	try pip install mpi4py
 	try pip install .
 	cd ../..
 fi
