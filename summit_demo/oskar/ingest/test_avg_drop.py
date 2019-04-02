@@ -1,3 +1,4 @@
+import os
 import sys
 import time
 import logging
@@ -25,7 +26,7 @@ class TestAverager(unittest.TestCase):
 
         sink = AveragerSinkDrop('2', '2',
                                 stream_listen_port_start=51000,
-                                use_adios2=0,
+                                use_adios2=int(os.environ.get('USE_ADIOS2', 0)),
                                 baseline_exclusion_map_path='./conf/aa2_baselines.csv',
                                 node='127.0.0.1')
         drop = InMemoryDROP('3', '3')
