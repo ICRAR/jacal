@@ -73,7 +73,7 @@ class CImagerDrop(BashShellApp):
         self.conf['Cimager.dataset'] = self.inputs[0].path
         self.conf['Cimager.Images.Names'].append(output)
 
-        self.conf_file = f'/tmp/{output}.ini'
+        self.conf_file = '/tmp/%s.ini' % output
         self._write_conf(self.conf_file)
 
         self._command = '{0} -c {1}'.format(self.IMAGER_CMD, self.conf_file)
@@ -84,4 +84,4 @@ class CImagerDrop(BashShellApp):
         with open(filename, 'w') as the_file:
             for i, j in self.conf.items():
                 val = str(j).replace("'", "")
-                the_file.write(f'{i}={val}\n')
+                the_file.write('%s=%s\n' % (i, val))
