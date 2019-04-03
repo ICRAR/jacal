@@ -13,7 +13,8 @@ logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 class TestCImager(unittest.TestCase):
 
     def test_basic_run(self):
-        a = FileDROP('1', '1', filepath='/tmp/output/aa01.ms')
+        input_ms = os.environ.get('INPUT_MS', '/tmp/output/aa01.ms')
+        a = FileDROP('1', '1', filepath=input_ms)
         b = CImagerDrop('2', '2')
         c = FileDROP('3', '3', filepath='image_aa01')
 
