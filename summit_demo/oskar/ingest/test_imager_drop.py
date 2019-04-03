@@ -22,7 +22,7 @@ class TestCImager(unittest.TestCase):
         b.addInput(a)
         b.addOutput(c)
 
-        with DROPWaiterCtx(self, c, 100):
+        with DROPWaiterCtx(self, c, 10000):
             a.setCompleted()
 
 
