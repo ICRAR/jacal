@@ -16,6 +16,11 @@ from spead_send import SpeadSender
 
 logger = logging.getLogger(__name__)
 
+this_dir = os.path.abspath(os.path.dirname(__file__))
+jacal_root = os.path.normpath(os.path.join(this_dir, '..', '..', '..'))
+
+def relative_to_me(path):
+    return os.path.join(jacal_root, path)
 
 class SignalGenerateAndAverageDrop(BarrierAppDROP):
 
@@ -164,7 +169,7 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
         with open(file_path) as csvfile:
             read_csv = csv.reader(csvfile, delimiter=',')
             for row in read_csv:
-                file_map.append((int(row[0]), row[1]))
+                file_map.append((int(row[0]), relative_to_me(row[1])))
         return sorted(file_map, key=lambda kv: kv[0])
 
     def _start_oskar_process(self, spead_config, oskar_config_path):
