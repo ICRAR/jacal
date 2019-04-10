@@ -10,17 +10,16 @@ function print_usage {
 $0 [opts]
 
 General options:
-
- -h/-?                 Show this help and leave
- -V <venv-root>        A virtual environment to load
- -o <output-dir>       The base directory for all outputs
+ -h/-?                    Show this help and leave
+ -V <venv-root>           A virtual environment to load
+ -o <output-dir>          The base directory for all outputs
 
 Runtime options:
- -n <nodes>            Number of nodes to use for simulating data
- -g <gpus-per-node>    #GPUs per node to use
- -f <start-freq>       Global start frequency, in Hz. Default=210200000
- -s <freq-step>        Frequency step, in Hz. Default=4000
- -a                    Use the ADIOS2 Storage Manager
+ -n <nodes>               Number of nodes to use for simulating data
+ -g <gpus-per-node>       #GPUs per node to use
+ -f <start-freq>          Global start frequency, in Hz. Default=210200000
+ -s <freq-step>           Frequency step, in Hz. Default=4000
+ -a                       Use the ADIOS2 Storage Manager
 
 Runtime paths:
  -b <baseline-exclusion>  The file containing the baseline exclusion map
