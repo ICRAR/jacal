@@ -64,7 +64,7 @@ do
 done
 
 logical_graph=`abspath $this_dir/graphs/ingest_graph.json`
-apps_rootdir="`abspath $this_dir/../../oskar/ingest`"
+apps_rootdir="`abspath $this_dir/../oskar/ingest`"
 
 # Create a new output dir with our date, *that* will be the base output dir
 outdir="$outdir/`date -u +%Y-%m-%dT%H-%M-%S`"
