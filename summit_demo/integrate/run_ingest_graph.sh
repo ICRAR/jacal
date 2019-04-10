@@ -19,5 +19,5 @@ mpirun --report-bindings --bind-to core --hetero-nodes \
     -L lg.json \
     -M \
     -d \
-    -v 2 \
+    -v 1 \
     --pg-modifiers modify_ingest_pg.modify_pg,start_freq=$start_freq,freq_step=$freq_step,channels_per_drop=$gpus_per_node
