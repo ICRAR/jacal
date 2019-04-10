@@ -18,7 +18,7 @@ def modify_sdg(sdg, i, sink_start_freq, freq_step, channels_per_drop):
     sdg['num_freq_steps'] = channels_per_drop
 
 def modify_sink(pg_spec, sink, start_freq, freq_step, channels_per_drop):
-    for i, sdg in enumerate(signal_generation_drops(pg_spec, sink[1]['inputs'])):
+    for i, sdg in enumerate(signal_generation_drops(pg_spec, sink[1]['streamingInputs'])):
         modify_sdg(sdg, i, start_freq, freq_step, channels_per_drop)
 
 def modify_pg(pg_spec, start_freq, freq_step, channels_per_drop):
