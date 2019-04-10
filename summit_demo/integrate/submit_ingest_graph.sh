@@ -96,9 +96,9 @@ mkdir -p "$outdir"
 # Turn LG "template" into actual LG for this run
 sed "
 # Replace filepaths to match our local filepaths
-s%\"baseline_exclusion_map_path=\\(.*\\)\"%\"baseline_exclusion_map_path=$baseline_exclusion\"%
-s%\"telescope_model_path=\\(.*\\)\"%\"telescope_model_path=$telescope_model\"%
-s%\"sky_model_file_path=\\(.*\\)\"%\"sky_model_file_path=$sky_model\"%
+s%\"baseline_exclusion_map_path=.*\"%\"baseline_exclusion_map_path=$baseline_exclusion\"%
+s%\"telescope_model_path=.*\"%\"telescope_model_path=$telescope_model\"%
+s%\"sky_model_file_path=.*\"%\"sky_model_file_path=$sky_model\"%
 
 # Replace num_of_copies's value in scatter component with $nodes
 /.*num_of_copies.*/ {
