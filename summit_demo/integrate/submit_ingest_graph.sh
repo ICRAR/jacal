@@ -20,6 +20,11 @@ Runtime options:
  -g <gpus-per-node>    #GPUs per node to use
  -f <start-freq>       Global start frequency, in Hz. Default=210200000
  -s <freq-step>        Frequency step, in Hz. Default=4000
+
+Runtime paths:
+ -b <baseline-exclusion>  The file containing the baseline exclusion map
+ -t <telescope-model>     The directory with the telescope model to use
+ -S <sky-model>           The sky model to use
 EOF
 }
 
@@ -30,8 +35,11 @@ nodes=1
 gpus_per_node=2
 start_freq=210200000
 freq_step=4000
+baseline_exclusion=
+telescope_model=
+sky_model=
 
-while getopts "V:o:n:g:f:s:h?" opt
+while getopts "h?V:o:n:g:f:s:b:t:S:" opt
 do
 	case "$opt" in
 		h?)
@@ -56,6 +64,15 @@ do
 		s)
 			freq_step=$OPTARG
 			;;
+		b)
+			baseline_exclusion="$OPTARG"
+			;;
+		t)
+			telescope_model="$OPTARG"
+			;;
+		S)
+			sky_model="$OPTARG"
+			;;
 		*)
 			print_usage 1>&2
 			exit 1
@@ -63,12 +80,29 @@ do
 	esac
 done
 
-logical_graph=`abspath $this_dir/graphs/ingest_graph.json`
 apps_rootdir="`abspath $this_dir/../oskar/ingest`"
+baseline_exclusion=${baseline_exclusion:-$apps_rootdir/conf/aa2_baselines.csv}
+telescope_model=${telescope_model:-$apps_rootdir/conf/aa2.tm}
+sky_model=${sky_model:-$apps_rootdir/conf/eor_model_list.csv}
 
 # Create a new output dir with our date, *that* will be the base output dir
 outdir="$outdir/`date -u +%Y-%m-%dT%H-%M-%S`"
 mkdir -p "$outdir"
+
+# Turn LG "template" into actual LG for this run
+sed "
+# Replace filepaths to match our local filepaths
+s%\"baseline_exclusion_map_path=\\(.*\\)\"%\"baseline_exclusion_map_path=$baseline_exclusion\"%
+s%\"telescope_model_path=\\(.*\\)\"%\"telescope_model_path=$telescope_model\"%
+s%\"sky_model_file_path=\\(.*\\)\"%\"sky_model_file_path=$sky_model\"%
+
+# Replace num_of_copies's value in scatter component with $nodes
+/.*num_of_copies.*/ {
+  N
+  N
+  s/\"value\": \".*\"/\"value\": \"$nodes\"/
+}
+" `abspath $this_dir/graphs/ingest_graph.json` > $outdir/lg.json
 
 # Whatever number of nodes we want to use for simulation, add 1 to them
 # to account for the DIM node
@@ -83,7 +117,7 @@ if [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	       -J ingest_graph \
 	       --gres=gpu:${gpus_per_node} \
 	       $this_dir/run_ingest_graph.sh \
-	         "$venv" "$outdir" "$apps_rootdir" "$logical_graph" \
+	         "$venv" "$outdir" "$apps_rootdir" \
 	         $start_freq $freq_step $gpus_per_node
 else
 	error "Queueing system not supported, add support please"
