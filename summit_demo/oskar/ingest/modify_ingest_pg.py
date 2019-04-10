@@ -1,3 +1,8 @@
+import logging
+
+
+logger = logging.getLogger(__name__)
+
 def is_sink(d):
     return d[1]['type'] == 'app' and d[1]['app'] == 'avg_drop.AveragerSinkDrop'
 
@@ -17,6 +22,7 @@ def modify_sink(pg_spec, sink, start_freq, freq_step, channels_per_drop):
         modify_sdg(sdg, i, start_freq, freq_step, channels_per_drop)
 
 def modify_pg(pg_spec, start_freq, freq_step, channels_per_drop):
+    logger.info('Modifying PG for correct signal generation/sink behavior')
     start_freq = int(start_freq)
     freq_step = int(freq_step)
     channels_per_drop = int(channels_per_drop)
