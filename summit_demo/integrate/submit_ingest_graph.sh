@@ -20,6 +20,7 @@ Runtime options:
  -g <gpus-per-node>    #GPUs per node to use
  -f <start-freq>       Global start frequency, in Hz. Default=210200000
  -s <freq-step>        Frequency step, in Hz. Default=4000
+ -a                    Use the ADIOS2 Storage Manager
 
 Runtime paths:
  -b <baseline-exclusion>  The file containing the baseline exclusion map
@@ -38,8 +39,9 @@ freq_step=4000
 baseline_exclusion=
 telescope_model=
 sky_model=
+use_adios2=0
 
-while getopts "h?V:o:n:g:f:s:b:t:S:" opt
+while getopts "h?V:o:n:g:f:s:b:t:S:a" opt
 do
 	case "$opt" in
 		h?)
@@ -73,6 +75,9 @@ do
 		S)
 			sky_model="$OPTARG"
 			;;
+		a)
+			use_adios2=1
+			;;
 		*)
 			print_usage 1>&2
 			exit 1
@@ -102,6 +107,9 @@ s%\"sky_model_file_path=\\(.*\\)\"%\"sky_model_file_path=$sky_model\"%
   N
   s/\"value\": \".*\"/\"value\": \"$nodes\"/
 }
+
+# Set whether to use ADIOS2 or not
+s/\"use_adios2=.*\"/\"use_adios2=$use_adios2\"/
 " `abspath $this_dir/graphs/ingest_graph.json` > $outdir/lg.json
 
 # Whatever number of nodes we want to use for simulation, add 1 to them
