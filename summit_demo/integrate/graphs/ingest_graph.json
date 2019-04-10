@@ -274,7 +274,7 @@
                 {
                     "name": "appclass",
                     "text": "Appclass",
-                    "value": "test.graphsRepository"
+                    "value": "dlg.apps.simple.NullBarrierApp"
                 },
                 {
                     "name": "Arg01",
