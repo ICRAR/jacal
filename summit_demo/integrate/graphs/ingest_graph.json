@@ -190,7 +190,7 @@
                 },
                 {
                     "Id": "7510647f-f659-4df9-8be2-84f20d6d9610",
-                    "IdText": "spead2"
+                    "IdText": "spead2Stream"
                 }
             ],
             "isData": false,
@@ -204,7 +204,7 @@
                 },
                 {
                     "Id": "23c6bbe8-c298-4adb-b186-696c36531e6a",
-                    "IdText": "spead2"
+                    "IdText": "spead2Stream"
                 }
             ],
             "outputPorts": [
@@ -357,7 +357,7 @@
                 },
                 {
                     "Id": "3c5fa9b5-bf89-4015-a6b9-0b78cafb3f4b",
-                    "IdText": "spead2"
+                    "IdText": "spead2Stream"
                 }
             ],
             "inputPorts": [
@@ -383,7 +383,7 @@
                 },
                 {
                     "Id": "c432ad49-517f-47eb-a94b-63b471b07684",
-                    "IdText": "spead2"
+                    "IdText": "spead2Stream"
                 }
             ],
             "text": "ClusterScatterAverager",
@@ -415,7 +415,7 @@
                 },
                 {
                     "Id": "77e75223-ffaf-4d24-a19c-8633136ce112",
-                    "IdText": "spead2"
+                    "IdText": "spead2Stream"
                 }
             ],
             "isData": true,
@@ -429,7 +429,7 @@
                 },
                 {
                     "Id": "6af4d654-9e7a-43b1-959b-941bb84ba597",
-                    "IdText": "spead2"
+                    "IdText": "spead2Stream"
                 }
             ],
             "shape": "Card",
@@ -532,7 +532,7 @@
                 },
                 {
                     "Id": "d1eaaff2-4651-4372-924f-6052e994340d",
-                    "IdText": "spead2"
+                    "IdText": "spead2Stream"
                 }
             ],
             "text": "Ingest Big Drop",
