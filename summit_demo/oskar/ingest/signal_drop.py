@@ -3,6 +3,7 @@ import csv
 import copy
 import logging
 
+import six
 from six.moves import configparser
 
 from oskar import SettingsTree
@@ -193,10 +194,17 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
 
         for i, conf in enumerate(self.spead_send):
             conf_path = "/tmp/sim%d.ini" % i
-            parser = configparser.ConfigParser()
-            parser.read_dict(conf['oskar'])
-            with open(conf_path, 'w') as conf_file:
-                parser.write(conf_file, space_around_delimiters=False)
+            if six.PY3:
+                parser = configparser.ConfigParser()
+                parser.read_dict(conf['oskar'])
+                with open(conf_path, 'w') as conf_file:
+                    parser.write(conf_file, space_around_delimiters=False)
+            else:
+                with open(conf_path, 'w') as conf_file:
+                    for section_name, section_dict in conf['oskar'].items():
+                        conf_file.write('[%s]\n' % section_name)
+                        for name, value in section_dict.items():
+                            conf_file.write('%s=%s\n' % (name, str(value)))
             p = Process(target=self._start_oskar_process, args=(conf['spead'], conf_path))
             self.oskar_process.append(p)
 
