@@ -92,7 +92,7 @@
                 {
                     "name": "num_cpus",
                     "text": "Num CPUs",
-                    "value": "6"
+                    "value": "0"
                 },
                 {
                     "name": "group_start",
@@ -446,7 +446,7 @@
                 {
                     "name": "execution_time",
                     "text": "Execution time",
-                    "value": "5"
+                    "value": "10"
                 },
                 {
                     "name": "num_cpus",
