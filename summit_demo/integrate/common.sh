@@ -2,6 +2,7 @@
 
 function load_modules {
 	module use /flush1/tob020/modulefiles
+	module load yandasoft/default
 	module load oskar/2.7.1-adios
 	module load spead2/1.10.0
 	module load casacore/3.0.0-adios
