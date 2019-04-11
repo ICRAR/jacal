@@ -15,7 +15,9 @@ General options:
  -o <output-dir>          The base directory for all outputs
 
  Runtime options:
+ -n <nodes>               Number of nodes to request, defaults to #inputs / 4
  -i <input>               Measurement Sets i.e. "in01.ms in02.ms in03.ms"
+ -d                       Direct run (no queueing system, no mpirun)"
 
 EOF
 }
@@ -23,8 +25,10 @@ EOF
 # Command line parsing
 venv=
 outdir=`abspath .`
+direct_run=no
+nodes=
 
-while getopts "h?V:o:i:" opt
+while getopts "h?V:o:n:i:d" opt
 do
 	case "$opt" in
 		h?)
@@ -37,8 +41,14 @@ do
 		o)
 			outdir="`abspath $OPTARG`"
 			;;
+		n)
+			nodes="$OPTARG"
+			;;
 		i)
 			inputs=("$OPTARG")
+			;;
+		d)
+			direct_run=yes
 			;;
 		*)
 			print_usage 1>&2
@@ -63,6 +73,14 @@ if [ ${#files[@]} -eq 0 ]; then
     exit -1
 fi
 
+# nodes defaults to #files/4 using ceiling division
+if [ -z "$nodes" ]; then
+	nodes=$(( (${#files[@]} + 4  - 1) / 4 ))
+fi
+
+# However nodes we request, we actually need 1 more to account for the DIM
+nodes=$(($nodes + 1))
+
 # Turn LG "template" into actual LG for this run
 sed "
 # Replace num_of_copies's value in scatter component with ${#files[@]}
@@ -74,5 +92,18 @@ sed "
 " `abspath $this_dir/graphs/image_graph.json` > $outdir/image_lg.json
 
 
-. $this_dir/run_image_graph.sh "$venv" "$outdir" "$apps_rootdir" "${files[@]}"
-
+# Submit differently depending on your queueing system
+if [ ${direct_run} = yes ]; then
+	. $this_dir/run_image_graph.sh "$venv" "$outdir" "$apps_rootdir" yes "${files[@]}"
+fi
+if [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
+	sbatch --ntasks-per-node=1 \
+	       -o "$outdir"/image_graph.log \
+	       -N $nodes \
+	       -t 00:30:00 \
+	       -J image_graph \
+	       $this_dir/run_image_graph.sh \
+	         "$venv" "$outdir" "$apps_rootdir" no "${files[@]}"
+else
+	error "Queueing system not supported, add support please"
+fi
