@@ -1,4 +1,6 @@
 import os
+
+import six
 from dlg.apps.bash_shell_app import BashShellApp
 
 
@@ -70,6 +72,8 @@ class CImagerDrop(BashShellApp):
 
     def run(self):
         output = os.path.basename(self.outputs[0].path)
+        if six.PY2 and isinstance(output, unicode):
+            output = output.encode()
         self.conf['Cimager.dataset'] = self.inputs[0].path
         self.conf['Cimager.Images.Names'].append(output)
 
