@@ -154,13 +154,15 @@ def concat_images(fits_cube_output, fits_image_input):
             total_channels += in_num_channels
 
             with open(input_fits, 'rb') as inf:
-                in_hdr_size = header_size_obj(inf)
+                header_size_obj(inf)
 
                 total_to_read = in_image_size * in_num_channels
                 total_size += total_to_read
 
                 while total_to_read > 0:
-                    buff = inf.read(io.DEFAULT_BUFFER_SIZE)
+                    buff = inf.read(io.DEFAULT_BUFFER_SIZE
+                                    if total_to_read >= io.DEFAULT_BUFFER_SIZE
+                                    else total_to_read)
                     if not buff:
                         raise Exception("Error reading fits")
                     total_to_read -= len(buff)
