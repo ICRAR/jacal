@@ -73,7 +73,7 @@ check_supported_values() {
 
 system=centos
 compiler=gcc
-cmake=cmake
+cmake=
 jobs=1
 prefix=/usr/local
 workdir=.
@@ -151,7 +151,7 @@ do
 done
 
 check_supported_values system $system centos ubuntu
-check_supported_values compiler $compiler gcc clang cray
+check_supported_values compiler $compiler gcc clang cray intel
 check_supported_values casacore_version $casacore_version master 2.4.0 2.0.3
 if [ $casacore_version != master ]; then
 	build_adios=no
@@ -163,8 +163,12 @@ else
 	SUDO=sudo
 fi
 
-if [ $system == centos ]; then
-	cmake=cmake3
+if [ -z "$cmake" ]; then
+	if [ $system == centos ]; then
+		cmake=cmake3
+	else
+		cmake=cmake
+	fi
 fi
 
 install_dependencies() {
@@ -271,6 +275,8 @@ build_and_install() {
 		comp_opts="-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang"
 	elif [ $compiler == cray ]; then
 		comp_opts="-DCMAKE_CXX_COMPILER=CC -DCMAKE_C_COMPILER=cc"
+	elif [ $compiler == intel ]; then
+		comp_opts="-DCMAKE_CXX_COMPILER=icpc -DCMAKE_C_COMPILER=icc"
 	else
 		comp_opts="-DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc"
 	fi
