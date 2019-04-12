@@ -151,9 +151,12 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
                 if key >= freq:
                     oskar_conf["sky"]["oskar_sky_model/file"] = value
                     break
-
             if not oskar_conf["sky"]["oskar_sky_model/file"]:
                 raise Exception("Could not find sky model for freq %f" % freq)
+
+            msg = "Creating OSKAR configuration with frequency start/step = %d / %d, sky model file %s"
+            logger.info(msg, freq, self.freq_step, value)
+            logger.info('Using telescope model %s', self.telescope_model_path)
 
             self.spead_send.append({"spead": spead_conf, "oskar": oskar_conf})
 

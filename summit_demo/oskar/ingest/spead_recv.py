@@ -114,6 +114,7 @@ class SpeadReceiver(object):
                     else:
                         self._baseline_exclude.append(index)
                     index += 1
+            logger.info('Baseline count: total=%d, used=%d, excluded=%d', len(full_baseline_map), len(self._baseline_map), len(self._baseline_exclude))
 
     def close(self):
         for stream in list(self._streams):
@@ -280,6 +281,8 @@ class SpeadReceiver(object):
                         msg = 'Creating ADIOS2 MS from rank %d/%d (comm=%s) under %s'
                         args = (self.mpi_comm.Get_rank() + 1, self.mpi_comm.Get_size(),
                                 self.mpi_comm.Get_name(), self._file_name)
+                    msg += ' using %d antennas, %d channels'
+                    args += data['num_stations'], data['num_channels']
                     logger.info(msg, *args)
 
                     if self._measurement_set is None:
