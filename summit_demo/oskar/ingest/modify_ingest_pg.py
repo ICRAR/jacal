@@ -13,7 +13,7 @@ def signal_generation_drops(pg_spec, input_oids):
 
 def modify_sdg(sdg, i, sink_start_freq, freq_step, channels_per_drop):
     sdg['stream_port'] = 51000 + i
-    sdg['start_freq'] = sink_start_freq + freq_step * i
+    sdg['start_freq'] = sink_start_freq + freq_step * channels_per_drop * i
     sdg['freq_step'] = freq_step
     sdg['num_freq_steps'] = channels_per_drop
 
