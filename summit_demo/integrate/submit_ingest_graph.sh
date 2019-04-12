@@ -16,10 +16,11 @@ General options:
 
 Runtime options:
  -n <nodes>               Number of nodes to use for simulating data
- -g <gpus-per-node>       #GPUs per node to use
+ -c <channels-per-node>   #channels to simulate per node
  -f <start-freq>          Global start frequency, in Hz. Default=210200000
  -s <freq-step>           Frequency step, in Hz. Default=4000
  -a                       Use the ADIOS2 Storage Manager
+ -g                       Use GPUs (one per channel)
 
 Runtime paths:
  -b <baseline-exclusion>  The file containing the baseline exclusion map
@@ -32,15 +33,16 @@ EOF
 venv=
 outdir=`abspath .`
 nodes=1
-gpus_per_node=2
+channels_per_node=2
 start_freq=210200000
 freq_step=4000
 baseline_exclusion=
 telescope_model=
 sky_model=
 use_adios2=0
+use_gpus=0
 
-while getopts "h?V:o:n:g:f:s:b:t:S:a" opt
+while getopts "h?V:o:n:c:f:s:b:t:S:ag" opt
 do
 	case "$opt" in
 		h?)
@@ -53,8 +55,8 @@ do
 		o)
 			outdir="`abspath $OPTARG`"
 			;;
-		g)
-			gpus_per_node="$OPTARG"
+		c)
+			channels_per_node="$OPTARG"
 			;;
 		n)
 			nodes="$OPTARG"
@@ -76,6 +78,9 @@ do
 			;;
 		a)
 			use_adios2=1
+			;;
+		g)
+			use_gpus=1
 			;;
 		*)
 			print_usage 1>&2
@@ -109,6 +114,9 @@ s%\"sky_model_file_path=.*\"%\"sky_model_file_path=$sky_model\"%
 
 # Set whether to use ADIOS2 or not
 s/\"use_adios2=.*\"/\"use_adios2=$use_adios2\"/
+
+# Set whether to use GPUs or not
+s/\"use_gpus=.*\"/\"use_gpus=$use_gpus\"/
 " `abspath $this_dir/graphs/ingest_graph.json` > $outdir/lg.json
 
 # Whatever number of nodes we want to use for simulation, add 1 to them
@@ -117,15 +125,20 @@ nodes=$((${nodes} + 1))
 
 # Submit differently depending on your queueing system
 if [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
+	request_gpus=
+	if [ $use_gpus = 1 ]; then
+		request_gpus="--gres=gpu:${channels_per_node}"
+	fi
 	sbatch --ntasks-per-node=1 \
 	       -o "$outdir"/ingest_graph.log \
 	       -N $nodes \
+	       --exclusive \
 	       -t 00:30:00 \
 	       -J ingest_graph \
-	       --gres=gpu:${gpus_per_node} \
+	       ${request_gpus} \
 	       $this_dir/run_ingest_graph.sh \
 	         "$venv" "$outdir" "$apps_rootdir" \
-	         $start_freq $freq_step $gpus_per_node
+	         $start_freq $freq_step $channels_per_node
 else
 	error "Queueing system not supported, add support please"
 fi
