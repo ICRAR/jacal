@@ -127,6 +127,7 @@ class SpeadReceiver(object):
         if self._measurement_set:
             logger.info("Closing measurement set %s", self._file_name)
             self._measurement_set = None
+            logger.info("Measurement set closed")
 
     def _create_heaps(self, num_baselines):
         # Create SPEAD heap items based on content of the visibility block.
