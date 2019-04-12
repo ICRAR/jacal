@@ -1,7 +1,8 @@
-import os
-import csv
 import copy
+import csv
 import logging
+import os
+import tempfile
 
 import six
 from six.moves import configparser
@@ -198,7 +199,7 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
         self.relay_thread.start()
 
         for i, conf in enumerate(self.spead_send):
-            conf_path = "/tmp/sim%d.ini" % i
+            conf_path = tempfile.mktemp(prefix='sim%d_' % i, suffix='.ini')
             if six.PY3:
                 parser = configparser.ConfigParser()
                 parser.read_dict(conf['oskar'])

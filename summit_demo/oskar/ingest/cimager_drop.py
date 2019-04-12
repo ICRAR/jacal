@@ -1,4 +1,5 @@
 import os
+import tempfile
 
 import six
 from dlg.apps.bash_shell_app import BashShellApp
@@ -77,7 +78,7 @@ class CImagerDrop(BashShellApp):
         self.conf['Cimager.dataset'] = self.inputs[0].path
         self.conf['Cimager.Images.Names'].append(output)
 
-        self.conf_file = '/tmp/%s.ini' % output
+        self.conf_file = tempfile.mktemp(prefix='image_%s_' % output, suffix='.ini')
         self._write_conf(self.conf_file)
 
         self._command = '{0} -c {1}'.format(self.IMAGER_CMD, self.conf_file)
