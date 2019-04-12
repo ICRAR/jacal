@@ -11,6 +11,8 @@ gpus_per_node=$6
 
 load_modules
 
+env > $outdir/env
+
 export PYTHONPATH="${apps_rootdir}:$PYTHONPATH"
 cd "$outdir"
 mpirun --report-bindings --bind-to core --hetero-nodes \
