@@ -4,6 +4,7 @@ import time
 import logging
 import unittest
 
+from dlg import droputils
 from dlg.ddap_protocol import AppDROPStates
 from dlg.drop import InMemoryDROP, FileDROP
 from avg_drop import AveragerSinkDrop, AveragerRelayDrop
@@ -33,21 +34,8 @@ class TestAverager(unittest.TestCase):
         drop = InMemoryDROP('3', '3')
         drop.addStreamingConsumer(sink)
         signal.addOutput(drop)
-        sink.addOutput(FileDROP('4', '4', filepath='/tmp/test.ms'))
+        ms = FileDROP('4', '4', filepath='/tmp/test.ms')
+        sink.addOutput(ms)
 
-        signal.async_execute()
-
-        try:
-            tries = 10
-            for i in range(1, tries):
-                if sink.execStatus == AppDROPStates.ERROR:
-                    self.fail("AveragerSinkDrop in Error")
-                elif sink.execStatus == AppDROPStates.RUNNING:
-                    break
-
-                if i == tries-1:
-                    self.fail("Timeout")
-
-                time.sleep(1)
-        finally:
-            sink.close_sink()
+        with droputils.DROPWaiterCtx(self, ms, 1000):
+            signal.async_execute()

@@ -117,12 +117,15 @@ class AveragerSinkDrop(AppDROP):
             self.execStatus = AppDROPStates.RUNNING
 
     def dropCompleted(self, uid, drop_state):
+        n_inputs = len(self.streamingInputs)
         with self.lock:
             self.complete_called += 1
+            move_to_finished = self.complete_called == n_inputs
 
-        if self.complete_called == len(self.streamingInputs):
+        if move_to_finished:
             self.close_sink()
             self.execStatus = AppDROPStates.FINISHED
+            self._notifyAppIsFinished()
 
     def close_sink(self):
         if self.recv:
