@@ -21,6 +21,7 @@ Runtime options:
  -s <freq-step>           Frequency step, in Hz. Default=4000
  -a                       Use the ADIOS2 Storage Manager
  -g                       Use GPUs (one per channel)
+ -v <verbosity>           1=INFO (default), 2=DEBUG
 
 Runtime paths:
  -b <baseline-exclusion>  The file containing the baseline exclusion map
@@ -41,8 +42,9 @@ telescope_model=
 sky_model=
 use_adios2=0
 use_gpus=0
+verbosity=1
 
-while getopts "h?V:o:n:c:f:s:b:t:S:ag" opt
+while getopts "h?V:o:n:c:f:s:b:t:S:agv:" opt
 do
 	case "$opt" in
 		h?)
@@ -81,6 +83,9 @@ do
 			;;
 		g)
 			use_gpus=1
+			;;
+		v)
+			verbosity=$OPTARG
 			;;
 		*)
 			print_usage 1>&2
@@ -138,7 +143,7 @@ if [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	       ${request_gpus} \
 	       $this_dir/run_ingest_graph.sh \
 	         "$venv" "$outdir" "$apps_rootdir" \
-	         $start_freq $freq_step $channels_per_node
+	         $start_freq $freq_step $channels_per_node $verbosity
 else
 	error "Queueing system not supported, add support please"
 fi

@@ -6,6 +6,7 @@ apps_rootdir="$3"
 start_freq=$4
 freq_step=$5
 gpus_per_node=$6
+verbosity=$7
 
 . common.sh
 
@@ -21,5 +22,5 @@ mpirun --report-bindings --bind-to core --hetero-nodes \
     -L lg.json \
     -M \
     -d \
-    -v 1 \
+    -v $verbosity \
     --pg-modifiers modify_ingest_pg.modify_pg,start_freq=$start_freq,freq_step=$freq_step,channels_per_drop=$gpus_per_node

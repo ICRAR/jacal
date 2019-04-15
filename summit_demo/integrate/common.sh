@@ -6,6 +6,7 @@ function load_modules {
 		module use /scratch/summit_demo/modulefiles
 		module load summit_demo
 		module load openmpi/default
+		module load gcc/6.3.0
 	else
 		# Bracewell; put inside an "elif" if we need
 		# to add more environments
