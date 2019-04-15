@@ -22,6 +22,7 @@ Runtime options:
  -a                       Use the ADIOS2 Storage Manager
  -g                       Use GPUs (one per channel)
  -v <verbosity>           1=INFO (default), 2=DEBUG
+ -w <walltime>            SLURM walltime, defaults to 00:30:00
 
 Runtime paths:
  -b <baseline-exclusion>  The file containing the baseline exclusion map
@@ -43,8 +44,9 @@ sky_model=
 use_adios2=0
 use_gpus=0
 verbosity=1
+walltime=00:30:00
 
-while getopts "h?V:o:n:c:f:s:b:t:S:agv:" opt
+while getopts "h?V:o:n:c:f:s:b:t:S:agv:w:" opt
 do
 	case "$opt" in
 		h?)
@@ -86,6 +88,9 @@ do
 			;;
 		v)
 			verbosity=$OPTARG
+			;;
+		w)
+			walltime=$OPTARG
 			;;
 		*)
 			print_usage 1>&2
@@ -138,7 +143,7 @@ if [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	       -o "$outdir"/ingest_graph.log \
 	       -N $nodes \
 	       --exclusive \
-	       -t 00:30:00 \
+	       -t ${walltime} \
 	       -J ingest_graph \
 	       ${request_gpus} \
 	       $this_dir/run_ingest_graph.sh \
