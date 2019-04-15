@@ -73,12 +73,13 @@ class CImagerDrop(BashShellApp):
 
     def run(self):
         output = os.path.basename(self.outputs[0].path)
+        basedir = os.path.dirname(self.outputs[0].path)
         if six.PY2 and isinstance(output, unicode):
             output = output.encode()
         self.conf['Cimager.dataset'] = self.inputs[0].path
         self.conf['Cimager.Images.Names'].append(output)
 
-        self.conf_file = tempfile.mktemp(prefix='image_%s_' % output, suffix='.ini')
+        self.conf_file = tempfile.mktemp(dir=basedir, prefix=output, suffix='.ini')
         self._write_conf(self.conf_file)
 
         self._command = '{0} -c {1}'.format(self.IMAGER_CMD, self.conf_file)
