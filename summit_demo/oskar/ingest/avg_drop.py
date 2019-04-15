@@ -88,14 +88,10 @@ class AveragerSinkDrop(AppDROP):
             if self.start is False:
 
                 try:
-                    comm = dlg.mpi_comm
-                except AttributeError:
+                    from mpi4py import MPI
+                    comm = MPI.COMM_SELF
+                except:
                     comm = None
-                    try:
-                        import mpi4py
-                        comm = mpi4py.MPI.COMM_SELF
-                    except:
-                        pass
 
                 # Only now we know the correct number of inputs
                 self.config['streams'] = [{'host': '0.0.0.0', 'port': self.start_listen_port + i} for i in range(len(self.streamingInputs))]
