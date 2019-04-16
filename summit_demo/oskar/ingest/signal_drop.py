@@ -28,6 +28,7 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
     def initialize(self, **kwargs):
 
         # spead inputs
+        internal_port = int(kwargs.get('internal_port', 41000))
         self.stream_port = int(kwargs.get('stream_port', 51000))
         self.disconnect_tolerance = int(kwargs.get('disconnect_tolerance', 0))
 
@@ -137,7 +138,7 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
         for i in range(self.num_freq_steps):
             # creating N number of oskar and spead send configs
             spead_conf = copy.deepcopy(self.spead_send_conf)
-            spead_conf["stream"]["port"] = 41000 + i
+            spead_conf["stream"]["port"] = internal_port + i
 
             freq = self.start_freq + (self.freq_step * i)
             oskar_conf = copy.deepcopy(self.oskar_conf)
@@ -161,7 +162,7 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
             self.spead_send.append({"spead": spead_conf, "oskar": oskar_conf})
 
             # Setting relay incoming streams
-            self.spead_avg_local.append({"host": "127.0.0.1", "port": 41000+i})
+            self.spead_avg_local.append({"host": "127.0.0.1", "port": internal_port + i})
 
         self.spead_avg_conf["streams"] = self.spead_avg_local
 
