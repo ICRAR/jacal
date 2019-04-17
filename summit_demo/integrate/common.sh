@@ -7,15 +7,14 @@ function load_modules {
 		module load summit_demo
 		module load openmpi/default
 		module load gcc/6.3.0
-	else
-		# Bracewell; put inside an "elif" if we need
-		# to add more environments
+	elif [ "$SLURM_SUBMIT_HOST" = bracewell-login ]; then
 		module use /flush1/tob020/modulefiles
-		module load yandasoft/default
 		module load oskar/2.7.1-adios
+		module load yandasoft/default
 		module load spead2/1.10.0
-		module load casacore/3.0.0-adios
-		module load adios/2.2.0
+	else
+		echo "Unsupported system, exiting now"
+		exit 1
 	fi
 
 	if [ -n "$venv" ]; then
