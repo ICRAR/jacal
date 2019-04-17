@@ -73,7 +73,7 @@ build_oskar=yes
 install_dependencies=yes
 build_adios=yes
 casacore_version=master
-casacore_opts=
+casacore_opts=-DBUILD_PYTHON=OFF
 casarest_opts=
 yandasoft_opts=
 oskar_opts=
