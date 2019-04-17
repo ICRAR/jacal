@@ -255,7 +255,7 @@ try pip install numpy
 
 # ADIOS2, casacore and casarest
 if [ $build_adios == yes ]; then
-	build_and_install https://github.com/ornladios/ADIOS2 master -DADIOS2_BUILD_TESTING=OFF
+	build_and_install https://github.com/ornladios/ADIOS2 master -DADIOS2_BUILD_TESTING=OFF -DADIOS2_USE_Fortran=OFF
 fi
 
 if [ $casacore_version == master -a $build_adios == yes ]; then
