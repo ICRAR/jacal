@@ -332,9 +332,10 @@ fi
 
 if [ $casacore_version == master -a $build_adios == yes ]; then
 	casacore_opts+=" -DUSE_ADIOS2=ON"
-	casacore_version=summit_demo
 fi
-if [ $casacore_version != master ]; then
+if [ $casacore_version == master ]; then
+	casacore_version=summit_demo
+else
 	casacore_version=COMMIT-v$casacore_version
 fi
 build_and_install https://github.com/rtobar/casacore $casacore_version -DBUILD_TESTING=OFF -DBUILD_PYTHON=OFF $casacore_opts
