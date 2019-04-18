@@ -83,7 +83,7 @@ use_python3=no
 install_dependencies=yes
 build_adios=yes
 casacore_version=master
-casacore_opts=-DBUILD_PYTHON=OFF
+casacore_opts=
 casarest_opts=
 yandasoft_opts=
 oskar_opts=
@@ -337,7 +337,7 @@ fi
 if [ $casacore_version != master ]; then
 	casacore_version=COMMIT-v$casacore_version
 fi
-build_and_install https://github.com/rtobar/casacore $casacore_version -DBUILD_TESTING=OFF $casacore_opts
+build_and_install https://github.com/rtobar/casacore $casacore_version -DBUILD_TESTING=OFF -DBUILD_PYTHON=OFF $casacore_opts
 if [ $casacore_version == summit_demo ]; then
 	# Lets reset this back to master to save handling lots os special cases below!
 	casacore_version=master
