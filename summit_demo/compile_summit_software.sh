@@ -83,7 +83,7 @@ use_python3=no
 install_dependencies=yes
 build_adios=yes
 casacore_version=master
-casacore_opts=
+casacore_opts=-DBUILD_PYTHON=OFF
 casarest_opts=
 yandasoft_opts=
 oskar_opts=
@@ -327,7 +327,7 @@ try pip install numpy
 
 # ADIOS2, casacore and casarest
 if [ $build_adios == yes ]; then
-	build_and_install https://github.com/ornladios/ADIOS2 master -DADIOS2_BUILD_TESTING=OFF
+	build_and_install https://github.com/ornladios/ADIOS2 master -DADIOS2_BUILD_TESTING=OFF -DADIOS2_USE_Fortran=OFF
 fi
 
 if [ $casacore_version == master -a $build_adios == yes ]; then
