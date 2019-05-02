@@ -16,6 +16,7 @@ General options:
 
 Runtime options:
  -n <nodes>               Number of nodes to use for simulating data
+ -i <num-islands>         Number of data islands
  -c <channels-per-node>   #channels to simulate per node
  -f <start-freq>          Global start frequency, in Hz. Default=210200000
  -s <freq-step>           Frequency step, in Hz. Default=4000
@@ -35,6 +36,7 @@ EOF
 venv=
 outdir=`abspath .`
 nodes=1
+islands=1
 channels_per_node=2
 start_freq=210200000
 freq_step=4000
@@ -46,7 +48,7 @@ use_gpus=0
 verbosity=1
 walltime=00:30:00
 
-while getopts "h?V:o:n:c:f:s:b:t:S:agv:w:" opt
+while getopts "h?V:o:n:c:f:s:b:t:S:agv:w:i:" opt
 do
 	case "$opt" in
 		h?)
@@ -92,6 +94,9 @@ do
 		w)
 			walltime=$OPTARG
 			;;
+        i)
+            islands=$OPTARG
+            ;;
 		*)
 			print_usage 1>&2
 			exit 1
@@ -131,7 +136,12 @@ s/\"use_gpus=.*\"/\"use_gpus=$use_gpus\"/
 
 # Whatever number of nodes we want to use for simulation, add 1 to them
 # to account for the DIM node
-nodes=$((${nodes} + 1))
+
+if [ $islands -gt 1 ]; then
+    nodes=$((${nodes} + ${islands} + 1))
+else
+    nodes=$((${nodes} + 1))
+fi
 
 # Submit differently depending on your queueing system
 if [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
@@ -148,7 +158,7 @@ if [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	       ${request_gpus} \
 	       $this_dir/run_ingest_graph.sh \
 	         "$venv" "$outdir" "$apps_rootdir" \
-	         $start_freq $freq_step $channels_per_node $verbosity
+	         $start_freq $freq_step $channels_per_node $islands $verbosity
 else
 	error "Queueing system not supported, add support please"
 fi
