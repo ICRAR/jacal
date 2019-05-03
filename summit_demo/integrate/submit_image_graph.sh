@@ -16,6 +16,7 @@ General options:
 
  Runtime options:
  -n <nodes>               Number of nodes to request, defaults to #inputs / 4
+ -s <num-islands>         Number of data islands
  -i <input>               Measurement Sets i.e. "in01.ms in02.ms in03.ms"
  -d                       Direct run (no queueing system, no mpirun)"
 
@@ -27,6 +28,7 @@ venv=
 outdir=`abspath .`
 direct_run=no
 nodes=
+islands=1
 
 while getopts "h?V:o:n:i:d" opt
 do
@@ -50,6 +52,9 @@ do
 		d)
 			direct_run=yes
 			;;
+	    s)
+            islands=$OPTARG
+            ;;
 		*)
 			print_usage 1>&2
 			exit 1
@@ -79,7 +84,11 @@ if [ -z "$nodes" ]; then
 fi
 
 # However nodes we request, we actually need 1 more to account for the DIM
-nodes=$(($nodes + 1))
+if [ $islands -gt 1 ]; then
+    nodes=$((${nodes} + ${islands} + 1))
+else
+    nodes=$((${nodes} + 1))
+fi
 
 # Turn LG "template" into actual LG for this run
 sed "
@@ -103,7 +112,7 @@ if [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	       -t 00:30:00 \
 	       -J image_graph \
 	       $this_dir/run_image_graph.sh \
-	         "$venv" "$outdir" "$apps_rootdir" no "${files[@]}"
+	         "$venv" "$outdir" "$apps_rootdir" $islands no "${files[@]}"
 else
 	error "Queueing system not supported, add support please"
 fi

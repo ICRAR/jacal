@@ -3,8 +3,9 @@
 venv="$1"
 outdir="$2"
 apps_rootdir="$3"
-direct_run=$4
-files="${@:5}"
+islands=$4
+direct_run=$5
+files="${@:6}"
 
 . common.sh
 
@@ -24,7 +25,9 @@ mpirun --report-bindings --bind-to core --hetero-nodes \
     python -m dlg.deploy.pawsey.start_dfms_cluster \
     -l . \
     -L image_lg.json \
+    --part-algo mysarkar \
     -M \
     -d \
+    -s $islands \
     -v 2 \
     --pg-modifiers "modify_image_pg.modify_pg,inputs=$files,out_dir=$outdir"
