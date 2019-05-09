@@ -30,6 +30,7 @@ $runner \
     -l . \
     -L image_lg.json \
     --part-algo mysarkar \
+    --algo-param max_cpu=1 \
     --remote-mechanism $remote_mechanism \
     -d \
     -s $islands \
