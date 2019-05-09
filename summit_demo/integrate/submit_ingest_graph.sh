@@ -152,7 +152,6 @@ if [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	sbatch --ntasks-per-node=1 \
 	       -o "$outdir"/ingest_graph.log \
 	       -N $nodes \
-	       --exclusive \
 	       -t ${walltime} \
 	       -J ingest_graph \
 	       ${request_gpus} \
