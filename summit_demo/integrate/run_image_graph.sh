@@ -5,12 +5,15 @@ outdir="$2"
 apps_rootdir="$3"
 islands=$4
 direct_run=$5
-files="${@:6}"
+remote_mechanism=$6
+files="${@:7}"
 
 . common.sh
 
 if [ $direct_run != yes ]; then
 	load_modules
+	runner="`get_runner $remote_mechanism`"
+	echo "Using $runner to start dlg cluster using the $remote_mechanism mechanism"
 fi
 
 export PYTHONPATH="${apps_rootdir}:$PYTHONPATH"
@@ -22,12 +25,12 @@ if [ $direct_run = yes ]; then
 	exit 0
 fi
 
-mpirun --report-bindings --bind-to core --hetero-nodes \
+$runner \
     python -m dlg.deploy.pawsey.start_dfms_cluster \
     -l . \
     -L image_lg.json \
     --part-algo mysarkar \
-    -M \
+    --remote-mechanism $remote_mechanism \
     -d \
     -s $islands \
     -v 2 \

@@ -112,7 +112,7 @@ if [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	       -t 00:30:00 \
 	       -J image_graph \
 	       $this_dir/run_image_graph.sh \
-	         "$venv" "$outdir" "$apps_rootdir" $islands no "${files[@]}"
+	         "$venv" "$outdir" "$apps_rootdir" $islands no slurm "${files[@]}"
 else
 	error "Queueing system not supported, add support please"
 fi

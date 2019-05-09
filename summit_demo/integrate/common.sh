@@ -22,6 +22,18 @@ function load_modules {
 	fi
 }
 
+function get_runner {
+	if [ "$1" = slurm ]; then
+		runner=srun
+	elif [ "$1" = mpi ]; then
+		runner=mpirun
+	else
+		echo "Unsupported remote mechanims: $1" 1>&2
+		exit 1
+	fi
+	echo $runner
+}
+
 function abspath {
 	p="$1"
 	dirname="`dirname $p`"

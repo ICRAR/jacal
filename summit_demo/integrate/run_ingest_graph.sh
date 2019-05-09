@@ -8,21 +8,24 @@ freq_step=$5
 gpus_per_node=$6
 islands=$7
 verbosity=$8
+remote_mechanism=$9
 
 . common.sh
 
 load_modules
+runner="`get_runner $remote_mechanism`"
+echo "Using $runner to start dlg cluster using the $remote_mechanism mechanism"
 
 export PYTHONPATH="${apps_rootdir}:$PYTHONPATH"
 env > $outdir/env
 
 cd "$outdir"
-mpirun --report-bindings --bind-to core --hetero-nodes \
+$runner \
     python -m dlg.deploy.pawsey.start_dfms_cluster \
     -l . \
     -L lg.json \
     --part-algo mysarkar \
-    -M \
+    --remote-mechanism $remote_mechanism \
     -d \
     -s $islands \
     -v $verbosity \

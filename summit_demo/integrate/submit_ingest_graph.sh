@@ -24,6 +24,7 @@ Runtime options:
  -g                       Use GPUs (one per channel)
  -v <verbosity>           1=INFO (default), 2=DEBUG
  -w <walltime>            Walltime, defaults to 00:30:00
+ -M                       Use queue-specific, non-MPI-based daliuge cluster startup mechanism
 
 Runtime paths:
  -b <baseline-exclusion>  The file containing the baseline exclusion map
@@ -46,9 +47,10 @@ sky_model=
 use_adios2=0
 use_gpus=0
 verbosity=1
+remote_mechanism=mpi
 walltime=00:30:00
 
-while getopts "h?V:o:n:c:f:s:b:t:S:agv:w:i:" opt
+while getopts "h?V:o:n:c:f:s:b:t:S:agv:w:i:M" opt
 do
 	case "$opt" in
 		h?)
@@ -96,6 +98,9 @@ do
 			;;
 		i)
 			islands=$OPTARG
+			;;
+		M)
+			remote_mechanism=
 			;;
 		*)
 			print_usage 1>&2
@@ -157,7 +162,7 @@ if [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	       ${request_gpus} \
 	       $this_dir/run_ingest_graph.sh \
 	         "$venv" "$outdir" "$apps_rootdir" \
-	         $start_freq $freq_step $channels_per_node $islands $verbosity
+	         $start_freq $freq_step $channels_per_node $islands $verbosity ${remote_mechanism:-slurm}
 else
 	error "Queueing system not supported, add support please"
 fi
