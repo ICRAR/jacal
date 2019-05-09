@@ -15,15 +15,15 @@ General options:
  -o <output-dir>          The base directory for all outputs
 
 Runtime options:
- -n <nodes>               Number of nodes to use for simulating data
- -i <num-islands>         Number of data islands
- -c <channels-per-node>   #channels to simulate per node
+ -n <nodes>               Number of nodes to use for simulating data, defaults to 1
+ -i <num-islands>         Number of data islandsm, defaults to 1
+ -c <channels-per-node>   #channels to simulate per node, defaults to 2
  -f <start-freq>          Global start frequency, in Hz. Default=210200000
  -s <freq-step>           Frequency step, in Hz. Default=4000
  -a                       Use the ADIOS2 Storage Manager
  -g                       Use GPUs (one per channel)
  -v <verbosity>           1=INFO (default), 2=DEBUG
- -w <walltime>            SLURM walltime, defaults to 00:30:00
+ -w <walltime>            Walltime, defaults to 00:30:00
 
 Runtime paths:
  -b <baseline-exclusion>  The file containing the baseline exclusion map
