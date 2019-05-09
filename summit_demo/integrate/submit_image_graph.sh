@@ -30,7 +30,7 @@ direct_run=no
 nodes=
 islands=1
 
-while getopts "h?V:o:n:i:d" opt
+while getopts "h?V:o:n:i:ds:" opt
 do
 	case "$opt" in
 		h?)
@@ -52,9 +52,9 @@ do
 		d)
 			direct_run=yes
 			;;
-	    s)
-            islands=$OPTARG
-            ;;
+		s)
+			islands=$OPTARG
+			;;
 		*)
 			print_usage 1>&2
 			exit 1
