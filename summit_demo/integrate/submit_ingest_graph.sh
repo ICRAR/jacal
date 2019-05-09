@@ -94,9 +94,9 @@ do
 		w)
 			walltime=$OPTARG
 			;;
-        i)
-            islands=$OPTARG
-            ;;
+		i)
+			islands=$OPTARG
+			;;
 		*)
 			print_usage 1>&2
 			exit 1
