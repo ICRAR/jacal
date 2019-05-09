@@ -47,7 +47,7 @@ do
 			nodes="$OPTARG"
 			;;
 		i)
-			inputs=("$OPTARG")
+			inputs="$OPTARG"
 			;;
 		d)
 			direct_run=yes
@@ -69,7 +69,7 @@ mkdir -p "$outdir"
 
 declare -a files
 
-for file in $inputs;do
+for file in $inputs; do
     files+=($file)
 done
 
