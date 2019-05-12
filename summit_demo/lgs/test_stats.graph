@@ -49,14 +49,14 @@
             "from": -5,
             "fromPort": "a057ff0e-6559-46d6-9503-79e024c67d43",
             "points": [
-                1115.5986328125,
-                320.8708984375,
-                1115.5986328125,
-                310.8708984375,
-                1115.5986328125,
-                308,
+                997.5986328125,
+                498.8708984375,
+                997.5986328125,
+                488.8708984375,
+                997.5986328125,
+                488.8708984375,
                 1262.8974609375,
-                308,
+                488.8708984375,
                 1262.8974609375,
                 255.8708984375,
                 1262.8974609375,
@@ -69,18 +69,22 @@
             "from": -3,
             "fromPort": "3e752ba5-7310-4f1d-af82-1cbb83a922c0",
             "points": [
-                756.748046875,
-                328.8708984375,
-                766.748046875,
-                328.8708984375,
-                766.748046875,
-                328.8708984375,
-                766.748046875,
-                328.8708984375,
-                887.046875,
-                328.8708984375,
-                897.046875,
-                328.8708984375
+                775.8974609375,
+                382.8708984375,
+                775.8974609375,
+                392.8708984375,
+                775.8974609375,
+                396,
+                775.8974609375,
+                396,
+                775.8974609375,
+                428,
+                811.8974609375,
+                428,
+                811.8974609375,
+                488.8708984375,
+                811.8974609375,
+                498.8708984375
             ],
             "to": -5,
             "toPort": "8fdbbf3b-4edc-41f4-8d52-6f3810207ff9"
@@ -115,9 +119,9 @@
     "modelData": {
         "filePath": "test_stats.graph",
         "fileType": "graph",
-        "git_url": "https://api.github.com/repos/ICRAR/EAGLE/git/blobs/db989f32b89106ad7129f36c2d111a8f72a86392",
+        "git_url": "https://api.github.com/repos/ICRAR/EAGLE/git/blobs/8c7d6861da3a4d974093f2381aaa38ab6c44e318",
         "repo": "ICRAR/EAGLE",
-        "sha": "db989f32b89106ad7129f36c2d111a8f72a86392"
+        "sha": "8c7d6861da3a4d974093f2381aaa38ab6c44e318"
     },
     "nodeDataArray": [
         {
@@ -405,6 +409,7 @@
                     "value": ""
                 }
             ],
+            "group": -14,
             "inputPorts": [
                 {
                     "Id": "d79fac31-14b7-4341-a5f5-766c865c3874",
@@ -418,7 +423,7 @@
             "isData": true,
             "isGroup": false,
             "key": -5,
-            "loc": "897.046875 300",
+            "loc": "779.046875 478",
             "outputPorts": [
                 {
                     "Id": "1b2b274e-c7ac-4122-a7a6-8881e20cf26c",
@@ -506,6 +511,7 @@
                     "value": ""
                 }
             ],
+            "group": -14,
             "inputPorts": [
                 {
                     "Id": "38f3b356-da42-4319-8e3a-c968a387bef8",
@@ -515,7 +521,7 @@
             "isData": false,
             "isGroup": false,
             "key": -3,
-            "loc": "571.046875 300",
+            "loc": "623.046875 346",
             "outputPorts": [
                 {
                     "Id": "f81833cf-89b7-481f-9102-c20e1ca5656a",
@@ -576,6 +582,133 @@
             "shape": "Card",
             "text": "data_rate",
             "type": "File Drop"
+        },
+        {
+            "appFields": [
+                {
+                    "name": "execution_time",
+                    "text": "Execution time",
+                    "value": "5"
+                },
+                {
+                    "name": "num_cpus",
+                    "text": "Num CPUs",
+                    "value": "1"
+                },
+                {
+                    "name": "group_start",
+                    "text": "Group start",
+                    "value": "0"
+                },
+                {
+                    "name": "appclass",
+                    "text": "Appclass",
+                    "value": "dlg.apps.simple.NullBarrierApp"
+                },
+                {
+                    "name": "Arg01",
+                    "text": "Arg01",
+                    "value": ""
+                },
+                {
+                    "name": "Arg02",
+                    "text": "Arg02",
+                    "value": ""
+                },
+                {
+                    "name": "Arg03",
+                    "text": "Arg03",
+                    "value": ""
+                },
+                {
+                    "name": "Arg04",
+                    "text": "Arg04",
+                    "value": ""
+                },
+                {
+                    "name": "Arg05",
+                    "text": "Arg05",
+                    "value": ""
+                },
+                {
+                    "name": "Arg06",
+                    "text": "Arg06",
+                    "value": ""
+                },
+                {
+                    "name": "Arg07",
+                    "text": "Arg07",
+                    "value": ""
+                },
+                {
+                    "name": "Arg08",
+                    "text": "Arg08",
+                    "value": ""
+                },
+                {
+                    "name": "Arg09",
+                    "text": "Arg09",
+                    "value": ""
+                },
+                {
+                    "name": "Arg10",
+                    "text": "Arg10",
+                    "value": ""
+                }
+            ],
+            "application": "Component",
+            "canHaveInputs": true,
+            "canHaveOutputs": true,
+            "category": "SplitData",
+            "categoryType": "GroupComponent",
+            "colour": " #DDAD00",
+            "desiredSize": {
+                "class": "go.Size",
+                "height": 292,
+                "width": 537
+            },
+            "fields": [
+                {
+                    "name": "num_of_copies",
+                    "text": "Number of copies",
+                    "value": "4"
+                },
+                {
+                    "name": "scatter_axis",
+                    "text": "Scatter axis",
+                    "value": "time"
+                }
+            ],
+            "inputLocalPorts": [
+                {
+                    "Id": "9839df49-97a4-4bec-9890-2fcf98deada1",
+                    "IdText": "event"
+                }
+            ],
+            "inputPorts": [
+                {
+                    "Id": "d8110229-f63c-4803-9681-7aaf0b945b0c",
+                    "IdText": "event"
+                }
+            ],
+            "isData": false,
+            "isGroup": true,
+            "key": -14,
+            "loc": "586.046875 305",
+            "outputLocalPorts": [
+                {
+                    "Id": "28190dfa-bbe4-4739-922b-0ffdc2a5fcce",
+                    "IdText": "event"
+                }
+            ],
+            "outputPorts": [
+                {
+                    "Id": "5991e1c2-597f-4f15-8f95-247aab20a24e",
+                    "IdText": "event"
+                }
+            ],
+            "text": "MultiDD",
+            "type": "Scatter"
         }
     ]
 }
