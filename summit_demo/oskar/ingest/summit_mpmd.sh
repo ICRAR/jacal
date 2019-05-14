@@ -15,7 +15,7 @@
 
 # scenario: AA4 telescope config, 1 channel per GPU with 6 GPUs running in parallel
 SCENARIO="rialto2-142"
-GPU_COUNT=1
+GPU_COUNT=2
 USE_GPUS="true"
 
 let "gcount = $GPU_COUNT - 1"
