@@ -86,7 +86,7 @@ casacore_version=master
 casacore_opts=
 casarest_opts=
 yandasoft_opts=
-oskar_opts=
+oskar_opts=-DCUDA_ARCH="7.0"
 
 while getopts "h?s:c:m:j:p:w:WPoiaC:A:r:y:O:" opt
 do
@@ -328,6 +328,7 @@ echo "********************************************"
 
 source_venv
 try pip install numpy
+try pip install mpi4py
 
 # ADIOS2, casacore and casarest
 echo "*********************"
