@@ -17,7 +17,7 @@ export CC=/sw/summit/gcc/6.4.0/bin/gcc
 export CXX=/sw/summit/gcc/6.4.0/bin/g++
 export FC=/sw/summit/gcc/6.4.0/bin/gfortran
 
-#source /gpfs/alpine/csc303/scratch/wangj/jacal_dep/bin/activate
+source /gpfs/alpine/csc303/scratch/wangj/jacal_dep/bin/activate
 
 export PATH=/gpfs/alpine/csc303/scratch/wangj/jacal_dep/bin:$PATH
 export CPATH=/gpfs/alpine/csc303/scratch/wangj/jacal_dep/include:$CPATH
