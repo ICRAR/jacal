@@ -25,7 +25,6 @@ Runtime options:
  -v <verbosity>           1=INFO (default), 2=DEBUG
  -w <walltime>            Walltime, defaults to 00:30:00
  -M                       Use queue-specific, non-MPI-based daliuge cluster startup mechanism
- -p <pgtp path>						Absolute path to the physical graph template
 
 Runtime paths:
  -b <baseline-exclusion>  The file containing the baseline exclusion map
@@ -38,7 +37,7 @@ EOF
 venv=
 outdir=`abspath .`
 nodes=1
-islands=1
+islands=1 #summit specific
 channels_per_node=2
 start_freq=210200000
 freq_step=4000
@@ -47,13 +46,12 @@ telescope_model=
 sky_model=
 use_adios2=0
 use_gpus=0
+#use_gpus=1 #summit specific
 verbosity=1
 remote_mechanism=mpi
 walltime=00:30:00
-# physical graph template partition
-pgtp=
 
-while getopts "h?V:o:n:c:f:s:b:t:S:agv:w:i:M:p:" opt
+while getopts "h?V:o:n:c:f:s:b:t:S:agv:w:i:M" opt
 do
 	case "$opt" in
 		h?)
@@ -105,22 +103,19 @@ do
 		M)
 			remote_mechanism=
 			;;
-		p)
-			pgtp="`abspath $OPTARG`"
-			;;
 		*)
 			print_usage 1>&2
 			exit 1
 			;;
 	esac
 done
-
-apps_rootdir="`abspath $this_dir/../oskar/ingest`"
+#JACAL_HOME="/gpfs/alpine/csc303/scratch/wangj/jacal" #summit specific
+JACAL_HOME="`abspath $this_dir/../..`"
+apps_rootdir=$JACAL_HOME"/summit_demo/oskar/ingest"
 baseline_exclusion=${baseline_exclusion:-$apps_rootdir/conf/aa2_baselines.csv}
 telescope_model=${telescope_model:-$apps_rootdir/conf/aa2.tm}
 sky_model=${sky_model:-$apps_rootdir/conf/eor_model_list.csv}
 
-# Create a new output dir with our date, *that* will be the base output dir
 outdir="$outdir/`date -u +%Y-%m-%dT%H-%M-%S`"
 mkdir -p "$outdir"
 
@@ -143,32 +138,4 @@ s/\"use_adios2=.*\"/\"use_adios2=$use_adios2\"/
 
 # Set whether to use GPUs or not
 s/\"use_gpus=.*\"/\"use_gpus=$use_gpus\"/
-" `abspath $this_dir/graphs/ingest_graph.json` > $outdir/lg.json
-
-# Whatever number of nodes we want to use for simulation, add 1 to them
-# to account for the DIM node
-
-if [ $islands -gt 1 ]; then
-    nodes=$((${nodes} + ${islands} + 1))
-else
-    nodes=$((${nodes} + 1))
-fi
-
-# Submit differently depending on your queueing system
-if [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
-	request_gpus=
-	if [ $use_gpus = 1 ]; then
-		request_gpus="--gres=gpu:${channels_per_node}"
-	fi
-	sbatch --ntasks-per-node=1 \
-	       -o "$outdir"/ingest_graph.log \
-	       -N $nodes \
-	       -t ${walltime} \
-	       -J ingest_graph \
-	       ${request_gpus} \
-	       $this_dir/run_ingest_graph.sh \
-	         "$venv" "$outdir" "$apps_rootdir" \
-	         $start_freq $freq_step $channels_per_node $islands $verbosity ${remote_mechanism:-slurm} "$pgtp"
-else
-	error "Queueing system not supported, add support please"
-fi
+" `abspath $this_dir/graphs/ingest_graph.json` > $outdir"/lg_"$islands"i_"$nodes"n.json"

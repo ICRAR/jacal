@@ -9,6 +9,7 @@ gpus_per_node=$6
 islands=$7
 verbosity=$8
 remote_mechanism=$9
+pgtp_path=${10}
 
 . common.sh
 
@@ -17,14 +18,23 @@ runner="`get_runner $remote_mechanism`"
 echo "Using $runner to start dlg cluster using the $remote_mechanism mechanism"
 
 export PYTHONPATH="${apps_rootdir}:$PYTHONPATH"
+export PYTHONPATH="/scratch/cwu/proj/daliuge:$PYTHONPATH"
 env > $outdir/env
 
 cd "$outdir"
+if [ -z "$pgtp_path" ]
+then
+    graph_option="-L lg.json" 
+else
+    graph_option="-P $pgtp_path"
+fi
+
 $runner \
     python -m dlg.deploy.pawsey.start_dfms_cluster \
     -l . \
-    -L lg.json \
+    $graph_option \
     --part-algo mysarkar \
+    --algo-param max_cpu=1 \
     --remote-mechanism $remote_mechanism \
     -d \
     -s $islands \
