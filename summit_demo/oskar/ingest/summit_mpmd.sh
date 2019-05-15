@@ -3,9 +3,9 @@
 # OSKAR2 job submission script for parallel GPU usage on summit node
 #
 # Usage: summit-loop.sh
-# Job Submission: jsrun -n1 -a1 -g1 summit-loop.sh
+# Job Submission: bsub summit-mpmd.sh
 
-#BSUB -P csc303
+#BSUB -P csc143
 #BSUB -J rialto2-142
 #BSUB -W 00:05
 #BSUB -nnodes 1
@@ -37,6 +37,8 @@ VISNAME=${VIS_DIR}/${SCENARIO}-${LSB_JOBID}.vis
 FITSROOT=${IMG_DIR}/${SCENARIO}-${LSB_JOBID}
 INTER_INI=summit_demo/oskar/ingest/conf/${SCENARIO}-sim.ini
 IMAGER_INI=summit_demo/oskar/ingest/conf/${SCENARIO}-imager.ini
+
+source ${APP_ROOT}/summit_demo/summit_bashrc
 
 # EoR sky model partitioning test case
 DOUBLE_PRECISION="false"
