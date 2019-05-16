@@ -6,7 +6,7 @@
 # Job Submission: bsub summit-mpmd.sh
 
 #BSUB -P csc143
-#BSUB -J oskar-mpmd
+#BSUB -J oskar-plain
 #BSUB -W 00:05
 #BSUB -nnodes 1
 
@@ -91,6 +91,13 @@ for gidx in $(seq 0 $gcount) ; do
     oskar_sim_interferometer --set "${INTER_INI}.${LSB_JOBID}.${gidx}" observation/frequency_inc_hz ${FREQUENCY_INC_HZ}
     oskar_sim_interferometer --set "${INTER_INI}.${LSB_JOBID}.${gidx}" sky/oskar_sky_model/file ${SM_FILE[$gidx]}
 
+    jsrun -n1 -a1 -g1 oskar_sim_interferometer ${INTER_INI}.${LSB_JOBID}.${gidx} > ${LOG_DIR}/${LSB_JOBID}.${gidx}.simulator.log &
+done
+
+wait
+
+for gidx in $(seq 0 $gcount) ; do
+
     # FITS image settings
     oskar_imager --set "${IMAGER_INI}.${LSB_JOBID}.${gidx}" image/double_precision $DOUBLE_PRECISION
     oskar_imager --set "${IMAGER_INI}.${LSB_JOBID}.${gidx}" image/use_gpus $USE_GPUS
@@ -100,35 +107,10 @@ for gidx in $(seq 0 $gcount) ; do
     oskar_imager --set "${IMAGER_INI}.${LSB_JOBID}.${gidx}" image/input_vis_data ${VISNAME}.${LSB_JOBID}.${gidx}
     oskar_imager --set "${IMAGER_INI}.${LSB_JOBID}.${gidx}" image/root_path $FITSROOT.${LSB_JOBID}.${gidx}
 
-    echo "app ${gidx}: oskar_sim_interferometer ${INTER_INI}.${LSB_JOBID}.${gidx}" >> ${LOG_DIR}/summit_simulator_erf.${LSB_JOBID}
-    echo "app ${gidx}: oskar_imager ${IMAGER_INI}.${LSB_JOBID}.${gidx}" >> ${LOG_DIR}/summit_imager_erf.${LSB_JOBID}
+    jsrun -n1 -a1 -g1 oskar_imager ${IMAGER_INI}.${LSB_JOBID}.${gidx} > ${LOG_DIR}/${LSB_JOBID}.${gidx}.imager.log &
 done
 
-echo "overlapping-rs: warn" >> ${LOG_DIR}/summit_simulator_erf.${LSB_JOBID}
-echo "overlapping-rs: warn" >> ${LOG_DIR}/summit_imager_erf.${LSB_JOBID}
-
-echo "oversubscribe_cpu: warn" >> ${LOG_DIR}/summit_simulator_erf.${LSB_JOBID}
-echo "oversubscribe_cpu: warn" >> ${LOG_DIR}/summit_imager_erf.${LSB_JOBID}
-
-echo "oversubscribe_mem: allow" >> ${LOG_DIR}/summit_simulator_erf.${LSB_JOBID}
-echo "oversubscribe_mem: allow" >> ${LOG_DIR}/summit_imager_erf.${LSB_JOBID}
-
-echo "oversubscribe_gpu: allow" >> ${LOG_DIR}/summit_simulator_erf.${LSB_JOBID}
-echo "oversubscribe_gpu: allow" >> ${LOG_DIR}/summit_imager_erf.${LSB_JOBID}
-
-echo "launch_distribution : packed" >> ${LOG_DIR}/summit_simulator_erf.${LSB_JOBID}
-echo "launch_distribution : packed" >> ${LOG_DIR}/summit_imager_erf.${LSB_JOBID}
-
-for gidx in $(seq 0 $gcount) ; do
-    echo "rank: ${gidx} : {host: 1; cpu: {${gidx}}; gpu :{${gidx}} } : app ${gidx}" >> ${LOG_DIR}/summit_simulator_erf.${LSB_JOBID}
-    echo "rank: ${gidx} : {host: 1; cpu: {${gidx}}; gpu :{${gidx}} } : app ${gidx}" >> ${LOG_DIR}/summit_imager_erf.${LSB_JOBID}
-done
-
-# run simulator
-jsrun --erf_input ${LOG_DIR}/summit_simulator_erf.${LSB_JOBID} | sort > ${LOG_DIR}/${LSB_JOBID}.simulator.log
-
-# create image preview
-jsrun --erf_input ${LOG_DIR}/summit_imager_erf.${LSB_JOBID} | sort > ${LOG_DIR}/${LSB_JOBID}.imager.log
+wait
 
 # show visibility volume
 echo "Visibility files:"
