@@ -5,7 +5,7 @@ outdir="$2"
 apps_rootdir="$3"
 start_freq=$4
 freq_step=$5
-gpus_per_node=$6
+daliuge_gpus_per_node=$6
 islands=$7
 verbosity=$8
 remote_mechanism=$9
@@ -38,4 +38,4 @@ $runner \
     -d \
     -s $islands \
     -v $verbosity \
-    --pg-modifiers modify_ingest_pg.modify_pg,start_freq=$start_freq,freq_step=$freq_step,channels_per_drop=$gpus_per_node
+    --pg-modifiers modify_ingest_pg.modify_pg,start_freq=$start_freq,freq_step=$freq_step,channels_per_drop=$daliuge_gpus_per_node

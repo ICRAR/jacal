@@ -51,7 +51,7 @@ use_adios2=0
 use_gpus=0
 verbosity=1
 remote_mechanism=mpi
-walltime=00:30:00
+walltime=00:30
 # physical graph template partition
 pgtp=
 
@@ -178,6 +178,11 @@ if [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	       $this_dir/run_ingest_graph.sh \
 	         "$venv" "$outdir" "$apps_rootdir" \
 	         $start_freq $freq_step $channels_per_node $islands $verbosity ${remote_mechanism:-slurm} "$pgtp"
+elif [ ! -z "$(command -v bsub 2> /dev/null)" ]; then
+    echo "Submitting job using bsub"
+    echo "walltime = ${walltime}"
+    echo "nnodes = ${nodes}"
+    bsub -P csc143 -nnodes $nodes -W ${walltime} -o "$outdir"/ingest_graph.log -J ingest_graph $this_dir/run_ingest_graph.sh "$venv" "$outdir" "$apps_rootdir" $start_freq $freq_step $channels_per_node $islands $verbosity ${remote_mechanism:-lsf}
 else
-	error "Queueing system not supported, add support please"
+    error "Queueing system not supported, add support please"
 fi
