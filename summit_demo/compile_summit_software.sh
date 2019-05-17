@@ -48,6 +48,11 @@ print_usage() {
 	echo " -P            Use Python 3 - NOTE: Only tested with CentOS7 on POWER9"
 }
 
+banner() {
+	msg="** $@ **"
+	echo "$msg" | sed -n '{h; x; s/./*/gp; x; h; p; x; s/./*/gp}';
+}
+
 try() {
 	"$@"
 	status=$?
@@ -252,6 +257,7 @@ build_and_install() {
 		is_branch=no
 		is_merge=yes
 	fi
+	banner Building `repo2dir $1`
 	if [ ! -d `repo2dir $1` ]; then
 		try git clone $1
 		cd `repo2dir $1`
@@ -322,25 +328,17 @@ fi
 export LD_LIBRARY_PATH=$prefix/lib64:$LD_LIBRARY_PATH
 
 # Let's work with a virtualenv
-echo "********************************************"
-echo "** Setting up Python virtrual environment **"
-echo "********************************************"
+banner Setting up Python virtrual environment
 
 source_venv
 try pip install numpy
 try pip install mpi4py
 
 # ADIOS2, casacore and casarest
-echo "*********************"
-echo "** Building ADIOS2 **"
-echo "*********************"
 if [ $build_adios == yes ]; then
 	build_and_install https://github.com/ornladios/ADIOS2 master -DADIOS2_BUILD_TESTING=OFF -DADIOS2_USE_Fortran=OFF
 fi
 
-echo "***********************"
-echo "** Building casacore **"
-echo "***********************"
 if [ $casacore_version == master -a $build_adios == yes ]; then
 	casacore_opts+=" -DUSE_ADIOS2=ON"
 fi
@@ -355,9 +353,6 @@ if [ $casacore_version == summit_demo ]; then
 	casacore_version=master
 fi
 
-echo "***********************"
-echo "** Building casarest **"
-echo "***********************"
 if [ $casacore_version == master ]; then
 	casarest_version=master
 elif [ $casacore_version == COMMIT-v2.4.0 ]; then
@@ -371,55 +366,17 @@ build_and_install https://github.com/casacore/casarest $casarest_version -DBUILD
 if [ $casacore_version == master ]; then
 	yandasoft_opts+=" -DCMAKE_CXX_FLAGS=-Dcasa=casacore"
 fi
-echo "***************************"
-echo "** Building lofar-common **"
-echo "***************************"
 build_and_install https://bitbucket.csiro.au/scm/askapsdp/lofar-common.git master $yandasoft_opts
-
-echo "*************************"
-echo "** Building lofar-blob **"
-echo "*************************"
 build_and_install https://bitbucket.csiro.au/scm/askapsdp/lofar-blob.git master $yandasoft_opts
-
-echo "*************************"
-echo "** Building base-askap **"
-echo "*************************"
 build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-askap.git operator-overload-fix $yandasoft_opts
-
-echo "******************************"
-echo "** Building base-logfilters **"
-echo "******************************"
 build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-logfilters.git refactor $yandasoft_opts
-
-echo "*****************************"
-echo "** Building base-imagemath **"
-echo "*****************************"
 build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-imagemath.git refactor $yandasoft_opts
-
-echo "***************************"
-echo "** Building base-scimath **"
-echo "***************************"
 build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-scimath.git refactor $yandasoft_opts
-
-echo "*********************************"
-echo "** Building base-askapparallel **"
-echo "*********************************"
 build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-askapparallel.git refactor $yandasoft_opts
-
-echo "*****************************"
-echo "** Building base-accessors **"
-echo "*****************************"
 build_and_install https://bitbucket.csiro.au/scm/askapsdp/base-accessors.git refactor $yandasoft_opts
-
-echo "************************"
-echo "** Building yandasoft **"
-echo "************************"
 build_and_install https://bitbucket.csiro.au/scm/askapsdp/yandasoft.git cmake-improvements $yandasoft_opts
 
 # OSKAR
-echo "********************"
-echo "** Building OSKAR **"
-echo "********************"
 if [ $build_oskar == yes ]; then
 	# Required when building with clang on centos
 	if [ $system == centos -a $compiler == clang ]; then
@@ -438,9 +395,7 @@ if [ $build_oskar == yes ]; then
 	cd ../..
 fi
 
-echo "************************"
-echo "** Installing DALiuGE **"
-echo "************************"
+banner Installing DALiuGE
 # DALiuGE
 # 'centos' here means 'power9', where we need to build pyzmq ourselves
 # since the src dist from PyPI fails to build
@@ -454,6 +409,7 @@ fi
 try pip install git+https://github.com/ICRAR/daliuge
 
 # spead2
+banner Installing spead2
 try pip install spead2==1.10
 
 if [ $remove_workdir == yes ]; then
