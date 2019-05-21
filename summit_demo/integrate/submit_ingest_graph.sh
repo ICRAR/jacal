@@ -53,7 +53,7 @@ walltime=00:30:00
 # physical graph template partition
 pgtp=
 
-while getopts "h?V:o:n:c:f:s:b:t:S:agv:w:i:M:p:" opt
+while getopts "h?V:o:n:c:f:s:b:t:S:agv:w:i:Mp:" opt
 do
 	case "$opt" in
 		h?)
