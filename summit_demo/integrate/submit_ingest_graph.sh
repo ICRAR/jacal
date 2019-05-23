@@ -5,7 +5,7 @@ cmd="cd \$(dirname $0); echo \$PWD; cd \$OLDPWD"
 this_dir=`eval "$cmd"`
 . $this_dir/common.sh
 
-function print_usage {
+print_usage() {
 	cat <<EOF
 $0 [opts]
 

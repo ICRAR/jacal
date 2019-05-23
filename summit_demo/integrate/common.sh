@@ -1,6 +1,6 @@
 #/bin/bash
 
-function load_modules {
+load_modules() {
 
 	if [ "$SLURM_CLUSTER_NAME" = pleiades ]; then
 		module use /scratch/summit_demo/modulefiles
@@ -22,7 +22,7 @@ function load_modules {
 	fi
 }
 
-function get_runner {
+get_runner() {
 	if [ "$1" = slurm ]; then
 		runner=srun
 	elif [ "$1" = mpi ]; then
@@ -34,7 +34,7 @@ function get_runner {
 	echo $runner
 }
 
-function abspath {
+abspath() {
 	p="$1"
 	dirname="`dirname $p`"
 	basename="`basename $p`"
