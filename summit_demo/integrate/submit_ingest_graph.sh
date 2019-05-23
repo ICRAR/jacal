@@ -25,7 +25,7 @@ Runtime options:
  -v <verbosity>           1=INFO (default), 2=DEBUG
  -w <walltime>            Walltime, defaults to 00:30:00
  -M                       Use queue-specific, non-MPI-based daliuge cluster startup mechanism
- -p <pgtp path>						Absolute path to the physical graph template
+ -p <pgtp path>           Absolute path to the physical graph template
 
 Runtime paths:
  -b <baseline-exclusion>  The file containing the baseline exclusion map
