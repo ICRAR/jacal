@@ -119,7 +119,7 @@ def header_size(fits_file):
         return header_size_obj(fits_input_obj)
 
 
-def concat_images(fits_cube_output, fits_image_input):
+def concat_images(fits_cube_output, fits_image_input, freq_step=None):
     input_iter = iter(fits_image_input)
 
     if not os.path.exists(fits_cube_output):
@@ -134,7 +134,7 @@ def concat_images(fits_cube_output, fits_image_input):
     total_size = hdr_size + (image_size * orig_num_chan)
     total_channels = orig_num_chan
 
-    delta_freq = None
+    delta_freq = freq_step
 
     with open(fits_cube_output, 'rb+') as f:
         f.seek(total_size)
@@ -175,6 +175,5 @@ def concat_images(fits_cube_output, fits_image_input):
 
     # update the total number of freq channels in final image cube
     modify_header(fits_cube_output, 'NAXIS3', total_channels)
-    if delta_freq:
-        modify_header(fits_cube_output, 'CDELT3', delta_freq)
+    modify_header(fits_cube_output, 'CDELT3', delta_freq)
     insert_header(fits_cube_output, 'RESTFREQ', float(1420405751.786))
