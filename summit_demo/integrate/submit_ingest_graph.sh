@@ -123,6 +123,7 @@ sky_model=${sky_model:-$apps_rootdir/conf/eor_model_list.csv}
 # Create a new output dir with our date, *that* will be the base output dir
 outdir="$outdir/`date -u +%Y-%m-%dT%H-%M-%S`"
 mkdir -p "$outdir"
+echo "$0 $@" > $outdir/submission.log
 
 # Turn LG "template" into actual LG for this run
 sed "
