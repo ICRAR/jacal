@@ -1,5 +1,18 @@
 #/bin/bash
 
+error() {
+	echo "$@" 1>&2
+}
+
+try() {
+	"$@"
+	status=$?
+	if [ $status -ne 0 ]; then
+		error "Command exited with status $status, exiting now: $@"
+		exit 1
+	fi
+}
+
 load_modules() {
 
 	if [ "$SLURM_CLUSTER_NAME" = pleiades ]; then
