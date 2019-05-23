@@ -18,7 +18,6 @@ runner="`get_runner $remote_mechanism`"
 echo "Using $runner to start dlg cluster using the $remote_mechanism mechanism"
 
 export PYTHONPATH="${apps_rootdir}:$PYTHONPATH"
-export PYTHONPATH="/scratch/cwu/proj/daliuge:$PYTHONPATH"
 env > $outdir/env
 
 cd "$outdir"
