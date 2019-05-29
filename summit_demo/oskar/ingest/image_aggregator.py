@@ -8,12 +8,10 @@ class FitsImageAggregator(BarrierAppDROP):
 
     def initialize(self, **kwargs):
         self.freq_step = kwargs.get('freq_step', None)
-
         super(FitsImageAggregator, self).initialize(**kwargs)
 
     def run(self):
         fits_output = self.outputs[0].path
-
         channel_order = {}
         for i in self.inputs:
             if i.status != DROPStates.COMPLETED:
