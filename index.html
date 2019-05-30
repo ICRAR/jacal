@@ -1,6 +1,53 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta http-equiv="Refresh" content="0; url=https://github.com/ICRAR/jacal/blob/master/README.md" />
+    <!--meta http-equiv="Refresh" content="0; url=https://github.com/ICRAR/jacal/blob/master/README.md" /-->
   </head>
+  <body>
+	  <pre>
+		  Installation log, MD, 2019-05-30
+		  
+		  HPC cluster: Bracewell
+		  
+		  bash>
+		  export ROOT=/flush1/dol040
+		  export MBASE=${ROOT}/modulefiles
+		  export TARGET=${MBASE}/summit_demo
+
+		  cd $ROOT
+		  git clone https://github.com/ICRAR/jacal.git
+		  cd jacal/summit_demo
+
+          # MPI compilation error workaround:
+		  # change mpi to openmpi in line 324 of compile_summit_software.sh
+
+		  sh compile_summit_software.sh -i -j 8 -p $TARGET -c intel -m /apps/cmake/3.9.0/bin/cmake
+		  
+		  # error: A required library with BLAS API not found.  Please specify library
+		  # same casacore problem with compilers -c gcc and -c intel
+
+		  # as a workaround continue with pre-compiled modules:
+		  module use /flush1/tob020/modulefiles
+		  module load oskar/2.7.1-adios
+		  module load yandasoft/default
+		  module load spead2/1.10.0
+
+		  dol040@bracewell-login:/flush1/dol040/jacal/summit_demo/integrate> bash submit_ingest_graph.sh -g -a -w 01:00 -o /flush1/dol040/log
+		  Submitted batch job 27427131
+		  dol040@bracewell-login:/flush1/dol040/jacal/summit_demo/integrate> squeue -u $USER
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+          27427131     h2gpu ingest_g   dol040 PD       0:00      2 (Priority)
+		  
+		  ... waiting for node allocation ... it's getting too late for today ...
+		  
+		  
+		  
+		  
+		  
+		  # in case of success, run 36 node job like this (with ADIOS2 and GPU usage); is 1 min walltime realistic?
+		  bash submit_ingest_graph.sh -n 36 -i 6 -a -g -w 01:00 -o ${ROOT}/log
+            		  
+		  
+	  </pre>
+  </body>
 </html>
