@@ -89,18 +89,26 @@ corn_markers.append('%10.8f %10.8f %10.8e 0.0 0.0 0.0 %e %6.3f 0.0 %6.4f %6.4f 0
 
 #std_dev=np.std(ball,axis=(1,2))*0
 n=ball.shape
+mK2Jy=(6000e2/(57.3*3600))**2*1.36E-6 # I belive this should be the value. Need to check the milliK/milliJy
+# This is 1.15e-5 -- I have used 1e-5
+# to multiply the mK from FIRST to get Jy/bm (for a 6km baseline)
 if (show_plots==False):
   for n1 in range(n[0]):
     print 'Freq Chan: '+str(fq[n1])
+    tsys=60.*np.power(fq[n1]/300.,-2.55)
+    nant=512
+    diam=35.
+    area=np.pi/4*diam*diam
+    sefd=2760.*(50+tsys)/512.
     std_dev=np.std(ball[n1])*0
     l=[]
     for n2 in range(n[1]):
         for n3 in range(n[2]):
             if (np.abs(ball[n1][n2][n3])>std_dev):
-                l.append('%10.8f %10.8f %10.8e 0.0 0.0 0.0 %e %6.3f 0.0 %6.4f %6.4f 0.0\n'%(crval[0]+(n2-N2/2)*crdel[0],crval[1]+(n3-N3/2)*crdel[1],ball[n1][n2][n3]/1e3,fq[n1]*1e6,sall[n1][n2][n3],crdel[0]*3600.,crdel[1]*3600.))
+                l.append('%10.8f %10.8f %10.8e 0.0 0.0 0.0 %e %6.3f 0.0 %6.4f %6.4f 0.0\n'%(crval[0]+(n2-N2/2)*crdel[0],crval[1]+(n3-N3/2)*crdel[1],ball[n1][n2][n3]/1e5,fq[n1]*1e6,sall[n1][n2][n3],crdel[0]*3600.,crdel[1]*3600.))
             #if (n1<len(a)): ## Now a is added to ball
             #    l.append('%10.8f %10.8f %10.8e 0.0 0.0 0.0 %e %6.3f 0.0 %6.4f %6.4f 0.0\n'%(crval[0]+(n2-N2/2)*crdel[0],crval[1]+(n3-N3/2)*crdel[1],a[n1][n2][n3],1e9,0,crdel[0]/3600,crdel[1]/3600))
-    l.append('%10.8f %10.8f %10.8e 0.0 0.0 0.0 %e %6.3f 0.0 %6.4f %6.4f 0.0\n'%(crval[0],crval[1],sum[n1]/1e3,fq[n1]*1e6,0,crdel[0]*N2*3600.,crdel[1]*N3*3600.))
+    l.append('%10.8f %10.8f %10.8e 0.0 0.0 0.0 %e %6.3f 0.0 %6.4f %6.4f 0.0\n'%(crval[0],crval[1],sum[n1]/1e5,fq[n1]*1e6,0,crdel[0]*N2*3600.,crdel[1]*N3*3600.))
     fp=open('sky_eor_model_f%06.2f.osm'%(fq[n1]),'w')
     fp.writelines(corn_markers)
     if (len(l)):
