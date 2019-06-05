@@ -36,11 +36,11 @@ EOF
 }
 
 # Command line parsing
-venv=
+venv=/gpfs/alpine/csc303/scratch/wangj/jacal_dep
 outdir=`abspath .`
 nodes=1
 islands=1
-channels_per_node=2
+channels_per_node=6
 start_freq=210200000
 freq_step=4000
 time_steps=5
@@ -182,7 +182,16 @@ elif [ ! -z "$(command -v bsub 2> /dev/null)" ]; then
     echo "Submitting job using bsub"
     echo "walltime = ${walltime}"
     echo "nnodes = ${nodes}"
-    bsub -P csc143 -nnodes $nodes -W ${walltime} -o "$outdir"/ingest_graph.log -J ingest_graph $this_dir/run_ingest_graph.sh "$venv" "$outdir" "$apps_rootdir" $start_freq $freq_step $channels_per_node $islands $verbosity ${remote_mechanism:-lsf}
+    bsub -P csc303 -nnodes $nodes -W ${walltime} -o "$outdir"/ingest_graph.log -J ingest_graph $this_dir/run_ingest_graph.sh "$venv" "$outdir" "$apps_rootdir" $start_freq $freq_step $channels_per_node $islands $verbosity ${remote_mechanism:-lsf}
+    echo "$venv"
+    echo "$outdir"
+    echo "$apps_rootdir"
+    echo "$start_freq"
+    echo "$freq_step"
+    echo "$channels_per_node"
+    echo "$islands"
+    echo "$verbosity"
+    echo ${remote_mechanism:-lsf}
 else
     error "Queueing system not supported, add support please"
 fi

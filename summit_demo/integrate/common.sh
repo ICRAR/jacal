@@ -25,12 +25,7 @@ load_modules() {
 		module load oskar/2.7.1-adios
 		module load yandasoft/default
 		module load spead2/1.10.0
-	else
-		echo "Unsupported system, exiting now"
-		exit 1
-	fi
-
-    if [ "${LMOD_SYSTEM_NAME}" == "summit" ]; then
+    elif [ "${LMOD_SYSTEM_NAME}" == "summit" ]; then
         module load gcc/6.4.0
         module load cmake
         module load cuda
@@ -51,12 +46,16 @@ load_modules() {
         export CPATH=/gpfs/alpine/csc303/scratch/wangj/jacal_dep/include:$CPATH
         export LIBRARY_PATH=/gpfs/alpine/csc303/scratch/wangj/jacal_dep/lib:/gpfs/alpine/csc303/scratch/wangj/jacal_dep/lib64:$LIBRARY_PATH
         export LD_LIBRARY_PATH=/gpfs/alpine/csc303/scratch/wangj/jacal_dep/lib:/gpfs/alpine/csc303/scratch/wangj/jacal_dep/lib64:$LD_LIBRARY_PATH
-        source /gpfs/alpine/csc303/scratch/wangj/jacal_dep/bin/activate
-    fi
-
-	if [ -n "$venv" ]; then
-		source $venv/bin/activate
+        venv=/gpfs/alpine/csc303/scratch/wangj/jacal_dep
+	else
+		echo "Unsupported system, exiting now"
+		exit 1
 	fi
+
+
+    if [ -n "$venv" ]; then
+        source $venv/bin/activate
+    fi
 }
 
 get_runner() {
