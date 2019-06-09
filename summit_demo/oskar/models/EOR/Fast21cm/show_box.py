@@ -51,7 +51,8 @@ a=[]
 f='NGC1566_from_ASKAP12.bin'
 if (os.path.isfile(f)):
     a=np.fromfile(f,dtype='float32')
-    a=a.reshape(101,128,128)
+    a=a.reshape((101,128,128))
+    # ball in mK so scale up a to mK as well
     ball[0:101]=ball[0:101]+a*1000
 
 for n1 in range(len(fq)):
@@ -74,6 +75,13 @@ for n1 in range(1,len(sall)): # recalculate SI.
     ball[n1]=ball[n1]-sum[n1]
 #sall[np.where(np.isnan(sall)==True)]=0
 #ball[np.where(np.isnan(ball)==True)]=0
+s=sall.shape
+sall=sall.reshape((s[0]*s[1]*s[2]))
+lm=np.percentile(np.abs(sall),99)
+I=np.where(np.abs(sall)>lm)[0]
+sall[I]=lm*np.sign(sall[I])
+sall=sall.reshape(s)
+pl.clf();pl.hist(sall.flatten(),100)
 
 crval=[201,-44];crdel=[6.0/N2,6.0/N3] # reference values in deg
 corn_markers=[]
@@ -100,12 +108,14 @@ if (show_plots==False):
     diam=35.
     area=np.pi/4*diam*diam
     sefd=2760.*(50+tsys)/512.
+    # Note StdDev currently forced to zero
     std_dev=np.std(ball[n1])*0
     l=[]
     for n2 in range(n[1]):
         for n3 in range(n[2]):
             if (np.abs(ball[n1][n2][n3])>std_dev):
-                l.append('%10.8f %10.8f %10.8e 0.0 0.0 0.0 %e %6.3f 0.0 %6.4f %6.4f 0.0\n'%(crval[0]+(n2-N2/2)*crdel[0],crval[1]+(n3-N3/2)*crdel[1],ball[n1][n2][n3]/1e5,fq[n1]*1e6,sall[n1][n2][n3],crdel[0]*3600.,crdel[1]*3600.))
+                # Note SI currently forced to zero and angular size halved
+                l.append('%10.8f %10.8f %10.8e 0.0 0.0 0.0 %e %6.3f 0.0 %6.4f %6.4f 0.0\n'%(crval[0]+(n2-N2/2)*crdel[0],crval[1]+(n3-N3/2)*crdel[1],ball[n1][n2][n3]/1e5,fq[n1]*1e6,sall[n1][n2][n3]*0,crdel[0]*3600.*0.5,crdel[1]*3600.*0.5))
             #if (n1<len(a)): ## Now a is added to ball
             #    l.append('%10.8f %10.8f %10.8e 0.0 0.0 0.0 %e %6.3f 0.0 %6.4f %6.4f 0.0\n'%(crval[0]+(n2-N2/2)*crdel[0],crval[1]+(n3-N3/2)*crdel[1],a[n1][n2][n3],1e9,0,crdel[0]/3600,crdel[1]/3600))
     l.append('%10.8f %10.8f %10.8e 0.0 0.0 0.0 %e %6.3f 0.0 %6.4f %6.4f 0.0\n'%(crval[0],crval[1],sum[n1]/1e5,fq[n1]*1e6,0,crdel[0]*N2*3600.,crdel[1]*N3*3600.))

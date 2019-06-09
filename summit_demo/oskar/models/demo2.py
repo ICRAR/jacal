@@ -37,7 +37,7 @@ delta_f=(end_f-start_f)/delta_f
 print '#Freq Range (and step) %f %f %f MHz'%(start_f,end_f,delta_f)
 
 start_freq=np.arange(start_f,end_f,step=delta_f)
-start_freq=np.array(frq)
+#start_freq=np.array(frq)
 IdCount=0
 for start_f in start_freq:
     cmd=[]
