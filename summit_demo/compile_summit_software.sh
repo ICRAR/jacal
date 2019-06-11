@@ -84,13 +84,13 @@ prefix=/usr/local
 workdir=.
 remove_workdir=no
 build_oskar=yes
-use_python3=no
+use_python3=yes
 install_dependencies=yes
 build_adios=yes
 casacore_version=master
 casacore_opts=
 casarest_opts=
-yandasoft_opts=
+yandasoft_opts=" -DCMAKE_CXX_STANDARD_LIBRARIES=-luuid"
 oskar_opts=-DCUDA_ARCH="7.0"
 
 while getopts "h?s:c:m:j:p:w:WPoiaC:A:r:y:O:" opt
@@ -293,19 +293,20 @@ build_and_install() {
 }
 
 source_venv() {
-	if [ ! -f $prefix/bin/activate ]; then
-		if [ $use_python3 == yes ]; then
-			python3 -m venv $prefix
-		else
-			if [ -n "`command -v virtualenv 2> /dev/null`" ]; then
-				try virtualenv $prefix
-			else
-				try pip install --user virtualenv
-				try ~/.local/bin/virtualenv $prefix
-			fi
-		fi
-	fi
-	source $prefix/bin/activate
+    if [ ! -f $prefix/bin/activate ]; then
+        if [ $use_python3 == yes ]; then
+            python3 -m venv $prefix
+            echo "using python3, virtualenv created"
+        else
+            if [ -n "`command -v virtualenv 2> /dev/null`" ]; then
+                try virtualenv $prefix
+            else
+                try pip install --user virtualenv
+                try ~/.local/bin/virtualenv $prefix
+            fi
+        fi
+    fi
+    source $prefix/bin/activate
 }
 
 original_dir="$PWD"
