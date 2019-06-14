@@ -9,7 +9,8 @@ gpus_per_node=$6
 islands=$7
 verbosity=$8
 remote_mechanism=$9
-pgtp_path=${10}
+nodes=${10}
+pgtp_path=${11}
 
 echo "**************************************"
 echo "** Arguments passed from job script **"
@@ -41,7 +42,7 @@ else
     graph_option="-P $pgtp_path"
 fi
 
-$runner \
+$runner -a${nodes} -n1 -g6 -c42 -bpacked:42 \
     python -m dlg.deploy.pawsey.start_dfms_cluster \
     -l . \
     $graph_option \

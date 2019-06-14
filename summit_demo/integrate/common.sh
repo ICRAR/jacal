@@ -30,9 +30,6 @@ load_modules() {
         module load cmake
         module load cuda
         module load netlib-lapack
-        module load python
-        module load py-pip
-        module load py-setuptools
         module load boost
         module load fftw
         module load gsl
@@ -42,11 +39,11 @@ load_modules() {
         export CC=/sw/summit/gcc/6.4.0/bin/gcc
         export CXX=/sw/summit/gcc/6.4.0/bin/g++
         export FC=/sw/summit/gcc/6.4.0/bin/gfortran
-        export PATH=/gpfs/alpine/csc303/scratch/wangj/jacal_dep/bin:$PATH
-        export CPATH=/gpfs/alpine/csc303/scratch/wangj/jacal_dep/include:$CPATH
-        export LIBRARY_PATH=/gpfs/alpine/csc303/scratch/wangj/jacal_dep/lib:/gpfs/alpine/csc303/scratch/wangj/jacal_dep/lib64:$LIBRARY_PATH
-        export LD_LIBRARY_PATH=/gpfs/alpine/csc303/scratch/wangj/jacal_dep/lib:/gpfs/alpine/csc303/scratch/wangj/jacal_dep/lib64:$LD_LIBRARY_PATH
-        venv=/gpfs/alpine/csc303/scratch/wangj/jacal_dep
+        export PATH=/gpfs/alpine/csc303/scratch/wangj/jacal_install/bin:$PATH
+        export CPATH=/gpfs/alpine/csc303/scratch/wangj/jacal_install/include:$CPATH
+        export LIBRARY_PATH=/gpfs/alpine/csc303/scratch/wangj/jacal_install/lib:/gpfs/alpine/csc303/scratch/wangj/jacal_install/lib64:$LIBRARY_PATH
+        export LD_LIBRARY_PATH=/gpfs/alpine/csc303/scratch/wangj/jacal_install/lib:/gpfs/alpine/csc303/scratch/wangj/jacal_install/lib64:$LD_LIBRARY_PATH
+        venv=/gpfs/alpine/csc303/scratch/wangj/jacal_install
 	else
 		echo "Unsupported system, exiting now"
 		exit 1
