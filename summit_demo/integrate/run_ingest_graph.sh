@@ -28,7 +28,7 @@ echo "**************************************"
 . common.sh
 
 load_modules
-runner="jsrun"
+runner="jsrun -n${nodes} -a1 -g6 -c42 -bpacked:42"
 echo "Using $runner to start dlg cluster using the $remote_mechanism mechanism"
 
 export PYTHONPATH="${apps_rootdir}:$PYTHONPATH"
@@ -42,7 +42,7 @@ else
     graph_option="-P $pgtp_path"
 fi
 
-$runner -a${nodes} -n1 -g6 -c42 -bpacked:42 \
+$runner \
     python -m dlg.deploy.pawsey.start_dfms_cluster \
     -l . \
     $graph_option \
