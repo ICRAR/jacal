@@ -56,85 +56,96 @@ class SpeadReceiver(object):
         self._baseline_exclude = []
         self._baseline_map = []
 
-        if spead_config['as_relay'] == 1:
-            self.as_relay = True
-        else:
-            self.as_relay = False
-            self.use_adios2 = spead_config.get('use_adios2', False)
-            self._file_name = spead_config.get('output_ms', 'output.ms')
-            try:
-                os.mkdir(os.path.dirname(self._file_name))
-            except OSError:
-                pass
+        try:
+            if spead_config['as_relay'] == 1:
+                self.as_relay = True
+            else:
+                self.as_relay = False
+                self.use_adios2 = spead_config.get('use_adios2', False)
+                self._file_name = spead_config.get('output_ms', 'output.ms')
+                try:
+                    os.mkdir(os.path.dirname(self._file_name))
+                except OSError:
+                    pass
 
-        if self.as_relay:
-            # NOTE: Don't do baseline exclusion if its a relay  as it shares a codebase with the MS writer
-            # which will exclude baselines multiple times causing array dimension mismatches.
-            # So as a relay just average and pass on all baselines.
+            if self.as_relay:
+                # NOTE: Don't do baseline exclusion if its a relay  as it shares a codebase with the MS writer
+                # which will exclude baselines multiple times causing array dimension mismatches.
+                # So as a relay just average and pass on all baselines.
 
-            # Construct TCP streams and associated item groups.
-            stream_config = spead2.send.StreamConfig(
-                spead_config['relay']['stream_config']['max_packet_size'],
-                spead_config['relay']['stream_config']['rate'],
-                spead_config['relay']['stream_config']['burst_size'],
-                spead_config['relay']['stream_config']['max_heaps'])
+                # Construct TCP streams and associated item groups.
+                stream_config = spead2.send.StreamConfig(
+                    spead_config['relay']['stream_config']['max_packet_size'],
+                    spead_config['relay']['stream_config']['rate'],
+                    spead_config['relay']['stream_config']['burst_size'],
+                    spead_config['relay']['stream_config']['max_heaps'])
 
-            stream = spead_config['relay']['stream']
-            threads = stream['threads'] if 'threads' in stream else 1
-            thread_pool = spead2.ThreadPool(threads=threads)
-            logger.info("Relaying visibilities to host {} on port {}"
-                        .format(stream['host'], stream['port']))
-            tcp_stream = spead2.send.TcpStream(thread_pool, stream['host'],
-                                               stream['port'], stream_config)
+                stream = spead_config['relay']['stream']
+                threads = stream['threads'] if 'threads' in stream else 1
+                thread_pool = spead2.ThreadPool(threads=threads)
+                logger.info("Relaying visibilities to host {} on port {}"
+                            .format(stream['host'], stream['port']))
+                tcp_stream = spead2.send.TcpStream(thread_pool, stream['host'],
+                                                   stream['port'], stream_config)
 
-            item_group = spead2.send.ItemGroup(
-                flavour=spead2.Flavour(4, 64, 40, 0))
+                item_group = spead2.send.ItemGroup(
+                    flavour=spead2.Flavour(4, 64, 40, 0))
 
-            # Append udp_stream and item_group to the stream list as a tuple.
-            self._relay_stream = (tcp_stream, item_group)
-        else:
-            baseline_file = spead_config['baseline_map_filename']
-            if baseline_file:
-                full_baseline_map = parse_baseline_file(baseline_file)
+                # Append udp_stream and item_group to the stream list as a tuple.
+                self._relay_stream = (tcp_stream, item_group)
+            else:
+                baseline_file = spead_config['baseline_map_filename']
+                if baseline_file:
+                    full_baseline_map = parse_baseline_file(baseline_file)
 
-                index = 0
-                for b in full_baseline_map:
-                    if b[2] == 0:
-                        self._baseline_map.append(b)
-                    else:
-                        self._baseline_exclude.append(index)
-                    index += 1
+                    index = 0
+                    for b in full_baseline_map:
+                        if b[2] == 0:
+                            self._baseline_map.append(b)
+                        else:
+                            self._baseline_exclude.append(index)
+                        index += 1
 
-                logger.info('Baseline count: total=%d, used=%d, excluded=%d',
-                            len(full_baseline_map), len(self._baseline_map), len(self._baseline_exclude))
+                    logger.info('Baseline count: total=%d, used=%d, excluded=%d',
+                                len(full_baseline_map), len(self._baseline_map), len(self._baseline_exclude))
 
-        # Ports can be given explicitly or taken from the config file
-        if not ports:
-            ports = (c['port'] for c in spead_config['streams'])
+            # Ports can be given explicitly or taken from the config file
+            if not ports:
+                ports = (c['port'] for c in spead_config['streams'])
 
-        for port in ports:
-            logger.info('Adding TCP stream reader: port %d', port)
-            try:
-                stream = spead2.recv.Stream(spead2.ThreadPool(), 0)
-                stream.stop_on_stop_item = False
-                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-                sock.bind(('', port))
-                sock.listen(1)
-                stream.add_tcp_reader(sock)
-                self._ports.append(port)
-                self._streams.append(stream)
-            except Exception as e:
-                logger.error('Failed adding TCP stream reader: error %s port %d', str(e), port)
-                raise e
+            for port in ports:
+                logger.info('Adding TCP stream reader: port %d', port)
+                try:
+                    stream = spead2.recv.Stream(spead2.ThreadPool(), 0)
+                    stream.stop_on_stop_item = False
+                    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                    sock.bind(('', port))
+                    sock.listen(1)
+                    stream.add_tcp_reader(sock)
+                    self._ports.append(port)
+                    self._streams.append(stream)
+                except Exception as e:
+                    logger.error('Failed adding TCP stream reader: error %s port %d', str(e), port)
+                    raise e
+        except:
+            self.close(graceful=False)
+            raise
 
-    def close(self):
+    def close(self, graceful=True):
         for stream in list(self._streams):
-            stream.stop()
+            try:
+                stream.stop()
+            except:
+                continue
         if self._relay_stream:
             logger.info("Sending end-of-stream heap through relay stream")
             stream, item_group = self._relay_stream
-            stream.send_heap(item_group.get_end())
+            if graceful:
+                try:
+                    stream.send_heap(item_group.get_end())
+                except:
+                    pass
             self._relay_stream = None
         if self._measurement_set:
             logger.info("Closing measurement set %s", self._file_name)
