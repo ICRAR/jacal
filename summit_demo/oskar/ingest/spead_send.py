@@ -11,6 +11,7 @@ import spead2.send
 
 logger = logging.getLogger(__name__)
 
+
 class SpeadSender(oskar.Interferometer):
     # Simulates visibility data using OSKAR and sends it using SPEAD.
     # Inherits oskar.Interferometer to send data in the process_block() method.
@@ -47,7 +48,10 @@ class SpeadSender(oskar.Interferometer):
         oskar.Interferometer.finalise(self)
         # Send the end of stream message to each stream.
         for stream, item_group in self._streams:
-            stream.send_heap(item_group.get_end())
+            try:
+                stream.send_heap(item_group.get_end())
+            except:
+                continue
 
     def process_block(self, block, block_index):
         """Sends the visibility block using SPEAD.
