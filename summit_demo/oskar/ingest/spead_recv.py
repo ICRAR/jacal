@@ -4,6 +4,7 @@
 import os
 import logging
 import math
+import socket
 
 import oskar
 import spead2
@@ -48,17 +49,6 @@ class SpeadReceiver(object):
         # Relay attributes
         self._relay_stream = None
         self._descriptor = None
-
-        # Ports can be given explicitly or taken from the config file
-        if not ports:
-            ports = (c['port'] for c in spead_config['streams'])
-        for port in ports:
-            logger.info('Adding TCP stream reader in port %d', port)
-            stream = spead2.recv.Stream(spead2.ThreadPool(), 0)
-            stream.stop_on_stop_item = False
-            stream.add_tcp_reader(port)
-            self._ports.append(port)
-            self._streams.append(stream)
 
         self._measurement_set = None
         self._header = {}
@@ -114,7 +104,29 @@ class SpeadReceiver(object):
                     else:
                         self._baseline_exclude.append(index)
                     index += 1
-            logger.info('Baseline count: total=%d, used=%d, excluded=%d', len(full_baseline_map), len(self._baseline_map), len(self._baseline_exclude))
+
+                logger.info('Baseline count: total=%d, used=%d, excluded=%d',
+                            len(full_baseline_map), len(self._baseline_map), len(self._baseline_exclude))
+
+        # Ports can be given explicitly or taken from the config file
+        if not ports:
+            ports = (c['port'] for c in spead_config['streams'])
+
+        for port in ports:
+            logger.info('Adding TCP stream reader: port %d', port)
+            try:
+                stream = spead2.recv.Stream(spead2.ThreadPool(), 0)
+                stream.stop_on_stop_item = False
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                sock.bind(('', port))
+                sock.listen(1)
+                stream.add_tcp_reader(sock)
+                self._ports.append(port)
+                self._streams.append(stream)
+            except Exception as e:
+                logger.error('Failed adding TCP stream reader: error %s port %d', str(e), port)
+                raise e
 
     def close(self):
         for stream in list(self._streams):
