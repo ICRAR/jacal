@@ -127,7 +127,7 @@ class SpeadReceiver(object):
                     self._streams.append(stream)
                 except Exception as e:
                     logger.error('Failed adding TCP stream reader: error %s port %d', str(e), port)
-                    raise e
+                    raise
         except:
             self.close(graceful=False)
             raise
@@ -139,10 +139,11 @@ class SpeadReceiver(object):
             except:
                 continue
         if self._relay_stream:
-            logger.info("Sending end-of-stream heap through relay stream")
+            logger.info("Closing relay stream sender")
             stream, item_group = self._relay_stream
             if graceful:
                 try:
+                    logger.info("Sending end-of-stream heap through relay stream")
                     stream.send_heap(item_group.get_end())
                 except:
                     pass
