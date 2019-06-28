@@ -40,7 +40,7 @@ env > $outdir/env
 cd "$outdir"
 if [ -z "$pgtp_path" ]
 then
-    graph_option="-L lg.json" 
+    graph_option="-L lg.json"
 else
     graph_option="-P $pgtp_path"
 fi
