@@ -17,7 +17,7 @@ General options:
 Runtime options:
  -n <nodes>               Number of nodes to use for simulating data, defaults to 1
  -i <num-islands>         Number of data islandsm, defaults to 1
- -c <channels-per-node>   #channels to simulate per node, defaults to 2
+ -c <channels-per-node>   #channels to simulate per node, defaults to 6
  -f <start-freq>          Global start frequency, in Hz. Default=210200000
  -s <freq-step>           Frequency step, in Hz. Default=4000
  -T <time-steps>          Number of time steps. Default=5
@@ -42,7 +42,7 @@ venv=
 outdir=`abspath .`
 nodes=1
 islands=1
-channels_per_node=2
+channels_per_node=6
 start_freq=210200000
 freq_step=4000
 time_steps=5
@@ -197,7 +197,17 @@ if [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	         "$venv" "$outdir" "$apps_rootdir" \
 	         $start_freq $freq_step $channels_per_node \
 	         $islands $verbosity ${remote_mechanism:-slurm} "$pgtp" \
-	         $relay_base_port
+	         $nodes $relay_base_port
+elif [ ! -z "$(command -v bsub 2> /dev/null)" ]; then
+	bsub -P csc303 -nnodes $nodes \
+	     -W ${walltime} \
+	     -o "$outdir"/ingest_graph.log \
+	     -J ingest_graph \
+	     $this_dir/run_ingest_graph.sh \
+	        "$venv" "$outdir" "$apps_rootdir" \
+	        $start_freq $freq_step $channels_per_node \
+	        $islands $verbosity ${remote_mechanism:-lsf} "$pgtp" \
+	        "$nodes $relay_base_port
 else
 	error "Queueing system not supported, add support please"
 fi

@@ -9,13 +9,26 @@ gpus_per_node=$6
 islands=$7
 verbosity=$8
 remote_mechanism=$9
-pgtp_path=${10}
-relay_base_port=${11}
+nodes=${10}
+pgtp_path=${11}
+relay_base_port=${12}
 
 . common.sh
 
+banner "Arguments pased from job script"
+echo "venv = $venv"
+echo "outdir = $outdir"
+echo "apps_rootdir = $apps_rootdir"
+echo "start_freq = $start_freq"
+echo "freq_step = $freq_step"
+echo "gpus_per_node = $gpus_per_node"
+echo "island = $islands"
+echo "verbosity = $verbosity"
+echo "remote_mechanism = $remote_mechanism"
+echo "**************************************"
+
 load_modules
-runner="`get_runner $remote_mechanism`"
+runner="`get_runner $remote_mechanism $nodes`"
 echo "Using $runner to start dlg cluster using the $remote_mechanism mechanism"
 
 export PYTHONPATH="${apps_rootdir}:$PYTHONPATH"
