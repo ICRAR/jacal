@@ -21,6 +21,7 @@ Runtime options:
  -f <start-freq>          Global start frequency, in Hz. Default=210200000
  -s <freq-step>           Frequency step, in Hz. Default=4000
  -T <time-steps>          Number of time steps. Default=5
+ -I <internal port base>  Base port for spead2 in signal drop, defaults to 12345
  -a                       Use the ADIOS2 Storage Manager
  -g                       Use GPUs (one per channel)
  -v <verbosity>           1=INFO (default), 2=DEBUG
@@ -44,6 +45,7 @@ channels_per_node=2
 start_freq=210200000
 freq_step=4000
 time_steps=5
+internal_port=12345
 baseline_exclusion=
 telescope_model=
 sky_model=
@@ -55,7 +57,7 @@ walltime=00:30:00
 # physical graph template partition
 pgtp=
 
-while getopts "h?V:o:n:c:f:s:T:b:t:S:agv:w:i:Mp:" opt
+while getopts "h?V:o:n:c:f:s:T:I:b:t:S:agv:w:i:Mp:" opt
 do
 	case "$opt" in
 		h?)
@@ -82,6 +84,9 @@ do
 			;;
 		T)
 			time_steps=$OPTARG
+			;;
+		I)
+			internal_port=$OPTARG
 			;;
 		b)
 			baseline_exclusion="$OPTARG"
@@ -152,6 +157,9 @@ s/\"use_gpus=.*\"/\"use_gpus=$use_gpus\"/
 
 # Number of time steps to simulate
 s%\"num_time_steps=.*\"%\"num_time_steps=$time_steps\"%
+
+# The base port used for internal spead2 communications
+s%\"internal_port=.*\"%\"internal_port=$internal_port\"%
 " `abspath $this_dir/graphs/ingest_graph.json` > $outdir/lg.json
 
 # Whatever number of nodes we want to use for simulation, add 1 to them
