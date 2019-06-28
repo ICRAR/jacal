@@ -11,25 +11,26 @@ def signal_generation_drops(pg_spec, input_oids):
         input_spec = pg_spec[oid]
         yield pg_spec[input_spec['producers'][0]]
 
-def modify_sdg(sdg, i, sink_start_freq, freq_step, channels_per_drop):
-    sdg['stream_port'] = 51000 + i
+def modify_sdg(sdg, i, sink_start_freq, freq_step, channels_per_drop, relay_base_port):
+    sdg['stream_port'] = relay_base_port + i
     sdg['start_freq'] = sink_start_freq + freq_step * channels_per_drop * i
     sdg['freq_step'] = freq_step
     sdg['num_freq_steps'] = channels_per_drop
 
-def modify_sink(pg_spec, sink, start_freq, freq_step, channels_per_drop):
+def modify_sink(pg_spec, sink, start_freq, freq_step, channels_per_drop, relay_base_port):
     for i, sdg in enumerate(signal_generation_drops(pg_spec, sink[1]['streamingInputs'])):
-        modify_sdg(sdg, i, start_freq, freq_step, channels_per_drop)
+        modify_sdg(sdg, i, start_freq, freq_step, channels_per_drop, relay_base_port)
 
-def modify_pg(pg_spec, start_freq, freq_step, channels_per_drop):
+def modify_pg(pg_spec, start_freq, freq_step, channels_per_drop, relay_base_port):
     logger.info('Modifying PG for correct signal generation/sink behavior')
     start_freq = int(start_freq)
     freq_step = int(freq_step)
     channels_per_drop = int(channels_per_drop)
+    relay_base_port = int(relay_base_port)
     pg_spec = {drop_spec['oid']: drop_spec for drop_spec in pg_spec}
     for i, sink in enumerate(filter(is_sink, pg_spec.items())):
         sink_start_freq = start_freq + channels_per_drop * freq_step * i
-        modify_sink(pg_spec, sink, sink_start_freq, freq_step, channels_per_drop)
+        modify_sink(pg_spec, sink, sink_start_freq, freq_step, channels_per_drop, relay_base_port)
 
 if __name__ == '__main__':
     import argparse

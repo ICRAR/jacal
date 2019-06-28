@@ -22,6 +22,7 @@ Runtime options:
  -s <freq-step>           Frequency step, in Hz. Default=4000
  -T <time-steps>          Number of time steps. Default=5
  -I <internal port base>  Base port for spead2 in signal drop, defaults to 12345
+ -r <relay port base>     Base port for spead2 relay, defaults to 23456
  -a                       Use the ADIOS2 Storage Manager
  -g                       Use GPUs (one per channel)
  -v <verbosity>           1=INFO (default), 2=DEBUG
@@ -46,6 +47,7 @@ start_freq=210200000
 freq_step=4000
 time_steps=5
 internal_port=12345
+relay_base_port=23456
 baseline_exclusion=
 telescope_model=
 sky_model=
@@ -57,7 +59,7 @@ walltime=00:30:00
 # physical graph template partition
 pgtp=
 
-while getopts "h?V:o:n:c:f:s:T:I:b:t:S:agv:w:i:Mp:" opt
+while getopts "h?V:o:n:c:f:s:T:I:r:b:t:S:agv:w:i:Mp:" opt
 do
 	case "$opt" in
 		h?)
@@ -87,6 +89,9 @@ do
 			;;
 		I)
 			internal_port=$OPTARG
+			;;
+		r)
+			relay_base_port=$OPTARG
 			;;
 		b)
 			baseline_exclusion="$OPTARG"
@@ -160,6 +165,11 @@ s%\"num_time_steps=.*\"%\"num_time_steps=$time_steps\"%
 
 # The base port used for internal spead2 communications
 s%\"internal_port=.*\"%\"internal_port=$internal_port\"%
+
+# The base port used for relaying spead2 packets from one avg to another
+# This setting affets the AveragerSinkDrop; the signal generation drop is
+# modified through the modify_ingest.py modifier during graph translation
+s%\"stream_listen_port_start=.*\"%\"stream_listen_port_start=$relay_base_port\"%
 " `abspath $this_dir/graphs/ingest_graph.json` > $outdir/lg.json
 
 # Whatever number of nodes we want to use for simulation, add 1 to them
@@ -185,7 +195,9 @@ if [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	       ${request_gpus} \
 	       $this_dir/run_ingest_graph.sh \
 	         "$venv" "$outdir" "$apps_rootdir" \
-	         $start_freq $freq_step $channels_per_node $islands $verbosity ${remote_mechanism:-slurm} "$pgtp"
+	         $start_freq $freq_step $channels_per_node \
+	         $islands $verbosity ${remote_mechanism:-slurm} "$pgtp" \
+	         $relay_base_port
 else
 	error "Queueing system not supported, add support please"
 fi
