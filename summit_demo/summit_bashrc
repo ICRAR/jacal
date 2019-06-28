@@ -15,6 +15,7 @@ export CC=/sw/summit/gcc/6.4.0/bin/gcc
 export CXX=/sw/summit/gcc/6.4.0/bin/g++
 export FC=/sw/summit/gcc/6.4.0/bin/gfortran
 
+export SUMMIT_VENV=/gpfs/alpine/csc303/scratch/wangj/jacal_install
 export PATH=/gpfs/alpine/csc303/scratch/wangj/jacal_install/bin:$PATH
 export CPATH=/gpfs/alpine/csc303/scratch/wangj/jacal_install/include:$CPATH
 export LIBRARY_PATH=/gpfs/alpine/csc303/scratch/wangj/jacal_install/lib:/gpfs/alpine/csc303/scratch/wangj/jacal_install/lib64:$LIBRARY_PATH

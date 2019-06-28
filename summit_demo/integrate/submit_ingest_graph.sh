@@ -11,7 +11,7 @@ $0 [opts]
 
 General options:
  -h/-?                    Show this help and leave
- -V <venv-root>           A virtual environment to load
+ -V <venv-root>           A virtual environment to load (defaults to $SUMMIT_VENV)
  -o <output-dir>          The base directory for all outputs
 
 Runtime options:
@@ -38,7 +38,7 @@ EOF
 }
 
 # Command line parsing
-venv=
+venv=$SUMMIT_VENV
 outdir=`abspath .`
 nodes=1
 islands=1
