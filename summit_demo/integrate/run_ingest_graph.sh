@@ -55,4 +55,4 @@ $runner \
     -d \
     -s $islands \
     -v $verbosity \
-    --pg-modifiers modify_ingest_pg.modify_pg,start_freq=$start_freq,freq_step=$freq_step,channels_per_drop=$gpus_per_node,base_port=$relay_base_port
+    --pg-modifiers modify_ingest_pg.modify_pg,start_freq=$start_freq,freq_step=$freq_step,channels_per_drop=$gpus_per_node,relay_base_port=$relay_base_port
