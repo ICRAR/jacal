@@ -196,8 +196,8 @@ if [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	       $this_dir/run_ingest_graph.sh \
 	         "$venv" "$outdir" "$apps_rootdir" \
 	         $start_freq $freq_step $channels_per_node \
-	         $islands $verbosity ${remote_mechanism:-slurm} "$pgtp" \
-	         $nodes $relay_base_port
+	         $islands $verbosity ${remote_mechanism:-slurm} \
+	         $nodes "$pgtp" $relay_base_port
 elif [ ! -z "$(command -v bsub 2> /dev/null)" ]; then
 	bsub -P csc303 -nnodes $nodes \
 	     -W ${walltime} \
@@ -206,8 +206,8 @@ elif [ ! -z "$(command -v bsub 2> /dev/null)" ]; then
 	     $this_dir/run_ingest_graph.sh \
 	        "$venv" "$outdir" "$apps_rootdir" \
 	        $start_freq $freq_step $channels_per_node \
-	        $islands $verbosity ${remote_mechanism:-lsf} "$pgtp" \
-	        $nodes $relay_base_port
+	        $islands $verbosity ${remote_mechanism:-lsf} \
+	        $nodes "$pgtp" $relay_base_port
 else
 	error "Queueing system not supported, add support please"
 fi
