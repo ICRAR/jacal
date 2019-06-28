@@ -25,6 +25,9 @@ echo "gpus_per_node = $gpus_per_node"
 echo "island = $islands"
 echo "verbosity = $verbosity"
 echo "remote_mechanism = $remote_mechanism"
+echo "nodes = $nodes"
+echo "pgtp_path = $pgtp_path"
+echo "relay_base_port = $relay_base_port"
 echo "**************************************"
 
 load_modules
