@@ -1,5 +1,10 @@
 #/bin/bash
 
+banner() {
+	msg="** $@ **"
+	echo "$msg" | sed -n '{h; x; s/./*/gp; x; h; p; x; s/./*/gp}';
+}
+
 error() {
 	echo "$@" 1>&2
 }
