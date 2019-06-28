@@ -23,6 +23,8 @@ Runtime options:
  -T <time-steps>          Number of time steps. Default=5
  -I <internal port base>  Base port for spead2 in signal drop, defaults to 12345
  -r <relay port base>     Base port for spead2 relay, defaults to 23456
+ -E <error tolerance>     Error tolerance of the signal generator, as % (0-100), defaults to 0.
+ -e <error tolerance>     Error tolerance of the sink, as % (0-100), defaults to 0.
  -a                       Use the ADIOS2 Storage Manager
  -g                       Use GPUs (one per channel)
  -v <verbosity>           1=INFO (default), 2=DEBUG
@@ -48,6 +50,8 @@ freq_step=4000
 time_steps=5
 internal_port=12345
 relay_base_port=23456
+signal_generator_error_tolerance=0
+sink_error_tolerance=0
 baseline_exclusion=
 telescope_model=
 sky_model=
@@ -59,7 +63,7 @@ walltime=00:30:00
 # physical graph template partition
 pgtp=
 
-while getopts "h?V:o:n:c:f:s:T:I:r:b:t:S:agv:w:i:Mp:" opt
+while getopts "h?V:o:n:c:f:s:T:I:r:E:e:b:t:S:agv:w:i:Mp:" opt
 do
 	case "$opt" in
 		h?)
@@ -92,6 +96,12 @@ do
 			;;
 		r)
 			relay_base_port=$OPTARG
+			;;
+		E)
+			signal_generator_error_tolerance=$OPTARG
+			;;
+		e)
+			sink_error_tolerance=$OPTARG
 			;;
 		b)
 			baseline_exclusion="$OPTARG"
@@ -170,6 +180,10 @@ s%\"internal_port=.*\"%\"internal_port=$internal_port\"%
 # This setting affets the AveragerSinkDrop; the signal generation drop is
 # modified through the modify_ingest.py modifier during graph translation
 s%\"stream_listen_port_start=.*\"%\"stream_listen_port_start=$relay_base_port\"%
+
+# Error tolerances for the sink and signal generator drops
+s%SIGNAL_GENERATOR_ERROR_TOLERANCE%$signal_generator_error_tolerance%
+s%SINK_ERROR_TOLERANCE%$sink_error_tolerance%
 " `abspath $this_dir/graphs/ingest_graph.json` > $outdir/lg.json
 
 # Whatever number of nodes we want to use for simulation, add 1 to them
