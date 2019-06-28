@@ -211,7 +211,7 @@ class SpeadReceiver(object):
         running = True
         while running:
 
-            logger.info("Reading one heap from all streams")
+            logger.debug("Reading one heap from all streams")
             heaps = []
             for stream in list(self._streams):
                 try:
@@ -239,7 +239,7 @@ class SpeadReceiver(object):
                 running = False
                 continue
 
-            logger.info("Putting corresponding heaps together")
+            logger.debug("Putting corresponding heaps together")
             datum = []
             for heap in heaps:
                 # Extract data from the heap into a dictionary.
