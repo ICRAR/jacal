@@ -60,13 +60,12 @@ load_modules() {
 
 get_runner() {
 	# $1 is the remote_mechanism, $2 is the #nodes allocated
-	if [ "$1" = slurm ]; then
+	if [ "${LMOD_SYSTEM_NAME}" == "summit" ]; then
+		runner="jsrun -n$2 -a1 -g6 -c42 -bpacked:42"
+	elif [ "$1" = slurm ]; then
 		runner=srun
 	elif [ "$1" = lsf ]; then
 		runner=jsrun
-		if [ "${LMOD_SYSTEM_NAME}" == "summit" ]; then
-			runner="jsrun -n$2 -a1 -g6 -c42 -bpacked:42"
-		fi
 	elif [ "$1" = mpi ]; then
 		runner=mpirun
 	else
