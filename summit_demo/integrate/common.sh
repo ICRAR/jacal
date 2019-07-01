@@ -54,6 +54,7 @@ load_modules() {
 	fi
 
 	if [ -n "$venv" ]; then
+		echo "Activating $venv"
 		source $venv/bin/activate
 	fi
 }
