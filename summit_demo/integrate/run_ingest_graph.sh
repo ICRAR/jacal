@@ -10,8 +10,8 @@ islands=$7
 verbosity=$8
 remote_mechanism=$9
 nodes=${10}
-pgtp_path=${11}
-relay_base_port=${12}
+relay_base_port=${11}
+pgtp_path=${12}
 
 . common.sh
 
@@ -26,8 +26,8 @@ echo "island = $islands"
 echo "verbosity = $verbosity"
 echo "remote_mechanism = $remote_mechanism"
 echo "nodes = $nodes"
-echo "pgtp_path = $pgtp_path"
 echo "relay_base_port = $relay_base_port"
+echo "pgtp_path = $pgtp_path"
 echo "**************************************"
 
 load_modules

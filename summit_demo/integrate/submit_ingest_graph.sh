@@ -221,7 +221,7 @@ elif [ ! -z "$(command -v bsub 2> /dev/null)" ]; then
 	        "$venv" "$outdir" "$apps_rootdir" \
 	        $start_freq $freq_step $channels_per_node \
 	        $islands $verbosity ${remote_mechanism:-lsf} \
-	        $nodes "$pgtp" $relay_base_port
+	        $nodes $relay_base_port "$pgtp"
 else
 	error "Queueing system not supported, add support please"
 fi
