@@ -7,12 +7,13 @@ islands=$4
 direct_run=$5
 remote_mechanism=$6
 files="${@:7}"
+nodes=$8
 
 . common.sh
 
 if [ $direct_run != yes ]; then
 	load_modules
-	runner="`get_runner $remote_mechanism`"
+	runner="`get_runner $remote_mechanism $nodes`"
 	echo "Using $runner to start dlg cluster using the $remote_mechanism mechanism"
 fi
 
