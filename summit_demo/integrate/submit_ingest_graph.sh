@@ -211,7 +211,7 @@ if [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	         "$venv" "$outdir" "$apps_rootdir" \
 	         $start_freq $freq_step $channels_per_node \
 	         $islands $verbosity ${remote_mechanism:-slurm} \
-	         $nodes "$pgtp" $relay_base_port
+	         $nodes $relay_base_port "$pgtp"
 elif [ ! -z "$(command -v bsub 2> /dev/null)" ]; then
 	bsub -P csc143 -nnodes $nodes \
 	     -W ${walltime} \
