@@ -17,7 +17,7 @@ if [ $direct_run != yes ]; then
 fi
 
 export PYTHONPATH="${apps_rootdir}:$PYTHONPATH"
-env > $outdir/env
+env > $outdir/env.txt
 cd "$outdir"
 
 if [ $direct_run = yes ]; then

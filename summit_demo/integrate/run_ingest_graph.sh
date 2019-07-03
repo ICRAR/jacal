@@ -35,7 +35,7 @@ runner="`get_runner $remote_mechanism $nodes`"
 echo "Using $runner to start dlg cluster using the $remote_mechanism mechanism"
 
 export PYTHONPATH="${apps_rootdir}:$PYTHONPATH"
-env > $outdir/env
+env > $outdir/env.txt
 
 cd "$outdir"
 if [ -z "$pgtp_path" ]
