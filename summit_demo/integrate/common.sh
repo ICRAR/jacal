@@ -6,7 +6,11 @@ banner() {
 }
 
 error() {
-	echo "$@" 1>&2
+	echo "error: $@" 1>&2
+}
+
+warning() {
+	echo "warning: $@" 1>&2
 }
 
 try() {
