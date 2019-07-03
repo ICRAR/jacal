@@ -86,6 +86,7 @@ apps_rootdir="`abspath $this_dir/../oskar/ingest`"
 # Create a new output dir with our date, *that* will be the base output dir
 outdir="$outdir/`date -u +%Y-%m-%dT%H-%M-%S`"
 mkdir -p "$outdir"
+echo "$0 $@" > $outdir/submission.log
 
 declare -a files
 get_measurement_sets "$inputs"
