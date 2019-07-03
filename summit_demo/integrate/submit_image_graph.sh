@@ -23,6 +23,26 @@ General options:
 EOF
 }
 
+function get_measurement_sets {
+	inputs="$@"
+	for file in $inputs; do
+		# Skip current and parent directories
+		bfname=`basename $file`
+		if [ "$bfname" == . -o "$bname" == .. ]; then
+			continue
+		fi
+		file=`abspath $file`
+		# An actual measurement set
+		if [ -f "$file/table.dat" ]; then
+			files+=("$file")
+		elif [ -d "$file" ]; then
+			get_measurement_sets "$file/*"
+		else
+			warning "Ignoring $file, not a measurement set"
+		fi
+	done
+}
+
 # Command line parsing
 venv=
 outdir=`abspath .`
@@ -68,14 +88,16 @@ outdir="$outdir/`date -u +%Y-%m-%dT%H-%M-%S`"
 mkdir -p "$outdir"
 
 declare -a files
-
-for file in $inputs; do
-    files+=($file)
-done
+get_measurement_sets "$inputs"
 
 if [ ${#files[@]} -eq 0 ]; then
     echo "No input"
     exit -1
+else
+	banner "Going to image the following Measurement Sets:"
+	for file in $files; do
+		echo " - $file"
+	done
 fi
 
 # nodes defaults to #files/4 using ceiling division
