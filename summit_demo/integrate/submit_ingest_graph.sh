@@ -213,7 +213,7 @@ if [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	         $islands $verbosity ${remote_mechanism:-slurm} \
 	         $nodes $relay_base_port "$pgtp"
 elif [ ! -z "$(command -v bsub 2> /dev/null)" ]; then
-	bsub -P csc143 -nnodes $nodes \
+	bsub -P csc303 -nnodes $nodes \
 	     -W ${walltime} \
 	     -o "$outdir"/ingest_graph.log \
 	     -J ingest_graph \

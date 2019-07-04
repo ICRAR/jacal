@@ -15,7 +15,7 @@ pgtp_path=${12}
 
 . common.sh
 
-banner "Arguments pased from job script"
+banner "Arguments passed from job script"
 echo "venv = $venv"
 echo "outdir = $outdir"
 echo "apps_rootdir = $apps_rootdir"

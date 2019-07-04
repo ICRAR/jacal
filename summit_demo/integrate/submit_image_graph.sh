@@ -135,14 +135,14 @@ if [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	       -t 00:30:00 \
 	       -J image_graph \
 	       $this_dir/run_image_graph.sh \
-	         "$venv" "$outdir" "$apps_rootdir" $islands no slurm "${files[@]}"
+	         "$venv" "$outdir" "$apps_rootdir" $islands no slurm $nodes "${files[@]}"
 elif [ ! -z "$(command -v bsub 2> /dev/null)" ]; then
-	bsub -P csc143 -nnodes $nodes \
+	bsub -P csc303 -nnodes $nodes \
 	     -W 00:10 \
 	     -o "$outdir"/image_graph.log \
 	     -J image_graph \
 	     $this_dir/run_image_graph.sh \
-	         "$venv" "$outdir" "$apps_rootdir" $islands no mpi "${files[@]}" $nodes
+	         "$venv" "$outdir" "$apps_rootdir" $islands no mpi $nodes "${files[@]}" 
 else
 	error "Queueing system not supported, add support please"
 fi

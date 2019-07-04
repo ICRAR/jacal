@@ -6,10 +6,21 @@ apps_rootdir="$3"
 islands=$4
 direct_run=$5
 remote_mechanism=$6
-files="${@:7}"
-nodes=$8
+nodes=$7
+files="${@:8}"
 
 . common.sh
+
+banner "Arguments passed from job script"
+echo "venv = $venv"
+echo "outdir = $outdir"
+echo "apps_rootdir = $apps_rootdir"
+echo "island = $islands"
+echo "direct_run = $direct_run"
+echo "remote_mechanism = $remote_mechanism"
+echo "nodes = $nodes"
+echo "files = $files"
+echo "**************************************"
 
 if [ $direct_run != yes ]; then
 	load_modules
