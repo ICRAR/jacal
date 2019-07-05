@@ -142,7 +142,7 @@ elif [ ! -z "$(command -v bsub 2> /dev/null)" ]; then
 	     -o "$outdir"/image_graph.log \
 	     -J image_graph \
 	     $this_dir/run_image_graph.sh \
-	         "$venv" "$outdir" "$apps_rootdir" $islands no mpi $nodes "${files[@]}" 
+	         "$venv" "$outdir" "$apps_rootdir" $islands no mpi $nodes "${files[@]}"
 else
 	error "Queueing system not supported, add support please"
 fi
