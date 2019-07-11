@@ -111,8 +111,8 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
                     },
                 "observation":
                     {
-                        "phase_centre_ra_deg": 201.4,
-                        "phase_centre_dec_deg": -43.0,
+                        "phase_centre_ra_deg": 201.0,
+                        "phase_centre_dec_deg": -44.0,
                         "start_frequency_hz": 0,
                         "num_channels": 1,
                         "frequency_inc_hz": 0,
