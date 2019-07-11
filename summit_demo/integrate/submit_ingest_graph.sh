@@ -141,8 +141,8 @@ do
 done
 
 apps_rootdir="`abspath $this_dir/../oskar/ingest`"
-baseline_exclusion=${baseline_exclusion:-$apps_rootdir/conf/aa2_baselines.csv}
-telescope_model=${telescope_model:-$apps_rootdir/conf/aa2.tm}
+baseline_exclusion=${baseline_exclusion:-$apps_rootdir/conf/aa4_baselines.csv}
+telescope_model=${telescope_model:-$apps_rootdir/conf/aa4.tm}
 sky_model=${sky_model:-$apps_rootdir/conf/eor_model_list.csv}
 
 # Create a new output dir with our date, *that* will be the base output dir
