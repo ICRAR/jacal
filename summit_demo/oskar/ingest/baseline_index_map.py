@@ -25,7 +25,11 @@ def parse_antenna_file(antenna_file):
             coord = line.strip('\n')
             if not coord:
                 continue
-            coord = coord.split(',')
+            if ',' in coord:
+                coord = coord.split(',')
+            else:
+                coord = coord.split(' ')
+
             locations.append((float(coord[1]), float(coord[0])))
     return locations
 
