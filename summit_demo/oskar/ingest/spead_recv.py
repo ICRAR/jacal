@@ -53,7 +53,7 @@ class SpeadReceiver(object):
         self._measurement_set = None
         self._header = {}
 
-        self._baseline_exclude = []
+        self._baseline_exclude = set()
         self._baseline_map = []
 
         try:
@@ -103,7 +103,7 @@ class SpeadReceiver(object):
                         if b[2] == 0:
                             self._baseline_map.append(b)
                         else:
-                            self._baseline_exclude.append(index)
+                            self._baseline_exclude.add(index)
                         index += 1
 
                     logger.info('Baseline count: total=%d, used=%d, excluded=%d',
