@@ -300,12 +300,12 @@ class SpeadReceiver(object):
                         raise Exception('User baseline map != simulation baseline count {} != {}'
                                         .format(supplied_baseline_count, self._header['num_baselines']))
 
-                    msg = 'Creating standard MS under %s'
-                    args = self._file_name,
-                    if self.use_adios2:
-                        msg = 'Creating ADIOS2 MS from rank %d/%d (comm=%s) under %s'
-                        args = (self.mpi_comm.Get_rank() + 1, self.mpi_comm.Get_size(),
-                                self.mpi_comm.Get_name(), self._file_name)
+                    msg = 'Creating %s MS under %s'
+                    args = 'ADIOS' if self.use_adios2 else 'standard', self._file_name
+                    if self.mpi_comm:
+                        msg += ' from rank %d/%d (comm=%s)'
+                        args += (self.mpi_comm.Get_rank() + 1, self.mpi_comm.Get_size(),
+                                self.mpi_comm.Get_name())
                     msg += ' using %d antennas, %d channels'
                     args += data['num_stations'], data['num_channels']
                     logger.info(msg, *args)
