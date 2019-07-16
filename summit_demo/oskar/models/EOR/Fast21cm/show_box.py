@@ -65,13 +65,16 @@ for n1 in range(len(fq)):
        pl.savefig('sky_eor_model_f%06.2f.png'%(fq[n1]))
 
 sum=np.zeros(len(sall))
-for n1 in range(1,len(sall)): # recalculate SI.
+sall[0]=np.zeros(sall[0].shape)
+sall[-1]=np.zeros(sall[-1].shape)
+for n1 in range(1,len(sall)-1): # recalculate SI.
     #   As there is a bug in previous calc which I can not both searching for :)
     #   si=-np.log(a/b)/np.log(fq[-1]/(df+fq[-1]))
-    sall[n1]=-np.log(ball[n1]/ball[n1-1])/np.log(fq[n1-1]/fq[n1])
+    sall[n1]=-np.log(ball[n1+1]/ball[n1-1])/np.log(fq[n1-1]/fq[n1+1])
     sum[n1]=np.mean(ball[n1]) #[np.where(np.isnan(ball[n1])==False)])
     for n2 in range(N2):
         sall[n1][n2][np.where(np.isnan(sall[n1][n2])==True)]=0
+        sall[n1][n2][np.where(sall[n1][n2]==np.inf)]=0
     ball[n1]=ball[n1]-sum[n1]
 #sall[np.where(np.isnan(sall)==True)]=0
 #ball[np.where(np.isnan(ball)==True)]=0
@@ -82,6 +85,7 @@ I=np.where(np.abs(sall)>lm)[0]
 sall[I]=lm*np.sign(sall[I])
 sall=sall.reshape(s)
 pl.clf();pl.hist(sall.flatten(),100)
+pl.title('SI distribution')
 
 crval=[201,-44];crdel=[6.0/N2,6.0/N3] # reference values in deg
 corn_markers=[]
