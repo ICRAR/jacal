@@ -5,6 +5,7 @@ import os
 import logging
 import math
 import socket
+import subprocess
 
 import oskar
 import spead2
@@ -152,6 +153,10 @@ class SpeadReceiver(object):
             logger.info("Closing measurement set %s", self._file_name)
             self._measurement_set = None
             logger.info("Measurement set closed")
+            ms_size = int(subprocess.check_output(['du', '-bs',
+                self._file_name]).split()[0])
+            logger.info('Measurement set %s volume is %d bytes',
+                    self._file_name, ms_size)
 
     def _create_heaps(self, num_baselines):
         # Create SPEAD heap items based on content of the visibility block.
