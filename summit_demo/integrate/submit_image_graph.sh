@@ -111,6 +111,12 @@ n_files=${#files[@]}
 if [ -z "$nodes" ]; then
 	nodes=$(( ($n_files + 4  - 1) / 4 ))
 fi
+# We need one node per imager at the most; if more were given
+# then reduce the amount
+if [ $nodes -gt $n_files ]; then
+	warning "$nodes nodes requested, but only $n_files need imaging; reducing nodes to $n_files"
+	nodes=$n_files
+fi
 
 # However nodes we request, we actually need 1 more to account for the DIM
 if [ $islands -gt 1 ]; then
