@@ -105,10 +105,11 @@ else
 		echo " - $file"
 	done
 fi
+n_files=${#files[@]}
 
 # nodes defaults to #files/4 using ceiling division
 if [ -z "$nodes" ]; then
-	nodes=$(( (${#files[@]} + 4  - 1) / 4 ))
+	nodes=$(( ($n_files + 4  - 1) / 4 ))
 fi
 
 # However nodes we request, we actually need 1 more to account for the DIM
@@ -120,11 +121,11 @@ fi
 
 # Turn LG "template" into actual LG for this run
 sed "
-# Replace num_of_copies's value in scatter component with ${#files[@]}
+# Replace num_of_copies's value in scatter component with $n_files
 /.*num_of_copies.*/ {
   N
   N
-  s/\"value\": \".*\"/\"value\": \"${#files[@]}\"/
+  s/\"value\": \".*\"/\"value\": \"${n_files}\"/
 }
 " `abspath $this_dir/graphs/image_graph.json` > $outdir/image_lg.json
 
