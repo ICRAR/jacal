@@ -67,9 +67,9 @@ class CImagerDrop(BashShellApp):
         self.conf['Cimager.restore.beam.cutoff'] = 0.5
         self.conf['Cimager.restore.beamReference'] = 'mid'
 
-        kwargs['command'] = 'dummy'
+        self.command = 'dummy'
 
-        super(BashShellApp, self).initialize(**kwargs)
+        super(CImagerDrop, self).initialize(**kwargs)
 
     def run(self):
         output = os.path.basename(self.outputs[0].path)
@@ -82,7 +82,7 @@ class CImagerDrop(BashShellApp):
         self.conf_file = tempfile.mktemp(dir=basedir, prefix=output, suffix='.ini')
         self._write_conf(self.conf_file)
 
-        self._command = '{0} -c {1}'.format(self.IMAGER_CMD, self.conf_file)
+        self.command = '{0} -c {1}'.format(self.IMAGER_CMD, self.conf_file)
 
         self._run_bash(self._inputs, self._outputs)
 
