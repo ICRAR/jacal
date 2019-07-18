@@ -18,6 +18,7 @@ General options:
  -n <nodes>               Number of nodes to request, defaults to #inputs / 4
  -s <num-islands>         Number of data islands
  -i <input>               Measurement Sets i.e. "in01.ms in02.ms in03.ms"
+ -w <walltime>            Walltime, defaults to 00:30:00
  -d                       Direct run (no queueing system, no mpirun)"
 
 EOF
@@ -49,8 +50,9 @@ outdir=`abspath .`
 direct_run=no
 nodes=
 islands=1
+walltime=00:30:00
 
-while getopts "h?V:o:n:i:ds:" opt
+while getopts "h?V:o:n:i:ds:w:" opt
 do
 	case "$opt" in
 		h?)
@@ -74,6 +76,9 @@ do
 			;;
 		s)
 			islands=$OPTARG
+			;;
+		w)
+			walltime=$OPTARG
 			;;
 		*)
 			print_usage 1>&2
@@ -132,13 +137,13 @@ if [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	sbatch --ntasks-per-node=1 \
 	       -o "$outdir"/image_graph.log \
 	       -N $nodes \
-	       -t 00:30:00 \
+	       -t ${walltime} \
 	       -J image_graph \
 	       $this_dir/run_image_graph.sh \
 	         "$venv" "$outdir" "$apps_rootdir" $islands no slurm $nodes "${files[@]}"
 elif [ ! -z "$(command -v bsub 2> /dev/null)" ]; then
 	bsub -P csc303 -nnodes $nodes \
-	     -W 00:10 \
+	     -W ${walltime} \
 	     -o "$outdir"/image_graph.log \
 	     -J image_graph \
 	     $this_dir/run_image_graph.sh \
