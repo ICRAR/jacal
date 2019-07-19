@@ -14,6 +14,7 @@ class CImagerDrop(BashShellApp):
         self.conf = {}
 
         self.conf['Cimager.dataset'] = ''
+        self.conf['Cimager.MaxUV'] = '6000.0'
         self.conf['Cimager.imagetype'] = 'fits'
         self.conf['Cimager.Images.Names'] = []
         self.conf['Cimager.Images.shape'] = [512, 512]
@@ -30,13 +31,13 @@ class CImagerDrop(BashShellApp):
         self.conf['Cimager.nwriters'] = 1
         self.conf['Cimager.singleoutputfile'] = 'false'
         # This defines the parameters for the gridding.
-        self.conf['Cimager.gridder.snapshotimaging'] = 'true'
+        self.conf['Cimager.gridder.snapshotimaging'] = 'false'
         self.conf['Cimager.gridder.snapshotimaging.wtolerance'] = 2600
         self.conf['Cimager.gridder.snapshotimaging.longtrack'] = 'true'
         self.conf['Cimager.gridder.snapshotimaging.clipping'] = 0.01
         self.conf['Cimager.gridder'] = 'WProject'
         self.conf['Cimager.gridder.WProject.wmax'] = 2600
-        self.conf['Cimager.gridder.WProject.nwplanes'] = 99
+        self.conf['Cimager.gridder.WProject.nwplanes'] = 5
         self.conf['Cimager.gridder.WProject.oversample'] = 4
         self.conf['Cimager.gridder.WProject.maxsupport'] = 512
         self.conf['Cimager.gridder.WProject.variablesupport'] = 'true'
@@ -55,7 +56,7 @@ class CImagerDrop(BashShellApp):
         self.conf['Cimager.solver.Clean.logevery'] = 50
         self.conf['Cimager.threshold.minorcycle'] = ['50%', '30mJy']
         self.conf['Cimager.threshold.majorcycle'] = '18mJy'
-        self.conf['Cimager.ncycles'] = 5
+        self.conf['Cimager.ncycles'] = 3
         self.conf['Cimager.Images.writeAtMajorCycle'] = 'false'
         self.conf['Cimager.preconditioner.Names'] = ['Wiener', 'GaussianTaper']
         self.conf['Cimager.preconditioner.GaussianTaper'] = ['60arcsec', '60arcsec', '0deg']
