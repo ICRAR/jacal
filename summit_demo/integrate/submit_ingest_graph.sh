@@ -207,6 +207,7 @@ if [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	       -t ${walltime} \
 	       -J ingest_graph \
 	       ${request_gpus} \
+	       -c $((${channels_per_node} + 4)) \
 	       $this_dir/run_ingest_graph.sh \
 	         "$venv" "$outdir" "$apps_rootdir" \
 	         $start_freq $freq_step $channels_per_node \
