@@ -196,7 +196,17 @@ else
 fi
 
 # Submit differently depending on your queueing system
-if [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
+if [ ! -z "$(command -v bsub 2> /dev/null)" ]; then
+	bsub -P csc303 -nnodes $nodes \
+	     -W ${walltime} \
+	     -o "$outdir"/ingest_graph.log \
+	     -J ingest_graph \
+	     $this_dir/run_ingest_graph.sh \
+	        "$venv" "$outdir" "$apps_rootdir" \
+	        $start_freq $freq_step $channels_per_node \
+	        $islands $verbosity ${remote_mechanism:-lsf} \
+	        $nodes $relay_base_port "$pgtp"
+elif [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	request_gpus=
 	if [ $use_gpus = 1 ]; then
 		request_gpus="--gres=gpu:${channels_per_node}"
@@ -213,16 +223,6 @@ if [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	         $start_freq $freq_step $channels_per_node \
 	         $islands $verbosity ${remote_mechanism:-slurm} \
 	         $nodes $relay_base_port "$pgtp"
-elif [ ! -z "$(command -v bsub 2> /dev/null)" ]; then
-	bsub -P csc303 -nnodes $nodes \
-	     -W ${walltime} \
-	     -o "$outdir"/ingest_graph.log \
-	     -J ingest_graph \
-	     $this_dir/run_ingest_graph.sh \
-	        "$venv" "$outdir" "$apps_rootdir" \
-	        $start_freq $freq_step $channels_per_node \
-	        $islands $verbosity ${remote_mechanism:-lsf} \
-	        $nodes $relay_base_port "$pgtp"
 else
 	error "Queueing system not supported, add support please"
 fi
