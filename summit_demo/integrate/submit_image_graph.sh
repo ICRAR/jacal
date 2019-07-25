@@ -221,7 +221,7 @@ if [ "$daliuge_run" = yes ]; then
   s/\"value\": \".*\"/\"value\": \"${n_files}\"/
 }" `abspath $this_dir/graphs/image_graph.json` > $outdir/image_lg.json
 else
-	rank=0
+	rank=1
 	for file in "${files[@]}"; do
 		generate_cimager_ini_file $rank "$file"
 		let "rank = rank + 1"
@@ -240,7 +240,7 @@ if [ ! -z "$(command -v bsub 2> /dev/null)" ]; then
 	cmd+=" -o `get_output_fname lfs`"
 	job_name="image_graph"
 	if [ $daliuge_run = no ]; then
-		job_name+="[0-$(($n_files - 1))]"
+		job_name+="[1-$n_files]"
 	fi
 	cmd+=" -J ${job_name}"
 	dlg_remote=lfs
@@ -248,7 +248,7 @@ elif [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	cmd="sbatch --ntasks-per-node=1 -N $nodes -t ${walltime} -J image_graph"
 	cmd+=" -o `get_output_fname slurm`"
 	if [ $daliuge_run = no ]; then
-		cmd+=" --array 0-$(($n_files - 1))"
+		cmd+=" --array 1-$n_files"
 	fi
 	dlg_remote=slurm
 else
