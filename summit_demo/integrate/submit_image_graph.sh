@@ -239,10 +239,10 @@ if [ ! -z "$(command -v bsub 2> /dev/null)" ]; then
 	cmd="bsub -P csc303 -nnodes $nodes -W ${walltime}"
 	cmd+=" -o `get_output_fname lfs`"
 	job_name="image_graph"
-	cmd+=" -J ${job_name}"
 	if [ $daliuge_run = no ]; then
 		job_name+="[0-$(($n_files - 1))]"
 	fi
+	cmd+=" -J ${job_name}"
 	dlg_remote=lfs
 elif [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	cmd="sbatch --ntasks-per-node=1 -N $nodes -t ${walltime} -J image_graph"
