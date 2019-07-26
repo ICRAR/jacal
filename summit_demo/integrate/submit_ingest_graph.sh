@@ -36,6 +36,7 @@ Runtime paths:
  -b <baseline-exclusion>  The file containing the baseline exclusion map
  -t <telescope-model>     The directory with the telescope model to use
  -S <sky-model>           The sky model to use
+ -m <ms-output-dir>       The output directory for MSs. An extra copy is put in <output-dir>.
 EOF
 }
 
@@ -60,10 +61,11 @@ use_gpus=0
 verbosity=1
 remote_mechanism=mpi
 walltime=00:30:00
+ms_outdir=
 # physical graph template partition
 pgtp=
 
-while getopts "h?V:o:n:c:f:s:T:I:r:E:e:b:t:S:agv:w:i:Mp:" opt
+while getopts "h?V:o:n:c:f:s:T:I:r:E:e:b:t:S:agv:w:i:Mp:m:" opt
 do
 	case "$opt" in
 		h?)
@@ -133,6 +135,9 @@ do
 		p)
 			pgtp="`abspath $OPTARG`"
 			;;
+		m)
+			ms_outdir="$OPTARG"
+			;;
 		*)
 			print_usage 1>&2
 			exit 1
@@ -150,6 +155,14 @@ outdir="$outdir/`date -u +%Y-%m-%dT%H-%M-%S`"
 mkdir -p "$outdir"
 echo "$0 $@" > $outdir/submission.log
 
+# When using a different output directory for MSs (most probably node-local)
+# we use a different logical graph which includes an extra copying step
+# to put the MSs into the global filesystem
+logical_graph=ingest_graph.json
+if [ -n "$ms_outdir" ]; then
+	logical_graph=ingest_graph_local_ssd.json
+fi
+
 # Turn LG "template" into actual LG for this run
 sed "
 # Replace filepaths to match our local filepaths
@@ -162,6 +175,13 @@ s%\"sky_model_file_path=.*\"%\"sky_model_file_path=$sky_model\"%
   N
   N
   s/\"value\": \".*\"/\"value\": \"$nodes\"/
+}
+
+# Replace the MS output dirname, used by ingest_graph_local_ssd.json
+/.*dirname.*/ {
+  N
+  N
+  s%\"value\": \"ms_outdir\"%\"value\": \"$ms_outdir\"%
 }
 
 # Set whether to use ADIOS2 or not
@@ -184,7 +204,7 @@ s%\"stream_listen_port_start=.*\"%\"stream_listen_port_start=$relay_base_port\"%
 # Error tolerances for the sink and signal generator drops
 s%SIGNAL_GENERATOR_ERROR_TOLERANCE%$signal_generator_error_tolerance%
 s%SINK_ERROR_TOLERANCE%$sink_error_tolerance%
-" `abspath $this_dir/graphs/ingest_graph.json` > $outdir/lg.json
+" `abspath $this_dir/graphs/$logical_graph` > $outdir/lg.json
 
 # Whatever number of nodes we want to use for simulation, add 1 to them
 # to account for the DIM node
