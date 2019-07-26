@@ -2,6 +2,7 @@ import logging
 
 
 logger = logging.getLogger(__name__)
+NODES_PER_SINK = 6
 
 def is_sink(d):
     return d[1]['type'] == 'app' and d[1]['app'] == 'avg_drop.AveragerSinkDrop'
@@ -29,7 +30,7 @@ def modify_pg(pg_spec, start_freq, freq_step, channels_per_drop, relay_base_port
     relay_base_port = int(relay_base_port)
     pg_spec = {drop_spec['oid']: drop_spec for drop_spec in pg_spec}
     for i, sink in enumerate(filter(is_sink, pg_spec.items())):
-        sink_start_freq = start_freq + channels_per_drop * freq_step * i
+        sink_start_freq = start_freq + channels_per_drop * freq_step * NODES_PER_SINK * i
         modify_sink(pg_spec, sink, sink_start_freq, freq_step, channels_per_drop, relay_base_port)
 
 if __name__ == '__main__':
