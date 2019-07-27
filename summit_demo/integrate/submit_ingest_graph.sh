@@ -221,6 +221,7 @@ if [ ! -z "$(command -v bsub 2> /dev/null)" ]; then
 	     -W ${walltime} \
 	     -o "$outdir"/ingest_graph.log \
 	     -J ingest_graph \
+	     -alloc_flags "NVME" \
 	     $this_dir/run_ingest_graph.sh \
 	        "$venv" "$outdir" "$apps_rootdir" \
 	        $start_freq $freq_step $channels_per_node \
