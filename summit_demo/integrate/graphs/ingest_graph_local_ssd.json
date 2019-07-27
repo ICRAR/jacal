@@ -560,7 +560,12 @@
                 {
                     "name": "Arg10",
                     "text": "Arg10",
-                    "value": ""
+                    "value": "internal_port=12345"
+                },
+                {
+                    "name": "Arg11",
+                    "text": "Arg11",
+                    "value": "disconnect_tolerance=SIGNAL_GENERATOR_ERROR_TOLERANCE"
                 }
             ],
             "group": -11,
