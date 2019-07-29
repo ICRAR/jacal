@@ -51,13 +51,13 @@ def get_events(logfile):
     return [(node, t, evt) for t, evt in events]
 
 
-def _heatmap(_nodes, _times, node_bins, fig_height, suffix=''):
-    fig = plt.figure(figsize=(100, fig_height))
+def _heatmap(nodes, times, suffix=''):
+    node_bins = len(set(nodes))
+    print("Producing heatmap%s with %d node bins" % (suffix, node_bins))
+    fig = plt.figure(figsize=(100, node_bins / 10.))
     ax = fig.add_subplot(1, 1, 1)
-    H, _, _ = np.histogram2d(
-        _nodes, _times, bins=(node_bins, 1000))
-    ax.imshow(H, cmap='hot', origin='lower')
-    ax.set_yticks(np.arange(0, node_bins, 5))
+    ax.hist2d(times, nodes, bins=(1000, node_bins), cmap='hot')
+    ax.set_yticks(np.arange(1, node_bins + 1, 5))
     fig.savefig('heatmap%s.pdf' % suffix)
     fig.savefig('heatmap%s.png' % suffix)
 
@@ -67,25 +67,16 @@ def heatmap(nodes, times, events):
     times = np.array(times)
     events = np.array(events)
 
-    unique_nodes = set(nodes)
-    node_range = min(unique_nodes), max(unique_nodes) + 1
-    n_nodes = node_range[1] - node_range[0]
-
-    _heatmap(nodes, times, n_nodes, 36)
+    _heatmap(nodes, times)
     for evt in ('send_vis', 'ms_write', 'relay_heap'):
-        node_bins = n_nodes // 6 if evt == 'ms_write' else n_nodes
         selection = np.where(events == evt)
-        fig_height = 6 if evt == 'ms_write' else 36
-        _heatmap(nodes[selection], times[selection], node_bins, fig_height,
-                 suffix="_%s" % evt)
+        _heatmap(nodes[selection], times[selection], suffix="_%s" % evt)
 
 
 def main(input_dir):
-
     all_logs = glob.glob(os.path.join(input_dir, '*', 'dlgNM.log'))
     events = multiprocessing.Pool().map(get_events, all_logs)
-    events = itertools.chain(*events)
-    nodes, times, events = map(list, zip(*events))
+    nodes, times, events = zip(*itertools.chain(*events))
     heatmap(nodes, times, events)
 
 main(sys.argv[1])
