@@ -177,6 +177,7 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
         return sorted(file_map, key=lambda kv: kv[0])
 
     def _start_oskar_process(self, spead_config, oskar_config_path):
+        logger.info("Starting SpeadSender in process with pid=%d", os.getpid())
         oskar = SpeadSender(spead_config=spead_config,
                             oskar_settings=SettingsTree("oskar_sim_interferometer",
                                                         settings_file=oskar_config_path))

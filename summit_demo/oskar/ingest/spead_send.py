@@ -18,12 +18,14 @@ class SpeadSender(oskar.Interferometer):
     # SPEAD is configured using a Python dictionary passed to the constructor.
 
     def __init__(self, spead_config, precision=None, oskar_settings=None):
+        logger.info("Creating OSKAR interferometer")
         oskar.Interferometer.__init__(self, precision, oskar_settings)
         self._streams = []
         self._vis_pack = None
         self._write_ms = spead_config['write_ms']
 
         # Construct UDP streams and associated item groups.
+        logger.info("Creating SPEAD2 stream config")
         stream_config = spead2.send.StreamConfig(
             spead_config['stream_config']['max_packet_size'],
             spead_config['stream_config']['rate'],
@@ -32,6 +34,7 @@ class SpeadSender(oskar.Interferometer):
 
         stream = spead_config['stream']
         threads = stream['threads'] if 'threads' in stream else 1
+        logger.info("Creating SPEAD2 Thread pool")
         thread_pool = spead2.ThreadPool(threads=threads)
         logger.info("Creating SPEAD stream for host {} on port {}"
                     .format(stream['host'], stream['port']))

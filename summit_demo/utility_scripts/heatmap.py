@@ -26,6 +26,10 @@ def get_time(line):
 
 
 _events_info = (
+    ('Starting SpeadSender in process', 'spead_sender_start'),
+    ('Creating OSKAR interferometer', 'oskar_interferometer'),
+    ('Creating SPEAD2 stream config', 'send_stream_config'),
+    ('Creating SPEAD2 Thread pool', 'spead_send_thread_pool'),
     ('Sending visibility block', 'send_vis'),
     ('Relaying heap to sink', 'relay_heap'),
     ('Creating standard MS', 'ms_creating'),
