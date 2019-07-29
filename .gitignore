@@ -1,5 +1,6 @@
 .project
 .pydevproject
+.settings
 apps/askap/.clang_complete
 docs
 *.swp
