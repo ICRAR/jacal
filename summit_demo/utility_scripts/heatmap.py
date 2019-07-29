@@ -25,6 +25,15 @@ def get_time(line):
     return day * 24 * 3600 + hh * 3600 + mm * 60 + ss + ms/1000.
 
 
+_events_info = (
+    ('Sending visibility block', 'send_vis'),
+    ('Relaying heap to sink', 'relay_heap'),
+    ('Creating standard MS', 'ms_creating'),
+    ('Measurement Set created', 'ms_created'),
+    ('Writing visibilities to Measurement Set', 'ms_write'),
+    ('Closing measurement set', 'ms_closing'),
+    ('Measurement set closed', 'ms_closed'),
+)
 def get_events(logfile):
 
     events = []
@@ -32,21 +41,10 @@ def get_events(logfile):
         for i, line in enumerate(f):
             if i == 0:
                 start = get_time(line)
-            elif 'Sending visibility block' in line:
-                events.append((get_time(line) - start, 'send_vis'))
-            elif 'Relaying heap to sink' in line:
-                events.append((get_time(line) - start, 'relay_heap'))
-            elif 'Creating standard MS' in line:
-                events.append((get_time(line) - start, 'ms_creating'))
-            elif 'Measurement Set created' in line:
-                events.append((get_time(line) - start, 'ms_created'))
-            elif 'Writing visibilities to Measurement Set' in line:
-                events.append((get_time(line) - start, 'ms_write'))
-            elif 'Closing measurement set' in line:
-                events.append((get_time(line) - start, 'ms_closing'))
-            elif 'Measurement set closed' in line:
-                events.append((get_time(line) - start, 'ms_closed'))
-
+                continue
+            for text, name in _events_info:
+                if text in line:
+                    events.append((get_time(line) - start, name))
     node = int(os.path.basename(os.path.dirname(logfile)))
     return [(node, t, evt) for t, evt in events]
 
