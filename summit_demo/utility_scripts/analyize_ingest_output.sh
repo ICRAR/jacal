@@ -9,6 +9,10 @@ if [ $# -lt 1 ]; then
 fi
 
 for ingest_outdir in "$@"; do
+	if [ ! -f "$ingest_outdir/ingest_graph.log" ]; then
+		echo "$ingest_outdir doesn't look like an ingest pipeline output directory, skipping"
+		continue
+	fi
 	test -d "$ingest_outdir/analysis" || mkdir "$ingest_outdir/analysis"
 	oldpwd="$PWD"
 	cd "$ingest_outdir/analysis"
