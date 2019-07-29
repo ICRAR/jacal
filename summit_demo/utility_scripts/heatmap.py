@@ -51,32 +51,35 @@ def get_events(logfile):
     return [(node, t, evt) for t, evt in events]
 
 
-def _heatmap(nodes, times, suffix=''):
-    node_bins = len(set(nodes))
+def _heatmap(nodes, times, node_bins, suffix=''):
     print("Producing heatmap%s with %d node bins" % (suffix, node_bins))
     fig = plt.figure(figsize=(100, node_bins / 10.))
     ax = fig.add_subplot(1, 1, 1)
     ax.hist2d(times, nodes, bins=(1000, node_bins), cmap='hot')
     ax.set_yticks(np.arange(1, node_bins + 1, 5))
-    fig.savefig('heatmap%s.pdf' % suffix)
     fig.savefig('heatmap%s.png' % suffix)
 
 
-def heatmap(nodes, times, events):
+def heatmap(n_nodes, nodes, times, events):
     nodes = np.array(nodes)
     times = np.array(times)
     events = np.array(events)
 
-    _heatmap(nodes, times)
+    _heatmap(nodes, times, n_nodes)
     for evt in ('send_vis', 'ms_write', 'relay_heap'):
         selection = np.where(events == evt)
-        _heatmap(nodes[selection], times[selection], suffix="_%s" % evt)
+        node_bins = n_nodes
+        if evt == 'ms_write':
+            node_bins = node_bins // 6
+        _heatmap(nodes[selection], times[selection], node_bins,
+                 suffix="_%s" % evt)
 
 
 def main(input_dir):
     all_logs = glob.glob(os.path.join(input_dir, '*', 'dlgNM.log'))
+    n_nodes = len(list(all_logs))
     events = multiprocessing.Pool().map(get_events, all_logs)
     nodes, times, events = zip(*itertools.chain(*events))
-    heatmap(nodes, times, events)
+    heatmap(n_nodes, nodes, times, events)
 
 main(sys.argv[1])
