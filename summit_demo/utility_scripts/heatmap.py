@@ -51,6 +51,17 @@ def get_events(logfile):
     return [(node, t, evt) for t, evt in events]
 
 
+def _heatmap(_nodes, _times, node_bins, fig_height, suffix=''):
+    fig = plt.figure(figsize=(100, fig_height))
+    ax = fig.add_subplot(1, 1, 1)
+    H, _, _ = np.histogram2d(
+        _nodes, _times, bins=(node_bins, 1000))
+    ax.imshow(H, cmap='hot', origin='lower')
+    ax.set_yticks(np.arange(0, node_bins, 5))
+    fig.savefig('heatmap%s.pdf' % suffix)
+    fig.savefig('heatmap%s.png' % suffix)
+
+
 def heatmap(nodes, times, events):
     nodes = np.array(nodes)
     times = np.array(times)
@@ -60,23 +71,13 @@ def heatmap(nodes, times, events):
     node_range = min(unique_nodes), max(unique_nodes) + 1
     n_nodes = node_range[1] - node_range[0]
 
-    fig = plt.figure(figsize=(100, 36))
-    ax = fig.add_subplot(1, 1, 1)
-    H, xedges, yedges = np.histogram2d(nodes, times, bins=(n_nodes, 1000))
-    ax.imshow(H, cmap='hot')
-    fig.savefig('heatmap.pdf')
-
+    _heatmap(nodes, times, n_nodes, 36)
     for evt in ('send_vis', 'ms_write', 'relay_heap'):
+        node_bins = n_nodes // 6 if evt == 'ms_write' else n_nodes
         selection = np.where(events == evt)
-        fig = plt.figure(figsize=(100, 6 if evt == 'ms_write' else 36))
-        ax = fig.add_subplot(1, 1, 1)
-        node_bins = n_nodes / 6 if evt == 'ms_write' else n_nodes
-        H, xedges, yedges = np.histogram2d(nodes[selection],
-                times[selection], bins=(node_bins, 1000))
-        ax.imshow(H, cmap='hot')
-        ax.set_yticks(np.arange(0, node_bins, 5))
-        fig.savefig('heatmap_%s.pdf' % evt)
-        fig.savefig('heatmap_%s.png' % evt)
+        fig_height = 6 if evt == 'ms_write' else 36
+        _heatmap(nodes[selection], times[selection], node_bins, fig_height,
+                 suffix="_%s" % evt)
 
 
 def main(input_dir):
