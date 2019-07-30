@@ -190,9 +190,14 @@ else
 fi
 n_files=${#files[@]}
 
-# nodes defaults to #files/4 using ceiling division
 if [ -z "$nodes" ]; then
-	nodes=$(( ($n_files + 4  - 1) / 4 ))
+	# nodes defaults to #files/4 using ceiling division with daliuge,
+	# and #files with job arrays
+	if [ "$daliuge_run" = yes ]; then
+		nodes=$(( ($n_files + 4  - 1) / 4 ))
+	else
+		nodes=$n_files
+	fi
 fi
 # We need one node per imager at the most; if more were given
 # then reduce the amount
