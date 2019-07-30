@@ -80,7 +80,7 @@ get_runner() {
 
 ifconfig_usage() {
 	if [ "${LMOD_SYSTEM_NAME}" == "summit" ]; then
-		echo -use-ifconfig
+		echo --use-ifconfig
 	fi
 }
 
