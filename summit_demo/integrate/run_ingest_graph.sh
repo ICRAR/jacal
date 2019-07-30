@@ -46,6 +46,13 @@ else
     graph_option="-P $pgtp_path"
 fi
 
+# In the case of the ingest pipeline, having a high CPU count
+# is actually detrimental to the OSKAR instances, which slow
+# down heavily in high-CPU environments during its sky setup
+# OpenMP routines. Let's thus hardcode OMP_NUM_THREADS to 1
+# to get acceptable runtimes.
+export OMP_NUM_THREADS=1
+
 $runner \
     python -m dlg.deploy.pawsey.start_dfms_cluster \
     -l . \
