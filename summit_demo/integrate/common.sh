@@ -78,6 +78,12 @@ get_runner() {
 	echo $runner
 }
 
+ifconfig_usage() {
+	if [ "${LMOD_SYSTEM_NAME}" == "summit" ]; then
+		echo -use-ifconfig
+	fi
+}
+
 get_interface_index() {
 	if [ "${LMOD_SYSTEM_NAME}" == "summit" ]; then
 		echo 2

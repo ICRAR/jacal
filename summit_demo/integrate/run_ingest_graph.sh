@@ -54,6 +54,7 @@ $runner \
     --algo-param max_cpu=1 \
     --remote-mechanism $remote_mechanism \
     --interace `get_interface_index` \
+    `ifconfig_usage` \
     -d \
     -s $islands \
     -v $verbosity \
