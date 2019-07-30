@@ -196,7 +196,7 @@ if [ -z "$nodes" ]; then
 	if [ "$daliuge_run" = yes ]; then
 		nodes=$(( ($n_files + 4  - 1) / 4 ))
 	else
-		nodes=$n_files
+		nodes=1
 	fi
 fi
 # We need one node per imager at the most; if more were given
