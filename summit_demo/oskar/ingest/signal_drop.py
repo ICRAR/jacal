@@ -2,6 +2,7 @@ import copy
 import csv
 import logging
 import os
+import sys
 import tempfile
 
 import six
@@ -22,6 +23,23 @@ jacal_root = os.path.normpath(os.path.join(this_dir, '..', '..', '..'))
 
 def relative_to_me(path):
     return os.path.join(jacal_root, path)
+
+def start_oskar_process(spead_config, oskar_config_path, level):
+    # Let's reset the root handlers
+    if logging.root.handlers:
+        for h in logging.root.handlers[:]:
+            formatter = h.formatter
+            logging.root.removeHandler(h)
+        pass
+
+    logging.basicConfig(formatter=formatter, stream=sys.stdout, level=level)
+    logger.info("Starting SpeadSender in process with pid=%d", os.getpid())
+    oskar = SpeadSender(spead_config=spead_config,
+                        oskar_settings=SettingsTree("oskar_sim_interferometer",
+                                                    settings_file=oskar_config_path))
+    oskar.run()
+    oskar.finalise()
+
 
 class SignalGenerateAndAverageDrop(BarrierAppDROP):
 
@@ -176,14 +194,6 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
                 file_map.append((int(row[0]), relative_to_me(row[1])))
         return sorted(file_map, key=lambda kv: kv[0])
 
-    def _start_oskar_process(self, spead_config, oskar_config_path):
-        logger.info("Starting SpeadSender in process with pid=%d", os.getpid())
-        oskar = SpeadSender(spead_config=spead_config,
-                            oskar_settings=SettingsTree("oskar_sim_interferometer",
-                                                        settings_file=oskar_config_path))
-        oskar.run()
-        oskar.finalise()
-
     def run(self):
         logger.info("SignalDrop Starting")
 
@@ -215,7 +225,7 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
                         conf_file.write('[%s]\n' % section_name)
                         for name, value in section_dict.items():
                             conf_file.write('%s=%s\n' % (name, str(value)))
-            p = Process(target=self._start_oskar_process, args=(conf['spead'], conf_path))
+            p = Process(target=start_oskar_process, args=(conf['spead'], conf_path, logger.getEffectiveLevel()))
             self.oskar_process.append(p)
 
         for oskar in self.oskar_process:
