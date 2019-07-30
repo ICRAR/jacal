@@ -86,7 +86,7 @@ ifconfig_usage() {
 
 get_interface_index() {
 	if [ "${LMOD_SYSTEM_NAME}" == "summit" ]; then
-		echo 2
+		echo 1
 	else
 		echo 0
 	fi
