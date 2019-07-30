@@ -53,6 +53,7 @@ $runner \
     --part-algo mysarkar \
     --algo-param max_cpu=1 \
     --remote-mechanism $remote_mechanism \
+    --interace `get_interface_index` \
     -d \
     -s $islands \
     -v $verbosity \

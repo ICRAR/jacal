@@ -78,6 +78,14 @@ get_runner() {
 	echo $runner
 }
 
+get_interface_index() {
+	if [ "${LMOD_SYSTEM_NAME}" == "summit" ]; then
+		echo 2
+	else
+		echo 0
+	fi
+}
+
 abspath() {
 	p="$1"
 	dirname="`dirname $p`"
