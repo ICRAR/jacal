@@ -73,7 +73,8 @@ def heatmap(n_nodes, nodes, times, events):
         selection = np.where(events == evt)
         node_bins = n_nodes
         if evt == 'ms_write':
-            node_bins = node_bins // 6
+            # ceiling division
+            node_bins = (node_bins + 5) / 6
         _heatmap(nodes[selection], times[selection],
                 node_bins, time_bins, suffix="_%s" % evt)
 
