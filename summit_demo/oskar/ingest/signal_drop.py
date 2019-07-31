@@ -167,15 +167,17 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
             oskar_conf["simulator"]["use_gpus"] = bool(self.use_gpus)
 
             # set model file for specific freq
-            for key, value in sky_model_file_list:
-                if key >= freq:
-                    oskar_conf["sky"]["oskar_sky_model/file"] = value
+            for sky_model_freq, sky_model_file in sky_model_file_list:
+                if sky_model_freq >= freq:
+                    oskar_conf["sky"]["oskar_sky_model/file"] = sky_model_file
                     break
             if not oskar_conf["sky"]["oskar_sky_model/file"]:
-                raise Exception("Could not find sky model for freq %f" % freq)
+                oskar_conf["sky"]["oskar_sky_model/file"] = sky_model_file
+                logger.warning('Defaulting sky model for freq %f to that of frequency %f',
+                               freq, sky_model_freq)
 
             msg = "Creating OSKAR configuration with frequency start/step = %d / %d, sky model file %s"
-            logger.info(msg, freq, self.freq_step, value)
+            logger.info(msg, freq, self.freq_step, sky_model_file)
             logger.info('Using telescope model %s', self.telescope_model_path)
 
             self.spead_send.append({"spead": spead_conf, "oskar": oskar_conf})
