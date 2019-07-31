@@ -80,8 +80,10 @@ def heatmap(n_nodes, nodes, times, events):
 
 
 def main(input_dir):
-    all_logs = glob.glob(os.path.join(input_dir, '*', 'dlgNM.log'))
-    n_nodes = len(list(all_logs))
+    nm_logs = glob.glob(os.path.join(input_dir, '*', 'dlgNM.log'))
+    n_nodes = len(list(nm_logs))
+    oskar_logs = glob.glob(os.path.join(input_dir, '*', 'oskar_*.log'))
+    all_logs = nm_logs + oskar_logs
     events = multiprocessing.Pool().map(get_events, all_logs)
     nodes, times, events = zip(*itertools.chain(*events))
     heatmap(n_nodes, nodes, times, events)
