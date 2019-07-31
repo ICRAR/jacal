@@ -238,7 +238,7 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
         oskar_process = []
         for oskar_args in oskar_process_args:
             p = subprocess.Popen([sys.executable, '-msignal_drop'] + oskar_args,
-                                 shell=False)
+                                 shell=False, close_fds=True)
             oskar_process.append(p)
 
         for oskar in oskar_process:
