@@ -32,7 +32,9 @@ def start_oskar_process(spead_config, oskar_config_path, level):
             logging.root.removeHandler(h)
         pass
 
-    logging.basicConfig(formatter=formatter, stream=sys.stdout, level=level)
+    logging.basicConfig(stream=sys.stdout, level=level)
+    for h in logging.root.handlers[:]:
+        h.formatter = formatter
     logger.info("Starting SpeadSender in process with pid=%d", os.getpid())
     oskar = SpeadSender(spead_config=spead_config,
                         oskar_settings=SettingsTree("oskar_sim_interferometer",
