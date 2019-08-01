@@ -53,12 +53,13 @@ def get_events(logfile):
     return [(node, t, evt) for t, evt in events]
 
 
-def _heatmap(nodes, times, node_bins, time_bins, suffix='', ):
+def _heatmap(nodes, times, node_bins, time_bins, exec_time, suffix='', ):
     print("Producing heatmap%s with %d node bins" % (suffix, node_bins))
     fig = plt.figure(figsize=(time_bins / 10., node_bins / 10.))
     ax = fig.add_subplot(1, 1, 1)
     ax.hist2d(times, nodes, bins=(time_bins, node_bins), cmap='hot')
     ax.set_yticks(np.arange(1, node_bins + 1, 5))
+    ax.set_title('Execution time: %.2f [s]' % exec_time, fontsize=50.)
     fig.savefig('heatmap%s.png' % suffix)
 
 
@@ -67,8 +68,9 @@ def heatmap(n_nodes, nodes, times, events):
     times = np.array(times)
     events = np.array(events)
     time_bins = min(1000, np.max(times))
+    exec_time = np.max(times)
 
-    _heatmap(nodes, times, n_nodes, time_bins)
+    _heatmap(nodes, times, n_nodes, time_bins, exec_time)
     for evt in ('send_vis', 'ms_write', 'relay_heap'):
         selection = np.where(events == evt)
         node_bins = n_nodes
@@ -76,7 +78,7 @@ def heatmap(n_nodes, nodes, times, events):
             # ceiling division
             node_bins = (node_bins + 5) / 6
         _heatmap(nodes[selection], times[selection],
-                node_bins, time_bins, suffix="_%s" % evt)
+                node_bins, time_bins, exec_time, suffix="_%s" % evt)
 
 
 def main(input_dir):
