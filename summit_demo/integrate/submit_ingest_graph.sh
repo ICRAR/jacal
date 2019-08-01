@@ -1,5 +1,15 @@
 #/bin/bash
 
+DEFAULT_NODES=1
+DEFAULT_ISLANDS=1
+DEFAULT_CHANNELS_PER_NODE=6
+DEFAULT_START_FREQ=45991200
+DEFAULT_FREQ_STEP=6400
+DEFAULT_NUM_TIME_STEPS=5
+DEFAULT_INTERNAL_PORT=12345
+DEFAULT_RELAY_BASE_PORT=23456
+DEFAULT_WALLTIME=00:30:00
+
 # Load common functionality
 cmd="cd \$(dirname $0); echo \$PWD; cd \$OLDPWD"
 this_dir=`eval "$cmd"`
@@ -15,20 +25,20 @@ General options:
  -o <output-dir>          The base directory for all outputs
 
 Runtime options:
- -n <nodes>               Number of nodes to use for simulating data, defaults to 1
- -i <num-islands>         Number of data islandsm, defaults to 1
- -c <channels-per-node>   #channels to simulate per node, defaults to 6
- -f <start-freq>          Global start frequency, in Hz. Default=210200000
- -s <freq-step>           Frequency step, in Hz. Default=4000
- -T <time-steps>          Number of time steps. Default=5
- -I <internal port base>  Base port for spead2 in signal drop, defaults to 12345
- -r <relay port base>     Base port for spead2 relay, defaults to 23456
+ -n <nodes>               Number of nodes to use for simulating data, defaults to $DEFAULT_NODES
+ -i <num-islands>         Number of data islands, defaults to $DEFAULT_ISLANDS
+ -c <channels-per-node>   #channels to simulate per node, defaults to $DEFAULT_CHANNELS_PER_NODE
+ -f <start-freq>          Global start frequency, in Hz. Default=$DEFAULT_START_FREQ
+ -s <freq-step>           Frequency step, in Hz. Default=$DEFAULT_FREQ_STEP
+ -T <time-steps>          Number of time steps. Default=$DEFAULT_NUM_TIME_STEPS
+ -I <internal port base>  Base port for spead2 in signal drop, defaults to $DEFAULT_INTERNAL_PORT
+ -r <relay port base>     Base port for spead2 relay, defaults to $DEFAULT_RELAY_BASE_PORT
  -E <error tolerance>     Error tolerance of the signal generator, as % (0-100), defaults to 0.
  -e <error tolerance>     Error tolerance of the sink, as % (0-100), defaults to 0.
  -a                       Use the ADIOS2 Storage Manager
  -g                       Use GPUs (one per channel)
  -v <verbosity>           1=INFO (default), 2=DEBUG
- -w <walltime>            Walltime, defaults to 00:30:00
+ -w <walltime>            Walltime, defaults to $DEFAULT_WALLTIME
  -M                       Use queue-specific, non-MPI-based daliuge cluster startup mechanism
  -p <pgtp path>           Absolute path to the physical graph template
 
@@ -43,14 +53,14 @@ EOF
 # Command line parsing
 venv=$SUMMIT_VENV
 outdir=`abspath .`
-nodes=1
-islands=1
-channels_per_node=6
-start_freq=45991200
-freq_step=6400
-time_steps=5
-internal_port=12345
-relay_base_port=23456
+nodes=$DEFAULT_NODES
+islands=$DEFAULT_ISLANDS
+channels_per_node=$DEFAULT_CHANNELS_PER_NODE
+start_freq=$DEFAULT_START_FREQ
+freq_step=$DEFAULT_FREQ_STEP
+time_steps=$DEFAULT_NUM_TIME_STEPS
+internal_port=$DEFAULT_INTERNAL_PORT
+relay_base_port=$DEFAULT_RELAY_BASE_PORT
 signal_generator_error_tolerance=0
 sink_error_tolerance=0
 baseline_exclusion=
@@ -60,7 +70,7 @@ use_adios2=0
 use_gpus=0
 verbosity=1
 remote_mechanism=mpi
-walltime=00:30:00
+walltime=$DEFAULT_WALLTIME
 ms_outdir=
 # physical graph template partition
 pgtp=
