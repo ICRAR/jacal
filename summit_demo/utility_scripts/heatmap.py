@@ -48,9 +48,9 @@ def get_events(logfile):
                 continue
             for text, name in _events_info:
                 if text in line:
-                    events.append((get_time(line) - start, name))
+                    events.append((get_time(line), name))
     node = int(os.path.basename(os.path.dirname(logfile)))
-    return [(node, t, evt) for t, evt in events]
+    return start, [(node, t, evt) for t, evt in events]
 
 
 def _heatmap(nodes, times, node_bins, time_bins, exec_time, suffix='', ):
@@ -86,8 +86,11 @@ def main(input_dir):
     n_nodes = len(list(nm_logs))
     oskar_logs = glob.glob(os.path.join(input_dir, '*', 'oskar_*.log'))
     all_logs = nm_logs + oskar_logs
-    events = multiprocessing.Pool().map(get_events, all_logs)
-    nodes, times, events = zip(*itertools.chain(*events))
+    results = multiprocessing.Pool().map(get_events, all_logs)
+    start_times, events = zip(*results)
+    start_time = np.min(start_times)
+    events = [(node, t - start_time, evt) for node, t, evt in itertools.chain(*events)]
+    nodes, times, events = zip(*events)
     heatmap(n_nodes, nodes, times, events)
 
 main(sys.argv[1])
