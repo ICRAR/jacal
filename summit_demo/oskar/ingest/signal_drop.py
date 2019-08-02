@@ -1,8 +1,11 @@
 import copy
 import csv
+import json
 import logging
 import os
+import subprocess
 import sys
+import time
 
 import six
 from six.moves import configparser
@@ -11,8 +14,6 @@ from threading import Thread
 from dlg.drop import BarrierAppDROP
 
 from spead_recv import SpeadReceiver
-import json
-import subprocess
 
 logger = logging.getLogger(__name__)
 
@@ -256,12 +257,16 @@ def run_oskar(spead_config, oskar_config_path, oskar_log_file):
     from spead_send import SpeadSender
 
     fmt = '%(asctime)-15s %(name)s#%(funcName)s:%(lineno)s %(message)s'
-    kwargs = {}
+    fmt = logging.Formatter(fmt)
+    fmt.converter = time.gmtime
     if oskar_log_file:
-        kwargs['filename'] = oskar_log_file
+        handler = logging.FileHandler(logfile)
     else:
-        kwargs['stream'] = sys.stdout
-    logging.basicConfig(format=fmt, level=logging.INFO, **kwargs)
+        handler = logging.StreamHandler(sys.stdout)
+    handler.setFormatter(fmt)
+    logging.root.addHandler(handler)
+    logging.root.setLevel(logging.INFO)
+
     logger.info("Starting SpeadSender in process with pid=%d", os.getpid())
     oskar = SpeadSender(spead_config=spead_config,
                         oskar_settings=SettingsTree("oskar_sim_interferometer",
