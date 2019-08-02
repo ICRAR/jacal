@@ -260,7 +260,7 @@ def run_oskar(spead_config, oskar_config_path, oskar_log_file):
     fmt = logging.Formatter(fmt)
     fmt.converter = time.gmtime
     if oskar_log_file:
-        handler = logging.FileHandler(logfile)
+        handler = logging.FileHandler(oskar_log_file)
     else:
         handler = logging.StreamHandler(sys.stdout)
     handler.setFormatter(fmt)
