@@ -114,8 +114,8 @@ function get_measurement_sets {
 			files+=("$file")
 		elif [ -d "$file" ]; then
 			get_measurement_sets "$file/*"
-		else
-			warning "Ignoring $file, not a measurement set"
+#		else
+#			warning "Ignoring $file, not a measurement set"
 		fi
 	done
 }
