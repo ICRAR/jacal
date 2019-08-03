@@ -8,7 +8,7 @@ generate_cimager_ini_file() {
 Cimager.dataset=$input
 Cimager.MaxUV=6000.0
 Cimager.imagetype=fits
-Cimager.Images.Names=[image_$input]
+Cimager.Images.Names=[image_$rank]
 Cimager.Images.shape=[512, 512]
 Cimager.Images.cellsize=[20arcsec, 20arcsec]
 Cimager.Images.direction=[13h24m00.00, -44.00.00.0, J2000]
