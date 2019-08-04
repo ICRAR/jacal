@@ -63,7 +63,7 @@ get_output_fname() {
 	elif [ $1 = slurm ]; then
 		echo "\"$outdir\"/%a/cimager.log"
 	else
-		echo "\"$outdir\"/%I/cimager.log"
+		echo "\"$outdir\"/cimager%I.log"
 	fi
 }
 
@@ -128,8 +128,9 @@ daliuge_run=no
 nodes=
 islands=1
 walltime=00:30:00
+processes_per_node=42
 
-while getopts "h?V:o:n:i:dDs:w:" opt
+while getopts "h?V:o:n:i:dDs:w:p:" opt
 do
 	case "$opt" in
 		h?)
@@ -159,6 +160,9 @@ do
 			;;
 		w)
 			walltime=$OPTARG
+			;;
+		p)
+			processes_per_node=$OPTARG
 			;;
 		*)
 			print_usage 1>&2
@@ -239,13 +243,15 @@ if [ ${direct_run} = yes ]; then
 	return
 fi
 
+
 # Prepare submission command
 if [ ! -z "$(command -v bsub 2> /dev/null)" ]; then
 	cmd="bsub -P csc303 -nnodes $nodes -W ${walltime}"
 	cmd+=" -o `get_output_fname lfs`"
 	job_name="image_graph"
 	if [ $daliuge_run = no ]; then
-		job_name+="[1-$n_files]"
+		subjobs=$(( $n_files / $processes_per_node + 1 ))
+		job_name+="[1-$subjobs]"
 	fi
 	cmd+=" -J ${job_name}"
 	dlg_remote=lfs
@@ -264,7 +270,10 @@ fi
 cmd+=" `get_run_script` \"$venv\" \"$outdir\""
 if [ $daliuge_run = yes ]; then
 	cmd+=" \"$apps_rootdir\" $islands no $dlg_remote $nodes \"${files[@]}\""
+else
+	cmd+=" $processes_per_node $n_files"
 fi
+
 
 echo "$cmd" > "$outdir"/submission_command.txt
 echo "Submitting with command: $cmd"
