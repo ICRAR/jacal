@@ -1,5 +1,15 @@
 #/bin/bash
 
+DEFAULT_NODES=1
+DEFAULT_ISLANDS=1
+DEFAULT_CHANNELS_PER_NODE=6
+DEFAULT_START_FREQ=45991200
+DEFAULT_FREQ_STEP=6400
+DEFAULT_NUM_TIME_STEPS=5
+DEFAULT_INTERNAL_PORT=12345
+DEFAULT_RELAY_BASE_PORT=23456
+DEFAULT_WALLTIME=00:30:00
+
 # Load common functionality
 cmd="cd \$(dirname $0); echo \$PWD; cd \$OLDPWD"
 this_dir=`eval "$cmd"`
@@ -15,20 +25,20 @@ General options:
  -o <output-dir>          The base directory for all outputs
 
 Runtime options:
- -n <nodes>               Number of nodes to use for simulating data, defaults to 1
- -i <num-islands>         Number of data islandsm, defaults to 1
- -c <channels-per-node>   #channels to simulate per node, defaults to 6
- -f <start-freq>          Global start frequency, in Hz. Default=210200000
- -s <freq-step>           Frequency step, in Hz. Default=4000
- -T <time-steps>          Number of time steps. Default=5
- -I <internal port base>  Base port for spead2 in signal drop, defaults to 12345
- -r <relay port base>     Base port for spead2 relay, defaults to 23456
+ -n <nodes>               Number of nodes to use for simulating data, defaults to $DEFAULT_NODES
+ -i <num-islands>         Number of data islands, defaults to $DEFAULT_ISLANDS
+ -c <channels-per-node>   #channels to simulate per node, defaults to $DEFAULT_CHANNELS_PER_NODE
+ -f <start-freq>          Global start frequency, in Hz. Default=$DEFAULT_START_FREQ
+ -s <freq-step>           Frequency step, in Hz. Default=$DEFAULT_FREQ_STEP
+ -T <time-steps>          Number of time steps. Default=$DEFAULT_NUM_TIME_STEPS
+ -I <internal port base>  Base port for spead2 in signal drop, defaults to $DEFAULT_INTERNAL_PORT
+ -r <relay port base>     Base port for spead2 relay, defaults to $DEFAULT_RELAY_BASE_PORT
  -E <error tolerance>     Error tolerance of the signal generator, as % (0-100), defaults to 0.
  -e <error tolerance>     Error tolerance of the sink, as % (0-100), defaults to 0.
  -a                       Use the ADIOS2 Storage Manager
  -g                       Use GPUs (one per channel)
  -v <verbosity>           1=INFO (default), 2=DEBUG
- -w <walltime>            Walltime, defaults to 00:30:00
+ -w <walltime>            Walltime, defaults to $DEFAULT_WALLTIME
  -M                       Use queue-specific, non-MPI-based daliuge cluster startup mechanism
  -p <pgtp path>           Absolute path to the physical graph template
 
@@ -36,20 +46,21 @@ Runtime paths:
  -b <baseline-exclusion>  The file containing the baseline exclusion map
  -t <telescope-model>     The directory with the telescope model to use
  -S <sky-model>           The sky model to use
+ -m <ms-output-dir>       The output directory for MSs. An extra copy is put in <output-dir>.
 EOF
 }
 
 # Command line parsing
 venv=$SUMMIT_VENV
 outdir=`abspath .`
-nodes=1
-islands=1
-channels_per_node=6
-start_freq=210200000
-freq_step=4000
-time_steps=5
-internal_port=12345
-relay_base_port=23456
+nodes=$DEFAULT_NODES
+islands=$DEFAULT_ISLANDS
+channels_per_node=$DEFAULT_CHANNELS_PER_NODE
+start_freq=$DEFAULT_START_FREQ
+freq_step=$DEFAULT_FREQ_STEP
+time_steps=$DEFAULT_NUM_TIME_STEPS
+internal_port=$DEFAULT_INTERNAL_PORT
+relay_base_port=$DEFAULT_RELAY_BASE_PORT
 signal_generator_error_tolerance=0
 sink_error_tolerance=0
 baseline_exclusion=
@@ -59,11 +70,12 @@ use_adios2=0
 use_gpus=0
 verbosity=1
 remote_mechanism=mpi
-walltime=00:30:00
+walltime=$DEFAULT_WALLTIME
+ms_outdir=
 # physical graph template partition
 pgtp=
 
-while getopts "h?V:o:n:c:f:s:T:I:r:E:e:b:t:S:agv:w:i:Mp:" opt
+while getopts "h?V:o:n:c:f:s:T:I:r:E:e:b:t:S:agv:w:i:Mp:m:" opt
 do
 	case "$opt" in
 		h?)
@@ -133,6 +145,9 @@ do
 		p)
 			pgtp="`abspath $OPTARG`"
 			;;
+		m)
+			ms_outdir="$OPTARG"
+			;;
 		*)
 			print_usage 1>&2
 			exit 1
@@ -150,6 +165,14 @@ outdir="$outdir/`date -u +%Y-%m-%dT%H-%M-%S`"
 mkdir -p "$outdir"
 echo "$0 $@" > $outdir/submission.log
 
+# When using a different output directory for MSs (most probably node-local)
+# we use a different logical graph which includes an extra copying step
+# to put the MSs into the global filesystem
+logical_graph=ingest_graph.json
+if [ -n "$ms_outdir" ]; then
+	logical_graph=ingest_graph_local_ssd.json
+fi
+
 # Turn LG "template" into actual LG for this run
 sed "
 # Replace filepaths to match our local filepaths
@@ -162,6 +185,13 @@ s%\"sky_model_file_path=.*\"%\"sky_model_file_path=$sky_model\"%
   N
   N
   s/\"value\": \".*\"/\"value\": \"$nodes\"/
+}
+
+# Replace the MS output dirname, used by ingest_graph_local_ssd.json
+/.*dirname.*/ {
+  N
+  N
+  s%\"value\": \"ms_outdir\"%\"value\": \"$ms_outdir\"%
 }
 
 # Set whether to use ADIOS2 or not
@@ -184,7 +214,7 @@ s%\"stream_listen_port_start=.*\"%\"stream_listen_port_start=$relay_base_port\"%
 # Error tolerances for the sink and signal generator drops
 s%SIGNAL_GENERATOR_ERROR_TOLERANCE%$signal_generator_error_tolerance%
 s%SINK_ERROR_TOLERANCE%$sink_error_tolerance%
-" `abspath $this_dir/graphs/ingest_graph.json` > $outdir/lg.json
+" `abspath $this_dir/graphs/$logical_graph` > $outdir/lg.json
 
 # Whatever number of nodes we want to use for simulation, add 1 to them
 # to account for the DIM node
@@ -196,7 +226,18 @@ else
 fi
 
 # Submit differently depending on your queueing system
-if [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
+if [ ! -z "$(command -v bsub 2> /dev/null)" ]; then
+	bsub -P csc303 -nnodes $nodes \
+	     -W ${walltime} \
+	     -o "$outdir"/ingest_graph.log \
+	     -J ingest_graph \
+	     -alloc_flags "NVME" \
+	     $this_dir/run_ingest_graph.sh \
+	        "$venv" "$outdir" "$apps_rootdir" \
+	        $start_freq $freq_step $channels_per_node \
+	        $islands $verbosity ${remote_mechanism:-lsf} \
+	        $nodes $relay_base_port "$pgtp"
+elif [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	request_gpus=
 	if [ $use_gpus = 1 ]; then
 		request_gpus="--gres=gpu:${channels_per_node}"
@@ -207,21 +248,12 @@ if [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	       -t ${walltime} \
 	       -J ingest_graph \
 	       ${request_gpus} \
+	       -c $((${channels_per_node} + 4)) \
 	       $this_dir/run_ingest_graph.sh \
 	         "$venv" "$outdir" "$apps_rootdir" \
 	         $start_freq $freq_step $channels_per_node \
 	         $islands $verbosity ${remote_mechanism:-slurm} \
 	         $nodes $relay_base_port "$pgtp"
-elif [ ! -z "$(command -v bsub 2> /dev/null)" ]; then
-	bsub -P csc303 -nnodes $nodes \
-	     -W ${walltime} \
-	     -o "$outdir"/ingest_graph.log \
-	     -J ingest_graph \
-	     $this_dir/run_ingest_graph.sh \
-	        "$venv" "$outdir" "$apps_rootdir" \
-	        $start_freq $freq_step $channels_per_node \
-	        $islands $verbosity ${remote_mechanism:-lsf} \
-	        $nodes $relay_base_port "$pgtp"
 else
 	error "Queueing system not supported, add support please"
 fi

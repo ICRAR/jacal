@@ -1,19 +1,19 @@
 import copy
 import csv
+import json
 import logging
 import os
-import tempfile
+import subprocess
+import sys
+import time
 
 import six
 from six.moves import configparser
 
-from oskar import SettingsTree
 from threading import Thread
-from multiprocessing import Process
 from dlg.drop import BarrierAppDROP
 
 from spead_recv import SpeadReceiver
-from spead_send import SpeadSender
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +22,7 @@ jacal_root = os.path.normpath(os.path.join(this_dir, '..', '..', '..'))
 
 def relative_to_me(path):
     return os.path.join(jacal_root, path)
+
 
 class SignalGenerateAndAverageDrop(BarrierAppDROP):
 
@@ -41,7 +42,6 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
         self.sky_model_file_path = kwargs.get('sky_model_file_path')
         self.obs_length = kwargs.get('obs_length', '06:00:00.0')
         self.num_time_steps = int(kwargs.get('num_time_steps', 5))
-        self.use_adios = int(kwargs.get('use_adios', 0))
 
         # SPEAD send config template
         self.spead_send_conf = {
@@ -128,7 +128,6 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
 
         self.relay = None
         self.relay_process = None
-        self.oskar_process = []
 
         self.spead_send = []
         self.spead_avg_local = []
@@ -148,15 +147,17 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
             oskar_conf["simulator"]["use_gpus"] = bool(self.use_gpus)
 
             # set model file for specific freq
-            for key, value in sky_model_file_list:
-                if key >= freq:
-                    oskar_conf["sky"]["oskar_sky_model/file"] = value
+            for sky_model_freq, sky_model_file in sky_model_file_list:
+                if sky_model_freq >= freq:
+                    oskar_conf["sky"]["oskar_sky_model/file"] = sky_model_file
                     break
             if not oskar_conf["sky"]["oskar_sky_model/file"]:
-                raise Exception("Could not find sky model for freq %f" % freq)
+                oskar_conf["sky"]["oskar_sky_model/file"] = sky_model_file
+                logger.warning('Defaulting sky model for freq %f to that of frequency %f',
+                               freq, sky_model_freq)
 
             msg = "Creating OSKAR configuration with frequency start/step = %d / %d, sky model file %s"
-            logger.info(msg, freq, self.freq_step, value)
+            logger.info(msg, freq, self.freq_step, sky_model_file)
             logger.info('Using telescope model %s', self.telescope_model_path)
 
             self.spead_send.append({"spead": spead_conf, "oskar": oskar_conf})
@@ -177,15 +178,22 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
                 file_map.append((int(row[0]), relative_to_me(row[1])))
         return sorted(file_map, key=lambda kv: kv[0])
 
-    def _start_oskar_process(self, spead_config, oskar_config_path):
-        oskar = SpeadSender(spead_config=spead_config,
-                            oskar_settings=SettingsTree("oskar_sim_interferometer",
-                                                        settings_file=oskar_config_path))
-        oskar.run()
-        oskar.finalise()
-
     def run(self):
         logger.info("SignalDrop Starting")
+
+        # HACK HACK HACK
+        # HACK HACK HACK
+        oskar_log_dir = '.'
+        try:
+            for h in logging.root.handlers:
+                if isinstance(h, logging.FileHandler):
+                    oskar_log_dir = os.path.dirname(h.baseFilename)
+                    break
+        except:
+            pass
+        # HACK HACK HACK
+        # HACK HACK HACK
+
 
         # assume a downstream AveragerSinkDrop
         self.outputs[0].write(b'init')
@@ -202,8 +210,16 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
         self.relay_thread = Thread(target=self.relay.run, args=())
         self.relay_thread.start()
 
+        oskar_process_args = []
         for i, conf in enumerate(self.spead_send):
-            conf_path = tempfile.mktemp(prefix='sim%d_' % i, suffix='.ini')
+            conf_path = os.path.join(oskar_log_dir, 'oskar_sim_%d.ini' % i)
+            spead_conf_path = os.path.join(oskar_log_dir, 'oskar_spead_%d.json' % i)
+            # An empty log_file means the underlying OSKAR process will not
+            # produce a file with the logs, which is what we want during
+            # interactive runs
+            log_file = ''
+            if oskar_log_dir != '.':
+                log_file = os.path.join(oskar_log_dir, 'oskar_%d.log' % i)
             if six.PY3:
                 parser = configparser.ConfigParser()
                 parser.read_dict(conf['oskar'])
@@ -215,16 +231,52 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
                         conf_file.write('[%s]\n' % section_name)
                         for name, value in section_dict.items():
                             conf_file.write('%s=%s\n' % (name, str(value)))
-            p = Process(target=self._start_oskar_process, args=(conf['spead'], conf_path))
-            self.oskar_process.append(p)
+            with open(spead_conf_path, 'w') as spead_conf_file:
+                json.dump(conf['spead'], spead_conf_file)
+            args = [spead_conf_path, conf_path, log_file]
+            oskar_process_args.append(args)
 
-        for oskar in self.oskar_process:
-            oskar.start()
+        oskar_process = []
+        for oskar_args in oskar_process_args:
+            p = subprocess.Popen([sys.executable, '-msignal_drop'] + oskar_args,
+                                 shell=False, close_fds=True)
+            oskar_process.append(p)
 
-        for oskar in self.oskar_process:
-            oskar.join()
+        for oskar in oskar_process:
+            ecode = oskar.wait()
+            logger.info('OSKAR process %d exited with code %d', oskar.pid, ecode)
 
         self.relay_thread.join()
         self.relay.close()
 
         logger.info("SignalDrop Finished")
+
+def run_oskar(spead_config, oskar_config_path, oskar_log_file):
+
+    from oskar import SettingsTree
+    from spead_send import SpeadSender
+
+    fmt = '%(asctime)-15s %(name)s#%(funcName)s:%(lineno)s %(message)s'
+    fmt = logging.Formatter(fmt)
+    fmt.converter = time.gmtime
+    if oskar_log_file:
+        handler = logging.FileHandler(oskar_log_file)
+    else:
+        handler = logging.StreamHandler(sys.stdout)
+    handler.setFormatter(fmt)
+    logging.root.addHandler(handler)
+    logging.root.setLevel(logging.INFO)
+
+    logger.info("Starting SpeadSender in process with pid=%d", os.getpid())
+    oskar = SpeadSender(spead_config=spead_config,
+                        oskar_settings=SettingsTree("oskar_sim_interferometer",
+                                                    settings_file=oskar_config_path))
+    oskar.run()
+    oskar.finalise()
+
+if __name__ == '__main__':
+    # Called from the signal drop to start OSKAR
+    spead_conf_path, oskar_config_path, oskar_log_file = sys.argv[1:4]
+    with open(spead_conf_path, 'r') as spead_conf_file:
+        spead_config = json.load(spead_conf_file)
+    run_oskar(spead_config, oskar_config_path, oskar_log_file)

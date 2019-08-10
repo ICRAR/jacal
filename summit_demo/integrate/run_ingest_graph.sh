@@ -36,6 +36,7 @@ echo "Using $runner to start dlg cluster using the $remote_mechanism mechanism"
 
 export PYTHONPATH="${apps_rootdir}:$PYTHONPATH"
 env > $outdir/env.txt
+git rev-parse HEAD > $outdir/commit.txt
 
 cd "$outdir"
 if [ -z "$pgtp_path" ]
@@ -45,6 +46,13 @@ else
     graph_option="-P $pgtp_path"
 fi
 
+# In the case of the ingest pipeline, having a high CPU count
+# is actually detrimental to the OSKAR instances, which slow
+# down heavily in high-CPU environments during its sky setup
+# OpenMP routines. Let's thus hardcode OMP_NUM_THREADS to 1
+# to get acceptable runtimes.
+export OMP_NUM_THREADS=1
+
 $runner \
     python -m dlg.deploy.pawsey.start_dfms_cluster \
     -l . \
@@ -52,6 +60,7 @@ $runner \
     --part-algo mysarkar \
     --algo-param max_cpu=1 \
     --remote-mechanism $remote_mechanism \
+    --interface `get_interface_index` \
     -d \
     -s $islands \
     -v $verbosity \

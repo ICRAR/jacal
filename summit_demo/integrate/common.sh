@@ -31,9 +31,7 @@ load_modules() {
 		module load gcc/6.3.0
 	elif [ "$SLURM_SUBMIT_HOST" = bracewell-login ]; then
 		module use /flush1/tob020/modulefiles
-		module load oskar/2.7.1-adios
-		module load yandasoft/default
-		module load spead2/1.10.0
+		module load summit_demo/default
     elif [ "${LMOD_SYSTEM_NAME}" == "summit" ]; then
 		module load gcc/6.4.0
 		module load cmake
@@ -78,6 +76,20 @@ get_runner() {
 		exit 1
 	fi
 	echo $runner
+}
+
+ifconfig_usage() {
+	if [ "${LMOD_SYSTEM_NAME}" == "summit" ]; then
+		echo --use-ifconfig
+	fi
+}
+
+get_interface_index() {
+	if [ "${LMOD_SYSTEM_NAME}" == "summit" ]; then
+		echo 1
+	else
+		echo 0
+	fi
 }
 
 abspath() {
