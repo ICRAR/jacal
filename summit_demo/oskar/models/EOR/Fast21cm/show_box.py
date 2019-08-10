@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pylab as pl
 pl.ion()
 show_plots=False
+#show_plots=True
 
 N1=16;N2=128;N3=N2
 
@@ -20,7 +21,8 @@ for f in fl:
       n=f.index('z')+1;
       z.append(float(f[n:(n+6)]))
       fq.append(1420.4/(1+z[-1]))
-      a=np.reshape(a,(N1,N2,N3))  # freq in first axis
+      a=np.reshape(a,(N3,N2,N1)) 
+      a=a.T  # freq in first axis
       if (First):
        si=a*0
        First=False
@@ -46,6 +48,13 @@ fq=1420.4/(1+fq)
 ball=np.array(ball)
 sall=np.array(sall)
 fall=np.array(fall)
+
+# for n in range(len(ball)/N1):
+#   for m in range(N1):
+#     tmp=ball[m+n*N1]
+#     ball[m+n*N1]=ball[N1-1-m+n*N1]
+#     ball[N1-1-m+n*N1]=tmp
+
 
 a=[]
 f='NGC1566_from_ASKAP12.bin'
