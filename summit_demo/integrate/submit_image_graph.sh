@@ -235,6 +235,7 @@ else
 		generate_cimager_ini_file $rank "$file"
 		let "rank = rank + 1"
 	done
+	subjobs=`ceil_div $n_files $processes_per_node`
 fi
 
 # Submit differently depending on your queueing system
@@ -250,16 +251,23 @@ if [ ! -z "$(command -v bsub 2> /dev/null)" ]; then
 	cmd+=" -o `get_output_fname lfs`"
 	job_name="image_graph"
 	if [ $daliuge_run = no ]; then
-		subjobs=`ceil_div $n_files $processes_per_node`
 		job_name+="[1-$subjobs]"
 	fi
 	cmd+=" -J ${job_name}"
 	dlg_remote=lfs
+if [ ! -z "$(command -v qsub 2> /dev/null)" ]; then
+	cmd="qsub -q csc303 -l nodes=$nodes:walltime=${walltime} -N image_graph"
+	cmd+=" -o `get_output_fname lfs`"
+	if [ $daliuge_run = no ]; then
+		cmd+=" -t 1-$subjobs"
+	fi
+	cmd+=" -J ${job_name}"
+	dlg_remote=pbs
 elif [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	cmd="sbatch --ntasks-per-node=1 -N $nodes -t ${walltime} -J image_graph"
 	cmd+=" -o `get_output_fname slurm`"
 	if [ $daliuge_run = no ]; then
-		cmd+=" --array 1-$n_files"
+		cmd+=" --array 1-$subjobs"
 	fi
 	dlg_remote=slurm
 else
