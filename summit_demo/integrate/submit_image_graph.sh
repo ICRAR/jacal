@@ -198,7 +198,7 @@ if [ -z "$nodes" ]; then
 	# nodes defaults to #files/4 using ceiling division with daliuge,
 	# and #files with job arrays
 	if [ "$daliuge_run" = yes ]; then
-		nodes=$(( ($n_files + 4  - 1) / 4 ))
+		nodes=`ceil_div $n_files 4`
 	else
 		nodes=1
 	fi
@@ -250,7 +250,7 @@ if [ ! -z "$(command -v bsub 2> /dev/null)" ]; then
 	cmd+=" -o `get_output_fname lfs`"
 	job_name="image_graph"
 	if [ $daliuge_run = no ]; then
-		subjobs=$(( $n_files / $processes_per_node + 1 ))
+		subjobs=`ceil_div $n_files $processes_per_node`
 		job_name+="[1-$subjobs]"
 	fi
 	cmd+=" -J ${job_name}"
