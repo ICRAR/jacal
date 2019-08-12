@@ -61,9 +61,9 @@ get_output_fname() {
 	if [ $daliuge_run = yes ]; then
 		echo "\"$outdir\"/image_graph.log"
 	elif [ $1 = slurm ]; then
-		echo "\"$outdir\"/%a/cimager.log"
+		echo "\"$outdir\"/cimager-job-%a.log"
 	else
-		echo "\"$outdir\"/cimager%I.log"
+		echo "\"$outdir\"/cimager-job-%I.log"
 	fi
 }
 

@@ -21,16 +21,16 @@ git rev-parse HEAD > $outdir/commit.txt
 subjob_id=${SLURM_ARRAY_TASK_ID:-$LSB_JOBINDEX}
 starting_process_id=$(( ($subjob_id - 1) * ($processes_per_node) + 1 ))
 ending_process_id=$(( $subjob_id * $processes_per_node ))
-total_processes=$(( $total_processes + 1 ))
 
 banner "Processing visibility data"
-for r in `seq $starting_process_id $ending_process_id`
+for rank in `seq $starting_process_id $ending_process_id`
 do
-    if [ $total_processes -gt $r ]; then
-        cd "$outdir/$r"
-        pwd
+    if [ $rank -le $total_processes ]; then
+        cd "$outdir/$rank"
         jsrun -n1 -a1 -c1 cimager -c imager.ini > cimager.log &
-        cd "../.."
+        cd ../..
     fi
 done
 echo "**************************************"
+
+wait
