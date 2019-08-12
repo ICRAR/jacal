@@ -16,6 +16,18 @@ echo "**************************************"
 load_modules
 echo "**************************************"
 
+# Adapt for different systems
+if [ -n "${LSB_JOBINDEX}" ]; then
+	runner="jsrun -n1 -a1 -c1"
+elif [ -n "${SLURM_ARRAY_TASK_ID}" ]; then
+	runner="srun -n1 -c1"
+elif [ -n "${PBS_ARRAYID}" ]; then
+	runner="pbsdsh -c 1"
+else
+	error "Queue mechanism not recognized, exiting now"
+	exit 1
+fi
+
 env > $outdir/env.txt
 git rev-parse HEAD > $outdir/commit.txt
 subjob_id=${SLURM_ARRAY_TASK_ID:-$LSB_JOBINDEX}
@@ -27,7 +39,7 @@ for rank in `seq $starting_process_id $ending_process_id`
 do
     if [ $rank -le $total_processes ]; then
         cd "$outdir/$rank"
-        jsrun -n1 -a1 -c1 cimager -c imager.ini > cimager.log &
+        $runner cimager -c imager.ini > cimager.log &
         cd ../..
     fi
 done
