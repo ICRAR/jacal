@@ -23,7 +23,7 @@ try() {
 }
 
 ceil_div() {
-	return $(( ($1 + $2 - 1) / $2 ))
+	echo $(( ($1 + $2 - 1) / $2 ))
 }
 
 load_modules() {
