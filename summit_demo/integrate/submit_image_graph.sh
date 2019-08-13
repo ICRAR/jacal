@@ -255,7 +255,7 @@ if [ ! -z "$(command -v bsub 2> /dev/null)" ]; then
 	fi
 	cmd+=" -J ${job_name}"
 	dlg_remote=lfs
-if [ ! -z "$(command -v qsub 2> /dev/null)" ]; then
+elif [ ! -z "$(command -v qsub 2> /dev/null)" ]; then
 	cmd="qsub -q csc303 -l nodes=$nodes:walltime=${walltime} -N image_graph"
 	cmd+=" -o `get_output_fname lfs`"
 	if [ $daliuge_run = no ]; then
