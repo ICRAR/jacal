@@ -41,7 +41,7 @@ class TestAverager(unittest.TestCase):
                                               num_freq_steps=int(os.environ.get('NUM_CHANNELS', 1)),
                                               telescope_model_path='./conf/%s.tm' % tm,
                                               sky_model_file_path="./conf/eor_model_list.csv",
-                                              num_time_step=int(os.environ.get('NUM_TIME_STEPS', 1)))
+                                              num_time_steps=int(os.environ.get('NUM_TIME_STEPS', 1)))
 
         sink = AveragerSinkDrop('2', '2',
                                 stream_listen_port_start=stream_port,
