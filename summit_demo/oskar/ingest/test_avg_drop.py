@@ -9,7 +9,11 @@ from avg_drop import AveragerSinkDrop
 from signal_drop import SignalGenerateAndAverageDrop
 
 
-logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+level = logging.INFO
+if int(os.environ.get('VERBOSE', '0')):
+    level = logging.DEBUG
+logging.basicConfig(stream=sys.stdout, level=level, datefmt='%H:%M:%S',
+                    format="%(asctime)s %(module)s:%(lineno)d %(message)s")
 
 output = os.environ.get('OUTPUT', '/tmp/test.ms')
 tm = os.environ.get('TM', 'aa2').lower()
