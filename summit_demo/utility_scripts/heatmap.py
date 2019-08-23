@@ -60,7 +60,7 @@ def _heatmap(nodes, times, node_bins, time_bins, exec_time, suffix='', ):
     ax.hist2d(times, nodes, bins=(time_bins, node_bins), cmap='summer')
     ax.set_yticks(np.arange(1, node_bins + 1, 5))
     ax.set_title('Execution time: %.2f [s]' % exec_time, fontsize=50.)
-    fig.savefig('heatmap%s.png' % suffix)
+    fig.savefig('heatmap%s.png' % suffix, dpi=80)
 
 
 def heatmap(n_nodes, nodes, times, events):
