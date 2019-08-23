@@ -45,6 +45,7 @@ class SpeadSender(oskar.Interferometer):
 
         # Append udp_stream and item_group to the stream list as a tuple.
         self._streams.append((udp_stream, item_group))
+        self.abort = False
 
     def finalise(self):
         # Called automatically by the base class at the end of run().
@@ -56,13 +57,39 @@ class SpeadSender(oskar.Interferometer):
             except:
                 continue
 
+    def run_block(self, block, thread_id):
+        """Like in base class, but with fast abort mechanism"""
+        if self.abort:
+            return
+        return super(SpeadSender, self).run_block(block, thread_id)
+
+    def finalise_block(self, block_index):
+        """Like in base class, but with fast abort mechanism"""
+        if self.abort:
+            return
+        return super(SpeadSender, self).finalise_block(block_index)
+
+
     def process_block(self, block, block_index):
-        """Sends the visibility block using SPEAD.
+        """Sends the visibility block using SPEAD. In case of failure it causes
+        the rest of the simulation to quickly skip the rest of the simulation
+        steps.
 
         Args:
             block (oskar.VisBlock): The block to be processed.
             block_index (int):      The index of the visibility block.
         """
+        if self.abort:
+            return
+        try:
+            self._process_block(block, block_index)
+        except:
+            logger.exception("Unexpected error while processing visibility block, aborting rest of the simulation")
+            self.abort = True
+
+
+    def _process_block(self, block, block_index):
+
         # Write the block to any open files (reimplements base class method).
         if self._write_ms:
             self.write_block(block, block_index)

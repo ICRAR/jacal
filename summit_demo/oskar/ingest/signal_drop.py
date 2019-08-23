@@ -276,6 +276,8 @@ def run_oskar(spead_config, oskar_config_path, oskar_log_file):
     except:
         logger.exception('Error when running OSKAR, returning with 1')
         sys.exit(1)
+    if oskar.abort:
+        sys.exit(2)
 
 if __name__ == '__main__':
     # Called from the signal drop to start OSKAR
