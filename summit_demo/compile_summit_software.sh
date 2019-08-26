@@ -37,6 +37,7 @@ print_usage() {
 	echo " -p <prefix>   Prefix for installation, defaults to /usr/local"
 	echo " -w <workdir>  Working directory, defaults to ."
 	echo " -W            Remove the working directory at the end of the build"
+	echo " -E            Build extras (i.e. cfitsio, wcslib, apr, apr-util, log4cxx and metis, useful in HPC centers)"
 	echo " -o            Do *not* build OSKAR"
 	echo " -i            Do *not* install system dependencies"
 	echo " -a            Do *not* build ADIOS2, implies -C 2.4.0"
@@ -83,6 +84,7 @@ jobs=1
 prefix=/usr/local
 workdir=.
 remove_workdir=no
+build_extras=no
 build_oskar=yes
 use_python3=no
 install_dependencies=yes
@@ -93,7 +95,7 @@ casarest_opts=
 yandasoft_opts=
 oskar_opts=-DCUDA_ARCH="7.0"
 
-while getopts "h?s:c:m:j:p:w:WPoiaC:A:r:y:O:" opt
+while getopts "h?s:c:m:j:p:w:WPEoiaC:A:r:y:O:" opt
 do
 	case "$opt" in
 		[h?])
@@ -120,6 +122,9 @@ do
 			;;
 		W)
 			remove_workdir=yes
+			;;
+		E)
+			build_extras=yes
 			;;
 		o)
 			build_oskar=no
@@ -409,6 +414,15 @@ banner Setting up Python virtrual environment
 source_venv
 try pip install numpy
 try pip install mpi4py
+
+# Extras, not always needed
+if [ $build_extras = yes ]; then
+	build_and_install http://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/cfitsio-3.47.tar.gz --disable-curl --enable-reentrant
+	build_and_install ftp://ftp.atnf.csiro.au/pub/software/wcslib/wcslib-6.4.tar.bz2 --without-pgplot
+	build_and_install http://apache.spinellicreations.com/apr/apr-1.7.0.tar.bz2
+	build_and_install http://mirrors.ibiblio.org/apache/apr/apr-util-1.6.1.tar.bz2 --with-apr="$prefix"
+	build_and_install https://github.com/apache/logging-log4cxx master --with-apr="$prefix" --with-apr-util="$prefix"
+fi
 
 # ADIOS2, casacore and casarest
 if [ $build_adios == yes ]; then
