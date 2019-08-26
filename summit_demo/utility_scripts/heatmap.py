@@ -57,10 +57,10 @@ def _heatmap(nodes, times, node_bins, time_bins, exec_time, suffix='', ):
     print("Producing heatmap%s with %d node bins" % (suffix, node_bins))
     fig = plt.figure(figsize=(time_bins / 10., node_bins / 10.))
     ax = fig.add_subplot(1, 1, 1)
-    ax.hist2d(times, nodes, bins=(time_bins, node_bins), cmap='hot')
+    ax.hist2d(times, nodes, bins=(time_bins, node_bins), cmap='summer')
     ax.set_yticks(np.arange(1, node_bins + 1, 5))
     ax.set_title('Execution time: %.2f [s]' % exec_time, fontsize=50.)
-    fig.savefig('heatmap%s.png' % suffix)
+    fig.savefig('heatmap%s.png' % suffix, dpi=80)
 
 
 def heatmap(n_nodes, nodes, times, events):

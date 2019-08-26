@@ -47,7 +47,7 @@ Cimager.threshold.majorcycle=18mJy
 Cimager.ncycles=3
 Cimager.Images.writeAtMajorCycle=false
 Cimager.preconditioner.Names=[Wiener, GaussianTaper]
-Cimager.preconditioner.GaussianTaper=[30arcsec, 30arcsec, 0deg]
+Cimager.preconditioner.GaussianTaper=[60arcsec, 60arcsec, 0deg]
 Cimager.preconditioner.preservecf=true
 Cimager.preconditioner.Wiener.robustness=0.5
 Cimager.restore=true
@@ -61,9 +61,9 @@ get_output_fname() {
 	if [ $daliuge_run = yes ]; then
 		echo "\"$outdir\"/image_graph.log"
 	elif [ $1 = slurm ]; then
-		echo "\"$outdir\"/%a/cimager.log"
+		echo "\"$outdir\"/cimager-job-%a.log"
 	else
-		echo "\"$outdir\"/%I/cimager.log"
+		echo "\"$outdir\"/cimager-job-%I.log"
 	fi
 }
 
@@ -128,8 +128,9 @@ daliuge_run=no
 nodes=
 islands=1
 walltime=00:30:00
+processes_per_node=42
 
-while getopts "h?V:o:n:i:dDs:w:" opt
+while getopts "h?V:o:n:i:dDs:w:p:" opt
 do
 	case "$opt" in
 		h?)
@@ -159,6 +160,9 @@ do
 			;;
 		w)
 			walltime=$OPTARG
+			;;
+		p)
+			processes_per_node=$OPTARG
 			;;
 		*)
 			print_usage 1>&2
@@ -194,7 +198,7 @@ if [ -z "$nodes" ]; then
 	# nodes defaults to #files/4 using ceiling division with daliuge,
 	# and #files with job arrays
 	if [ "$daliuge_run" = yes ]; then
-		nodes=$(( ($n_files + 4  - 1) / 4 ))
+		nodes=`ceil_div $n_files 4`
 	else
 		nodes=1
 	fi
@@ -231,6 +235,7 @@ else
 		generate_cimager_ini_file $rank "$file"
 		let "rank = rank + 1"
 	done
+	subjobs=`ceil_div $n_files $processes_per_node`
 fi
 
 # Submit differently depending on your queueing system
@@ -239,21 +244,30 @@ if [ ${direct_run} = yes ]; then
 	return
 fi
 
+
 # Prepare submission command
 if [ ! -z "$(command -v bsub 2> /dev/null)" ]; then
 	cmd="bsub -P csc303 -nnodes $nodes -W ${walltime}"
 	cmd+=" -o `get_output_fname lfs`"
 	job_name="image_graph"
 	if [ $daliuge_run = no ]; then
-		job_name+="[1-$n_files]"
+		job_name+="[1-$subjobs]"
 	fi
 	cmd+=" -J ${job_name}"
 	dlg_remote=lfs
+elif [ ! -z "$(command -v qsub 2> /dev/null)" ]; then
+	cmd="qsub -q csc303 -l nodes=$nodes:walltime=${walltime} -N image_graph"
+	cmd+=" -o `get_output_fname lfs`"
+	if [ $daliuge_run = no ]; then
+		cmd+=" -t 1-$subjobs"
+	fi
+	cmd+=" -J ${job_name}"
+	dlg_remote=pbs
 elif [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	cmd="sbatch --ntasks-per-node=1 -N $nodes -t ${walltime} -J image_graph"
 	cmd+=" -o `get_output_fname slurm`"
 	if [ $daliuge_run = no ]; then
-		cmd+=" --array 1-$n_files"
+		cmd+=" --array 1-$subjobs"
 	fi
 	dlg_remote=slurm
 else
@@ -264,7 +278,10 @@ fi
 cmd+=" `get_run_script` \"$venv\" \"$outdir\""
 if [ $daliuge_run = yes ]; then
 	cmd+=" \"$apps_rootdir\" $islands no $dlg_remote $nodes \"${files[@]}\""
+else
+	cmd+=" $processes_per_node $n_files"
 fi
+
 
 echo "$cmd" > "$outdir"/submission_command.txt
 echo "Submitting with command: $cmd"

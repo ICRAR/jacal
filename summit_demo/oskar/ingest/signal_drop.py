@@ -268,11 +268,16 @@ def run_oskar(spead_config, oskar_config_path, oskar_log_file):
     logging.root.setLevel(logging.INFO)
 
     logger.info("Starting SpeadSender in process with pid=%d", os.getpid())
-    oskar = SpeadSender(spead_config=spead_config,
-                        oskar_settings=SettingsTree("oskar_sim_interferometer",
-                                                    settings_file=oskar_config_path))
-    oskar.run()
-    oskar.finalise()
+    try:
+        oskar = SpeadSender(spead_config=spead_config,
+                            oskar_settings=SettingsTree("oskar_sim_interferometer",
+                                                        settings_file=oskar_config_path))
+        oskar.run()
+    except:
+        logger.exception('Error when running OSKAR, returning with 1')
+        sys.exit(1)
+    if oskar.abort:
+        sys.exit(2)
 
 if __name__ == '__main__':
     # Called from the signal drop to start OSKAR

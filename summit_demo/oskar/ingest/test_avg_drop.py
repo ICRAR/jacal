@@ -9,7 +9,11 @@ from avg_drop import AveragerSinkDrop
 from signal_drop import SignalGenerateAndAverageDrop
 
 
-logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+level = logging.INFO
+if int(os.environ.get('VERBOSE', '0')):
+    level = logging.DEBUG
+logging.basicConfig(stream=sys.stdout, level=level, datefmt='%H:%M:%S',
+                    format="%(asctime)s %(module)s:%(lineno)d %(message)s")
 
 output = os.environ.get('OUTPUT', '/tmp/test.ms')
 tm = os.environ.get('TM', 'aa2').lower()
@@ -31,13 +35,13 @@ class TestAverager(unittest.TestCase):
         signal = SignalGenerateAndAverageDrop('1', '1',
                                               internal_port=internal_port,
                                               stream_port=stream_port,
-                                              start_freq=210200000,
-                                              freq_step=4000,
+                                              start_freq=int(os.environ.get('START_FREQ', 45991200)),
+                                              freq_step=int(os.environ.get('FREQ_STEP', 6400)),
                                               use_gpus=int(os.environ.get('USE_GPUS', 0)),
                                               num_freq_steps=int(os.environ.get('NUM_CHANNELS', 1)),
                                               telescope_model_path='./conf/%s.tm' % tm,
                                               sky_model_file_path="./conf/eor_model_list.csv",
-                                              num_time_step=int(os.environ.get('NUM_TIME_STEPS', 1)))
+                                              num_time_steps=int(os.environ.get('NUM_TIME_STEPS', 1)))
 
         sink = AveragerSinkDrop('2', '2',
                                 stream_listen_port_start=stream_port,

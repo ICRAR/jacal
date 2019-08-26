@@ -22,6 +22,10 @@ try() {
 	fi
 }
 
+ceil_div() {
+	echo $(( ($1 + $2 - 1) / $2 ))
+}
+
 load_modules() {
 
 	if [ "$SLURM_CLUSTER_NAME" = pleiades ]; then
