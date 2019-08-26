@@ -227,7 +227,7 @@ fi
 
 # Submit differently depending on your queueing system
 if [ ! -z "$(command -v bsub 2> /dev/null)" ]; then
-	bsub -P csc303 -nnodes $nodes \
+	bsub -P ast157 -nnodes $nodes \
 	     -W ${walltime} \
 	     -o "$outdir"/ingest_graph.log \
 	     -J ingest_graph \
