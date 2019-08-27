@@ -37,6 +37,7 @@ print_usage() {
 	echo " -p <prefix>   Prefix for installation, defaults to /usr/local"
 	echo " -w <workdir>  Working directory, defaults to ."
 	echo " -W            Remove the working directory at the end of the build"
+	echo " -E            Build extras (i.e. cfitsio, wcslib, apr, apr-util, log4cxx and metis, useful in HPC centers)"
 	echo " -o            Do *not* build OSKAR"
 	echo " -i            Do *not* install system dependencies"
 	echo " -a            Do *not* build ADIOS2, implies -C 2.4.0"
@@ -83,6 +84,7 @@ jobs=1
 prefix=/usr/local
 workdir=.
 remove_workdir=no
+build_extras=no
 build_oskar=yes
 use_python3=no
 install_dependencies=yes
@@ -93,7 +95,7 @@ casarest_opts=
 yandasoft_opts=
 oskar_opts=-DCUDA_ARCH="7.0"
 
-while getopts "h?s:c:m:j:p:w:WPoiaC:A:r:y:O:" opt
+while getopts "h?s:c:m:j:p:w:WPEoiaC:A:r:y:O:" opt
 do
 	case "$opt" in
 		[h?])
@@ -120,6 +122,9 @@ do
 			;;
 		W)
 			remove_workdir=yes
+			;;
+		E)
+			build_extras=yes
 			;;
 		o)
 			build_oskar=no
@@ -244,37 +249,29 @@ repo2dir() {
 	echo ${d%%.git}
 }
 
-# Nice-to-use macro
-build_and_install() {
-	ref=$2
-	is_branch=yes
-	is_merge=no
-	if [[ "$ref" =~ COMMIT-(.*) ]]; then
-		ref=${BASH_REMATCH[1]}
-		is_branch=no
-	elif [[ "$ref" =~ MERGE-(.*) ]]; then
-		ref=${BASH_REMATCH[1]}
-		is_branch=no
-		is_merge=yes
-	fi
-	banner Building `repo2dir $1`
-	if [ ! -d `repo2dir $1` ]; then
-		try git clone $1
-		cd `repo2dir $1`
-		if [ $is_branch == yes ]; then
-			git checkout -b $ref origin/$ref
-		elif [ $is_merge == yes ]; then
-			git config user.email "you@example.com"
-			git config user.name "Your Name"
-			git merge --no-edit remotes/origin/$ref
-		else
-			git checkout -b working_copy
-			git reset --hard $ref
-		fi
-	else
-		cd `repo2dir $1`
-	fi
-	shift; shift
+url2tarball() {
+	t="`basename $1`"
+	echo $t
+}
+
+tarball2dir() {
+	d=`basename $1`
+	d=${d%%.tar.gz}
+	d=${d%%.tar.bz2}
+	echo $d
+}
+
+download() {
+	try wget "$1"
+}
+
+_build() {
+	banner Running make all -j${jobs}
+	try make all -j${jobs}
+	try make install -j${jobs}
+}
+
+_prebuild_cmake() {
 	test -d build || try mkdir build
 	cd build
 	if [ $compiler == clang ]; then
@@ -288,10 +285,92 @@ build_and_install() {
 	fi
 	banner Running ${cmake} .. -DCMAKE_INSTALL_PREFIX="$prefix" $comp_opts "$@"
 	try ${cmake} .. -DCMAKE_INSTALL_PREFIX="$prefix" $comp_opts "$@"
-	banner Running make all -j${jobs}
-	try make all -j${jobs}
-	try make install -j${jobs}
-	cd ../..
+}
+
+_prebuild_configure() {
+	if [ $compiler == clang ]; then
+		CC=clang
+		CXX=clang++
+	elif [ $compiler == cray ]; then
+		CC=CC
+		CXX=cc
+	elif [ $compiler == intel ]; then
+		CC=icc
+		CXX=icpc
+	else
+		CC=gcc
+		CXX=g++
+	fi
+	banner Running CC=$CC CXX=$CXX ./configure --prefix="$prefix" "$@"
+	CC=$CC CXX=$CXX ./configure --prefix="$prefix" "$@"
+}
+
+# Build macro
+build_and_install() {
+
+	url="$1"
+	if [[ "$url" == *.tar.gz || "$url" == *.tar.bz2 ]]; then
+		srcdir=$(tarball2dir $(url2tarball "$url"))
+		srctype=tarball
+	else
+		srcdir=`repo2dir $1`
+		srctype=git
+	fi
+
+	# Download/clone
+	if [ ! -d "$srcdir" ]; then
+		if [ $srctype = tarball ]; then
+			banner Downloading $url
+			mkdir -p tarballs || true
+			tarname=`url2tarball "$url"`
+			download "$url"
+			mv $tarname tarballs/
+			try tar xf tarballs/$tarname
+		else
+			is_branch=yes
+			ref=$2
+			if [[ "$ref" =~ COMMIT-(.*) ]]; then
+				ref=${BASH_REMATCH[1]}
+				is_branch=no
+			fi
+			banner Cloning $url
+			try git clone $1
+			cd `repo2dir $url`
+			if [ $is_branch == yes ]; then
+				git checkout -b $ref origin/$ref
+			else
+				git checkout -b working_copy
+				git reset --hard $ref
+			fi
+			cd ..
+		fi
+	fi
+
+	# Remove arguments used for downloading
+	# (a bit ugly, but it works)
+	if [ $srctype = tarball ]; then
+		shift
+	else
+		shift; shift
+	fi
+
+	# Build
+	banner Building $srcdir
+	cd $srcdir
+	if [ -e configure ]; then
+		_prebuild_configure "$@"
+		_build
+		cd ..
+	elif [ -e CMakeLists.txt ]; then
+		_prebuild_cmake "$@"
+		_build
+		cd ../..
+	elif [ -x autogen.sh ]; then
+		try ./autogen.sh
+		_prebuild_configure "$@"
+		_build
+		cd ..
+	fi
 }
 
 source_venv() {
@@ -335,6 +414,15 @@ banner Setting up Python virtrual environment
 source_venv
 try pip install numpy
 try pip install mpi4py
+
+# Extras, not always needed
+if [ $build_extras = yes ]; then
+	build_and_install http://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/cfitsio-3.47.tar.gz --disable-curl --enable-reentrant
+	build_and_install ftp://ftp.atnf.csiro.au/pub/software/wcslib/wcslib-6.4.tar.bz2 --without-pgplot
+	build_and_install http://apache.spinellicreations.com/apr/apr-1.7.0.tar.bz2
+	build_and_install http://mirrors.ibiblio.org/apache/apr/apr-util-1.6.1.tar.bz2 --with-apr="$prefix"
+	build_and_install https://github.com/apache/logging-log4cxx master --with-apr="$prefix" --with-apr-util="$prefix"
+fi
 
 # ADIOS2, casacore and casarest
 if [ $build_adios == yes ]; then

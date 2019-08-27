@@ -37,23 +37,7 @@ load_modules() {
 		module use /flush1/tob020/modulefiles
 		module load summit_demo/default
     elif [ "${LMOD_SYSTEM_NAME}" == "summit" ]; then
-		module load gcc/6.4.0
-		module load cmake
-		module load cuda
-		module load netlib-lapack
-		module load boost
-		module load fftw
-		module load gsl
-		alias gcc='/sw/summit/gcc/6.4.0/bin/gcc'
-		alias g++='/sw/summit/gcc/6.4.0/bin/g++'
-		alias gfortran='/sw/summit/gcc/6.4.0/bin/gfortran'
-		export CC=/sw/summit/gcc/6.4.0/bin/gcc
-		export CXX=/sw/summit/gcc/6.4.0/bin/g++
-		export FC=/sw/summit/gcc/6.4.0/bin/gfortran
-		export PATH=/gpfs/alpine/csc303/scratch/wangj/jacal_install/bin:$PATH
-		export CPATH=/gpfs/alpine/csc303/scratch/wangj/jacal_install/include:$CPATH
-		export LIBRARY_PATH=/gpfs/alpine/csc303/scratch/wangj/jacal_install/lib:/gpfs/alpine/csc303/scratch/wangj/jacal_install/lib64:$LIBRARY_PATH
-		export LD_LIBRARY_PATH=/gpfs/alpine/csc303/scratch/wangj/jacal_install/lib:/gpfs/alpine/csc303/scratch/wangj/jacal_install/lib64:$LD_LIBRARY_PATH
+		source ../summit_bashrc
 	else
 		echo "Unsupported system, exiting now"
 		exit 1
