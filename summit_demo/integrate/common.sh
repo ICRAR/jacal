@@ -49,9 +49,32 @@ load_modules() {
 	fi
 }
 
+summit_runner() {
+	nodes=$1
+	shift
+
+	# Collect IPs first
+	ips="`jsrun -n$nodes -c42 -bpacked:42 -a1 python -mdlg.deploy.pawsey.start_dfms_cluster --collect-interfaces -i 1`"
+	export DALIUGE_CLUSTER_IPS="$ips"
+
+	start=`date +%s`
+	for i in `eval echo {1..$nodes}`; do
+		jsrun -n 1 -a1 -g6 -c42 -bpacked:42 "$@" &
+	done
+	end=`date +%s`
+	echo "All processes launched in $(($end - $start)) [s], waiting now"
+
+	start=`date +%s`
+	wait
+	end=`date +%s`
+	echo "Finished in $(($end - $start)) [s]"
+}
+
 get_runner() {
 	# $1 is the remote_mechanism, $2 is the #nodes allocated
-	if [ "${LMOD_SYSTEM_NAME}" == "summit" ]; then
+	if [ "${LMOD_SYSTEM_NAME}" == "summit" -a "$1" != mpi ]; then
+		runner="summit_runner $2"
+	elif [ "${LMOD_SYSTEM_NAME}" == "summit" ]; then
 		runner="jsrun -n$2 -a1 -g6 -c42 -bpacked:42"
 	elif [ "$1" = slurm ]; then
 		runner=srun
