@@ -52,14 +52,22 @@ load_modules() {
 summit_runner() {
 	nodes=$1
 	shift
+	nodes_per_world=6
+	worlds=`ceil_div $nodes $nodes_per_world`
+	echo "Launching $worlds worlds with maximum $nodes_per_world nodes each"
 
 	# Collect IPs first
 	ips="`jsrun -n$nodes -c42 -bpacked:42 -a1 python -mdlg.deploy.pawsey.start_dfms_cluster --collect-interfaces -i 1`"
 	export DALIUGE_CLUSTER_IPS="$ips"
 
 	start=`date +%s`
-	for i in `eval echo {1..$nodes}`; do
-		jsrun -n 1 -a1 -g6 -c42 -bpacked:42 "$@" &
+	for i in `eval echo {1..$worlds}`; do
+		_nodes=$nodes_per_world
+		if [ $(($i * $nodes_per_world)) -gt $nodes ]; then
+			_nodes=$(($nodes_per_world - $i * $nodes_per_world + $nodes))
+		fi
+		echo "Launching world with $_nodes nodes"
+		jsrun -n $_nodes -a1 -g6 -c42 -bpacked:42 "$@" &
 	done
 	end=`date +%s`
 	echo "All processes launched in $(($end - $start)) [s], waiting now"

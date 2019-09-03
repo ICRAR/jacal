@@ -235,7 +235,7 @@ if [ ! -z "$(command -v bsub 2> /dev/null)" ]; then
 	     $this_dir/run_ingest_graph.sh \
 	        "$venv" "$outdir" "$apps_rootdir" \
 	        $start_freq $freq_step $channels_per_node \
-	        $islands $verbosity ${remote_mechanism:-dlg} \
+	        $islands $verbosity ${remote_mechanism:-dlg-hybrid} \
 	        $nodes $relay_base_port "$pgtp"
 elif [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	request_gpus=
