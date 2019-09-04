@@ -56,6 +56,9 @@ summit_runner() {
 	worlds=`ceil_div $nodes $nodes_per_world`
 	echo "Launching $worlds worlds with maximum $nodes_per_world nodes each"
 
+	# Adjust our limits to the maximum known
+	ulimit -u 8192
+
 	# Collect IPs first
 	ips="`jsrun -n$nodes -c42 -bpacked:42 -a1 python -mdlg.deploy.pawsey.start_dfms_cluster --collect-interfaces -i 1`"
 	export DALIUGE_CLUSTER_IPS="$ips"
