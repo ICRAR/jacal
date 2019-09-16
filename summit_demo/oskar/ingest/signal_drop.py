@@ -13,7 +13,7 @@ from six.moves import configparser
 from threading import Thread
 from dlg.drop import BarrierAppDROP
 
-from spead_recv import SpeadReceiver
+from spead_recv import VisibilityRelay, VisibilityMSWriter
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +23,9 @@ jacal_root = os.path.normpath(os.path.join(this_dir, '..', '..', '..'))
 def relative_to_me(path):
     return os.path.join(jacal_root, path)
 
+
+MODE_INGEST = 0
+MODE_ADIOS = 1
 
 class SignalGenerateAndAverageDrop(BarrierAppDROP):
 
@@ -42,6 +45,9 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
         self.sky_model_file_path = kwargs.get('sky_model_file_path')
         self.obs_length = kwargs.get('obs_length', '06:00:00.0')
         self.num_time_steps = int(kwargs.get('num_time_steps', 5))
+
+        # mode of operations
+        self.mode = int(kwargs.get('mode', 0))
 
         # SPEAD send config template
         self.spead_send_conf = {
@@ -126,9 +132,6 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
                     }
                 }
 
-        self.relay = None
-        self.relay_process = None
-
         self.spead_send = []
         self.spead_avg_local = []
 
@@ -195,20 +198,32 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
         # HACK HACK HACK
 
 
-        # assume a downstream AveragerSinkDrop
-        self.outputs[0].write(b'init')
+        if self.mode == MODE_INGEST:
+            # assume a downstream AveragerSinkDrop
+            self.outputs[0].write(b'init')
 
-        # should be the IP address of the AveragerSinkDrop
-        ip_address_sink = self.outputs[0].get_consumers_nodes()[0]
+            # should be the IP address of the AveragerSinkDrop
+            ip_address_sink = self.outputs[0].get_consumers_nodes()[0]
 
-        self.spead_avg_conf["relay"]["stream"]["host"] = ip_address_sink
-        self.spead_avg_conf["relay"]["stream"]["port"] = self.stream_port
+            self.spead_avg_conf["relay"]["stream"]["host"] = ip_address_sink
+            self.spead_avg_conf["relay"]["stream"]["port"] = self.stream_port
 
-        # pass this IP addr to spread relay config
-        self.relay = SpeadReceiver(spead_config=self.spead_avg_conf,
-                                   disconnect_tolerance=self.disconnect_tolerance)
-        self.relay_thread = Thread(target=self.relay.run, args=())
-        self.relay_thread.start()
+            # pass this IP addr to spread relay config
+            receiver = VisibilityRelay(spead_config=self.spead_avg_conf,
+                                       disconnect_tolerance=self.disconnect_tolerance)
+        else: # self.mode == MODE_ADIOS:
+            try:
+                from mpi4py import MPI
+                comm = MPI.COMM_SELF  # @UndefinedVariable
+            except:
+                comm = None
+            spead_config['use_adios2'] = True
+            self.config['output_ms'] = self.outputs[0].path
+            receiver = VisibilityMSWriter(spead_config, mpi_comm=comm,
+                                          disconnect_tolerance=self.disconnect_tolerance,
+                                          average=False)
+        receiver_thread = Thread(target=receiver.run, args=())
+        receiver_thread.start()
 
         oskar_process_args = []
         for i, conf in enumerate(self.spead_send):
@@ -246,8 +261,8 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
             ecode = oskar.wait()
             logger.info('OSKAR process %d exited with code %d', oskar.pid, ecode)
 
-        self.relay_thread.join()
-        self.relay.close()
+        receiver_thread.join()
+        receiver.close()
 
         logger.info("SignalDrop Finished")
 
