@@ -362,15 +362,11 @@ class VisibilityMSWriter(SpeadReceiver):
         if self.average:
             num_channels *= len(data)
 
-        msg = 'Creating %s MS under %s'
-        args = 'ADIOS' if self.use_adios2 else 'standard', self._file_name
-        if self.mpi_comm:
-            msg += ' from rank %d/%d (comm=%s)'
-            args += (self.mpi_comm.Get_rank() + 1, self.mpi_comm.Get_size(),
-                    self.mpi_comm.Get_name())
-        msg += ' using %d antennas, %d channels'
-        args += first_datum['num_stations'], num_channels
-        logger.info(msg, *args)
+        is_rank0 = True
+        msg = 'Creating %s MS under %s using %d antennas, %d channels'
+        args = ('ADIOS' if self.use_adios2 else 'standard', self._file_name,
+                first_datum['num_stations'], num_channels)
+        self.log(msg, *args)
 
         if self._measurement_set is None:
             self._measurement_set = oskar.MeasurementSet.create(
@@ -383,8 +379,14 @@ class VisibilityMSWriter(SpeadReceiver):
             self._measurement_set.set_phase_centre(
                 math.radians(first_datum['phase_centre_ra_deg']),
                 math.radians(first_datum['phase_centre_dec_deg']))
-        logger.info('Measurement Set created at %s', self._file_name)
+        self.log('Measurement Set created at %s', self._file_name)
 
+    def log(self, msg, *args):
+        if self.mpi_comm:
+            msg += ' @ rank %d/%d (comm=%s)'
+            args += (self.mpi_comm.Get_rank() + 1, self.mpi_comm.Get_size(),
+                    self.mpi_comm.Get_name())
+        return logger.info(msg, *args)
 
     def process_visibilities(self, data):
 
