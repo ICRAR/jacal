@@ -408,6 +408,12 @@ class VisibilityMSWriter(SpeadReceiver):
         time_inc_sec = self._header['time_inc_sec']
 
         first_datum = data[0]
+        start_row = first_datum['time_index']
+        if self.use_adios2:
+            start_row *= self.mpi_comm.Get_size()
+            start_row += self.mpi_comm.Get_rank()
+        start_row *= num_baselines
+        logger.info('Writing %d rows starting at row %d', num_baselines, start_row)
         if first_datum['channel_index'] == 0:
             uu = np.array(
                 [i for j, i in enumerate(first_datum['vis']['uu']) if j not in self._baseline_exclude])
@@ -416,7 +422,7 @@ class VisibilityMSWriter(SpeadReceiver):
             ww = np.array(
                 [i for j, i in enumerate(first_datum['vis']['ww']) if j not in self._baseline_exclude])
             self._measurement_set.write_coords(
-                num_baselines * first_datum['time_index'],
+                start_row,
                 num_baselines,
                 uu, vv, ww,
                 self._header['time_average_sec'], time_inc_sec,
@@ -425,7 +431,7 @@ class VisibilityMSWriter(SpeadReceiver):
 
         logger.info('Writing visibilities for %d channel(s) to Measurement Set', num_channels)
         self._measurement_set.write_vis(
-            num_baselines * first_datum['time_index'],
+            start_row,
             first_datum['channel_index'], num_channels,
             num_baselines,
             vis_amp)
