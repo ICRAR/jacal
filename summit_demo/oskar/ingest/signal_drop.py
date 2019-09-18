@@ -24,8 +24,8 @@ def relative_to_me(path):
     return os.path.join(jacal_root, path)
 
 
-MODE_INGEST = 0
-MODE_ADIOS = 1
+MODE_INGEST_PIPELINE = 0
+MODE_ADIOS_PIPELINE = 1
 
 class SignalGenerateAndAverageDrop(BarrierAppDROP):
 
@@ -48,6 +48,12 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
 
         # mode of operations
         self.mode = int(kwargs.get('mode', 0))
+        self.baseline_exclusion_map_path = kwargs.get('baseline_exclusion_map_path')
+        try:
+            from mpi4py import MPI
+            self.mpi_comm = MPI.COMM_WORLD  # @UndefinedVariable
+        except:
+            self.mpi_comm = None
 
         # SPEAD send config template
         self.spead_send_conf = {
@@ -181,8 +187,8 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
                 file_map.append((int(row[0]), relative_to_me(row[1])))
         return sorted(file_map, key=lambda kv: kv[0])
 
-    def run(self):
-        logger.info("SignalDrop Starting")
+
+    def get_oskar_cmdline_args(self):
 
         # HACK HACK HACK
         # HACK HACK HACK
@@ -197,8 +203,40 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
         # HACK HACK HACK
         # HACK HACK HACK
 
+        for i, conf in enumerate(self.spead_send):
+            if self.mpi_comm:
+                pattern, args = 'oskar_%s_%d_%d.ini', (i, self.mpi_comm.Get_rank())
+            else:
+                pattern, args = 'oskar_%s_%d.ini', (i,)
+            oskar_conf_path = os.path.join(oskar_log_dir, pattern % (('sim',) + args))
+            spead_conf_path = os.path.join(oskar_log_dir, pattern % (('spead',) + args))
+            # An empty log_file means the underlying OSKAR process will not
+            # produce a file with the logs, which is what we want during
+            # interactive runs
+            log_file = ''
+            if oskar_log_dir != '.':
+                log_file = os.path.join(oskar_log_dir, 'oskar_%d.log' % i)
+            if six.PY3:
+                parser = configparser.ConfigParser()
+                parser.read_dict(conf['oskar'])
+                with open(oskar_conf_path, 'w') as conf_file:
+                    parser.write(conf_file, space_around_delimiters=False)
+            else:
+                with open(oskar_conf_path, 'w') as conf_file:
+                    for section_name, section_dict in conf['oskar'].items():
+                        conf_file.write('[%s]\n' % section_name)
+                        for name, value in section_dict.items():
+                            conf_file.write('%s=%s\n' % (name, str(value)))
+            with open(spead_conf_path, 'w') as spead_conf_file:
+                json.dump(conf['spead'], spead_conf_file)
+            args = [spead_conf_path, oskar_conf_path, log_file]
+            yield args
 
-        if self.mode == MODE_INGEST:
+
+    def run(self):
+        logger.info("SignalDrop Starting")
+
+        if self.mode == MODE_INGEST_PIPELINE:
             # assume a downstream AveragerSinkDrop
             self.outputs[0].write(b'init')
 
@@ -212,47 +250,16 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
             receiver = VisibilityRelay(spead_config=self.spead_avg_conf,
                                        disconnect_tolerance=self.disconnect_tolerance)
         else: # self.mode == MODE_ADIOS:
-            try:
-                from mpi4py import MPI
-                comm = MPI.COMM_SELF  # @UndefinedVariable
-            except:
-                comm = None
-            spead_config['use_adios2'] = True
-            self.config['output_ms'] = self.outputs[0].path
-            receiver = VisibilityMSWriter(spead_config, mpi_comm=comm,
-                                          disconnect_tolerance=self.disconnect_tolerance,
-                                          average=False)
+            self.spead_avg_conf['use_adios2'] = True
+            self.spead_avg_conf['output_ms'] = self.outputs[0].path
+            self.spead_avg_conf['baseline_map_filename'] = self.baseline_exclusion_map_path
+            receiver = VisibilityMSWriter(self.spead_avg_conf, mpi_comm=self.mpi_comm,
+                                          disconnect_tolerance=self.disconnect_tolerance)
         receiver_thread = Thread(target=receiver.run, args=())
         receiver_thread.start()
 
-        oskar_process_args = []
-        for i, conf in enumerate(self.spead_send):
-            conf_path = os.path.join(oskar_log_dir, 'oskar_sim_%d.ini' % i)
-            spead_conf_path = os.path.join(oskar_log_dir, 'oskar_spead_%d.json' % i)
-            # An empty log_file means the underlying OSKAR process will not
-            # produce a file with the logs, which is what we want during
-            # interactive runs
-            log_file = ''
-            if oskar_log_dir != '.':
-                log_file = os.path.join(oskar_log_dir, 'oskar_%d.log' % i)
-            if six.PY3:
-                parser = configparser.ConfigParser()
-                parser.read_dict(conf['oskar'])
-                with open(conf_path, 'w') as conf_file:
-                    parser.write(conf_file, space_around_delimiters=False)
-            else:
-                with open(conf_path, 'w') as conf_file:
-                    for section_name, section_dict in conf['oskar'].items():
-                        conf_file.write('[%s]\n' % section_name)
-                        for name, value in section_dict.items():
-                            conf_file.write('%s=%s\n' % (name, str(value)))
-            with open(spead_conf_path, 'w') as spead_conf_file:
-                json.dump(conf['spead'], spead_conf_file)
-            args = [spead_conf_path, conf_path, log_file]
-            oskar_process_args.append(args)
-
         oskar_process = []
-        for oskar_args in oskar_process_args:
+        for oskar_args in self.get_oskar_cmdline_args():
             p = subprocess.Popen([sys.executable, '-msignal_drop'] + oskar_args,
                                  shell=False, close_fds=True)
             oskar_process.append(p)
