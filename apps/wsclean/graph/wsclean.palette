@@ -1,0 +1,393 @@
+{
+    "class": "go.GraphLinksModel",
+    "copiesArrayObjects": true,
+    "copiesArrays": true,
+    "linkDataArray": [],
+    "linkFromPortIdProperty": "fromPort",
+    "linkToPortIdProperty": "toPort",
+    "modelData": {
+        "fileType": "palette"
+    },
+    "nodeDataArray": [
+        {
+            "canHaveInputs": false,
+            "canHaveOutputs": true,
+            "category": "Start",
+            "categoryType": "ControlComponent",
+            "colour": " #229954",
+            "fields": [],
+            "inputPorts": [],
+            "isData": false,
+            "isGroup": false,
+            "key": -1,
+            "loc": "422 182",
+            "outputPorts": [
+                {
+                    "Id": "04003779-7c21-4eab-b023-554d0a1566f8",
+                    "IdText": "event"
+                },
+                {
+                    "Id": "86b5685f-997d-497c-8a9f-b23f4241bf22",
+                    "IdText": "configfile"
+                }
+            ],
+            "text": "Configuration",
+            "type": "Start"
+        },
+        {
+            "canHaveInputs": true,
+            "canHaveOutputs": false,
+            "category": "End",
+            "categoryType": "ControlComponent",
+            "colour": " #CB4335",
+            "fields": [],
+            "inputPorts": [
+                {
+                    "Id": "34895e17-2ce7-4f39-ad64-e63922b73003",
+                    "IdText": "event"
+                }
+            ],
+            "isData": false,
+            "isGroup": false,
+            "key": -10,
+            "loc": "392.3333339691162 299",
+            "outputPorts": [],
+            "text": "Done",
+            "type": "End"
+        },
+        {
+            "canHaveInputs": false,
+            "canHaveOutputs": false,
+            "category": "Description",
+            "categoryType": "Other",
+            "colour": " #9b3065",
+            "fields": [
+                {
+                    "text": "Description",
+                    "value": "wsclean split by channel"
+                }
+            ],
+            "inputPorts": [],
+            "isData": false,
+            "isGroup": false,
+            "key": -21,
+            "loc": "792 407",
+            "outputPorts": [],
+            "text": "wsclean2 ",
+            "type": "Graph Description"
+        },
+        {
+            "canHaveInputs": true,
+            "canHaveOutputs": true,
+            "category": "BashShellApp",
+            "categoryType": "ApplicationDrop",
+            "colour": " #1C2833",
+            "fields": [
+                {
+                    "name": "execution_time",
+                    "text": "Execution time",
+                    "value": "5"
+                },
+                {
+                    "name": "num_cpus",
+                    "text": "Num CPUs",
+                    "value": "1"
+                },
+                {
+                    "name": "group_start",
+                    "text": "Group start",
+                    "value": "0"
+                },
+                {
+                    "name": "Arg01",
+                    "text": "Arg01",
+                    "value": "/Users/wsl/Work/Cwork/ska/wsclean-2.8/build/wsclean"
+                },
+                {
+                    "name": "Arg02",
+                    "text": "Arg02",
+                    "value": "-weight natural"
+                },
+                {
+                    "name": "Arg03",
+                    "text": "Arg03",
+                    "value": "-data_column DATA"
+                },
+                {
+                    "name": "Arg04",
+                    "text": "Arg04",
+                    "value": "-size 1024 1024"
+                },
+                {
+                    "name": "Arg05",
+                    "text": "Arg05",
+                    "value": "-scale 1asec"
+                },
+                {
+                    "name": "Arg06",
+                    "text": "Arg06",
+                    "value": "-name /temp/wsclean/result/sm.ms"
+                },
+                {
+                    "name": "Arg07",
+                    "text": "Arg07",
+                    "value": "/Users/wsl/Work/Cwork/ska/casa/sm.ms.new"
+                },
+                {
+                    "name": "Arg08",
+                    "text": "Arg08",
+                    "value": ""
+                },
+                {
+                    "name": "Arg09",
+                    "text": "Arg09",
+                    "value": ""
+                },
+                {
+                    "name": "Arg10",
+                    "text": "Arg10",
+                    "value": ""
+                }
+            ],
+            "inputPorts": [
+                {
+                    "Id": "72900b29-937e-4550-9fdd-b3db0122b452",
+                    "IdText": "event"
+                }
+            ],
+            "isData": false,
+            "isGroup": false,
+            "key": -6,
+            "loc": "296.921875 40",
+            "outputPorts": [
+                {
+                    "Id": "295f1165-ac9b-4bfa-8963-084783fde7b1",
+                    "IdText": "event"
+                }
+            ],
+            "text": "wsclean",
+            "type": "Shell App"
+        },
+        {
+            "appFields": [
+                {
+                    "name": "execution_time",
+                    "text": "Execution time",
+                    "value": "5"
+                },
+                {
+                    "name": "num_cpus",
+                    "text": "Num CPUs",
+                    "value": "1"
+                },
+                {
+                    "name": "group_start",
+                    "text": "Group start",
+                    "value": "0"
+                },
+                {
+                    "name": "appclass",
+                    "text": "Appclass",
+                    "value": "dlg_integrate.wsclean.wscleandrop.Split"
+                },
+                {
+                    "name": "Arg01",
+                    "text": "Arg01",
+                    "value": "niter=5,pol=I"
+                },
+                {
+                    "name": "Arg02",
+                    "text": "Arg02",
+                    "value": "data_column=DATA"
+                },
+                {
+                    "name": "Arg03",
+                    "text": "Arg03",
+                    "value": "threshold=0.1"
+                },
+                {
+                    "name": "Arg04",
+                    "text": "Arg04",
+                    "value": "weight=briggs_0"
+                },
+                {
+                    "name": "Arg05",
+                    "text": "Arg05",
+                    "value": "gain=0.1"
+                },
+                {
+                    "name": "Arg06",
+                    "text": "Arg06",
+                    "value": "name=/temp/wsclean/result"
+                },
+                {
+                    "name": "Arg07",
+                    "text": "Arg07",
+                    "value": "scale=1arcmin"
+                },
+                {
+                    "name": "Arg08",
+                    "text": "Arg08",
+                    "value": "size=1024_1024"
+                },
+                {
+                    "name": "Arg09",
+                    "text": "Arg09",
+                    "value": "ms=/Users/wsl/Work/Cwork/ska/casa/arl_data/vis/ASKAP_example.ms"
+                },
+                {
+                    "name": "Arg10",
+                    "text": "Arg10",
+                    "value": "num_channel=192"
+                }
+            ],
+            "application": "Component",
+            "canHaveInputs": true,
+            "canHaveOutputs": true,
+            "category": "SplitData",
+            "categoryType": "GroupComponent",
+            "colour": " #DDAD00",
+            "fields": [
+                {
+                    "name": "num_of_copies",
+                    "text": "Number of copies",
+                    "value": "4"
+                },
+                {
+                    "name": "scatter_axis",
+                    "text": "Scatter axis",
+                    "value": "channel"
+                }
+            ],
+            "inputLocalPorts": [
+                {
+                    "Id": "f4dfdf0d-b484-4678-a6db-97dbd3991b1c",
+                    "IdText": "event"
+                }
+            ],
+            "inputPorts": [
+                {
+                    "Id": "394af289-9a84-4cc3-bf27-4ae5392e76b0",
+                    "IdText": "event"
+                }
+            ],
+            "isData": false,
+            "isGroup": true,
+            "key": -14,
+            "outputLocalPorts": [
+                {
+                    "Id": "9535e943-398a-4008-9e74-222a6ab531b3",
+                    "IdText": "event"
+                }
+            ],
+            "outputPorts": [
+                {
+                    "Id": "bf9764c7-2922-4969-9ecc-a7ecdfee4256",
+                    "IdText": "event"
+                }
+            ],
+            "text": "wsclean scatter",
+            "type": "Scatter"
+        },
+        {
+            "canHaveInputs": true,
+            "canHaveOutputs": true,
+            "category": "Component",
+            "categoryType": "ApplicationDrop",
+            "colour": " #3498DB",
+            "fields": [
+                {
+                    "name": "execution_time",
+                    "text": "Execution time",
+                    "value": "5"
+                },
+                {
+                    "name": "num_cpus",
+                    "text": "Num CPUs",
+                    "value": "1"
+                },
+                {
+                    "name": "group_start",
+                    "text": "Group start",
+                    "value": "0"
+                },
+                {
+                    "name": "appclass",
+                    "text": "Appclass",
+                    "value": "dlg_integrate.wsclean.wscleandrop.WSClean"
+                },
+                {
+                    "name": "Arg01",
+                    "text": "Arg01",
+                    "value": ""
+                },
+                {
+                    "name": "Arg02",
+                    "text": "Arg02",
+                    "value": ""
+                },
+                {
+                    "name": "Arg03",
+                    "text": "Arg03",
+                    "value": ""
+                },
+                {
+                    "name": "Arg04",
+                    "text": "Arg04",
+                    "value": ""
+                },
+                {
+                    "name": "Arg05",
+                    "text": "Arg05",
+                    "value": ""
+                },
+                {
+                    "name": "Arg06",
+                    "text": "Arg06",
+                    "value": ""
+                },
+                {
+                    "name": "Arg07",
+                    "text": "Arg07",
+                    "value": ""
+                },
+                {
+                    "name": "Arg08",
+                    "text": "Arg08",
+                    "value": ""
+                },
+                {
+                    "name": "Arg09",
+                    "text": "Arg09",
+                    "value": ""
+                },
+                {
+                    "name": "Arg10",
+                    "text": "Arg10",
+                    "value": ""
+                }
+            ],
+            "inputPorts": [
+                {
+                    "Id": "51507336-3a83-4ae0-9680-b3e2a0f3d06b",
+                    "IdText": "event"
+                }
+            ],
+            "isData": false,
+            "isGroup": false,
+            "key": -7,
+            "outputPorts": [
+                {
+                    "Id": "ececfeff-94da-4255-b5b1-b0571d7a6d43",
+                    "IdText": "event"
+                },
+                {
+                    "Id": "fac50e30-5624-417c-8941-1c5a6c17524d",
+                    "IdText": "result"
+                }
+            ],
+            "text": "WSClean",
+            "type": "Python App"
+        }
+    ]
+}

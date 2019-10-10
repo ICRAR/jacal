@@ -1,0 +1,396 @@
+{
+    "class": "go.GraphLinksModel",
+    "copiesArrayObjects": true,
+    "copiesArrays": true,
+    "linkDataArray": [
+        {
+            "from": -20,
+            "fromPort": "a4fd601e-8726-49c6-ba1b-da075385caf6",
+            "points": [
+                430.3697919845581,
+                271,
+                430.3697919845581,
+                261,
+                430.3697919845581,
+                260,
+                478.3697919845581,
+                260,
+                478.3697919845581,
+                318,
+                478.3697919845581,
+                328
+            ],
+            "to": -4,
+            "toPort": "111b3131-57a7-4023-ab14-ca67f6eec728"
+        },
+        {
+            "from": -4,
+            "fromPort": "0f4b9df1-ca4e-455c-adfd-d27f38fb0ab9",
+            "points": [
+                630.71875,
+                344.75919952392576,
+                630.71875,
+                354.75919952392576,
+                630.71875,
+                356,
+                630.71875,
+                356,
+                630.71875,
+                388,
+                491.375,
+                388,
+                491.375,
+                476.75919952392576,
+                491.375,
+                486.75919952392576
+            ],
+            "to": -22,
+            "toPort": "input_string"
+        },
+        {
+            "from": -22,
+            "fromPort": "output_string",
+            "points": [
+                643.7031259536743,
+                502,
+                643.7031259536743,
+                512,
+                643.7031259536743,
+                516,
+                705.8697919845581,
+                516,
+                705.8697919845581,
+                545.5,
+                705.8697919845581,
+                555.5
+            ],
+            "to": -7,
+            "toPort": "add668b4-f4f1-4ea9-91fc-80e3315d0f10"
+        }
+    ],
+    "linkFromPortIdProperty": "fromPort",
+    "linkToPortIdProperty": "toPort",
+    "modelData": {
+        "fileType": "graph"
+    },
+    "nodeDataArray": [
+        {
+            "canHaveInputs": true,
+            "canHaveOutputs": true,
+            "category": "file",
+            "categoryType": "DataDrop",
+            "colour": " #394BB2",
+            "fields": [
+                {
+                    "name": "data_volume",
+                    "text": "Data volume",
+                    "value": "5"
+                },
+                {
+                    "name": "group_end",
+                    "text": "Group end",
+                    "value": "0"
+                },
+                {
+                    "name": "check_filepath_exists",
+                    "text": "Check file path exists",
+                    "value": "1"
+                },
+                {
+                    "name": "filepath",
+                    "text": "File path",
+                    "value": ""
+                },
+                {
+                    "name": "dirname",
+                    "text": "Directory name",
+                    "value": ""
+                }
+            ],
+            "group": -20,
+            "inputPorts": [
+                {
+                    "Id": "add668b4-f4f1-4ea9-91fc-80e3315d0f10",
+                    "IdText": "event"
+                }
+            ],
+            "isData": true,
+            "isGroup": false,
+            "key": -7,
+            "loc": "689.703125 535.5",
+            "outputPorts": [
+                {
+                    "Id": "8102d2db-478d-41ad-ae16-fe22c805aed1",
+                    "IdText": "event"
+                }
+            ],
+            "shape": "Card",
+            "text": "Done",
+            "type": "File Drop"
+        },
+        {
+            "appFields": [
+                {
+                    "name": "execution_time",
+                    "text": "Execution time",
+                    "value": "5"
+                },
+                {
+                    "name": "num_cpus",
+                    "text": "Num CPUs",
+                    "value": "1"
+                },
+                {
+                    "name": "group_start",
+                    "text": "Group start",
+                    "value": "0"
+                },
+                {
+                    "name": "appclass",
+                    "text": "Appclass",
+                    "value": "dlg_integrate.wsclean.wscleandrop.Split"
+                },
+                {
+                    "name": "Arg01",
+                    "text": "Arg01",
+                    "value": "niter=5,pol=I"
+                },
+                {
+                    "name": "Arg02",
+                    "text": "Arg02",
+                    "value": "data_column=DATA"
+                },
+                {
+                    "name": "Arg03",
+                    "text": "Arg03",
+                    "value": "threshold=0.1"
+                },
+                {
+                    "name": "Arg04",
+                    "text": "Arg04",
+                    "value": "weight=briggs_0"
+                },
+                {
+                    "name": "Arg05",
+                    "text": "Arg05",
+                    "value": "gain=0.1"
+                },
+                {
+                    "name": "Arg06",
+                    "text": "Arg06",
+                    "value": "name=/temp/wsclean/result"
+                },
+                {
+                    "name": "Arg07",
+                    "text": "Arg07",
+                    "value": "scale=1arcmin"
+                },
+                {
+                    "name": "Arg08",
+                    "text": "Arg08",
+                    "value": "size=1024_1024"
+                },
+                {
+                    "name": "Arg09",
+                    "text": "Arg09",
+                    "value": "ms=/Users/wsl/Work/Cwork/ska/casa/arl_data/vis/ASKAP_example.ms"
+                },
+                {
+                    "name": "Arg10",
+                    "text": "Arg10",
+                    "value": "num_channel=192"
+                }
+            ],
+            "application": "Component",
+            "canHaveInputs": true,
+            "canHaveOutputs": true,
+            "category": "SplitData",
+            "categoryType": "GroupComponent",
+            "colour": " #DDAD00",
+            "desiredSize": {
+                "class": "go.Size",
+                "height": 398,
+                "width": 491
+            },
+            "fields": [
+                {
+                    "name": "num_of_copies",
+                    "text": "Number of copies",
+                    "value": "4"
+                },
+                {
+                    "name": "scatter_axis",
+                    "text": "Scatter axis",
+                    "value": "time"
+                }
+            ],
+            "inputLocalPorts": [
+                {
+                    "Id": "35b56fbb-3bc4-4496-9cc1-cfa823f6f988",
+                    "IdText": "event"
+                }
+            ],
+            "inputPorts": [
+                {
+                    "Id": "94a41ddc-d86b-4100-a6e8-c40d2811f128",
+                    "IdText": "event"
+                }
+            ],
+            "isData": false,
+            "isGroup": true,
+            "key": -20,
+            "loc": "414.203125 254",
+            "outputLocalPorts": [
+                {
+                    "Id": "a4fd601e-8726-49c6-ba1b-da075385caf6",
+                    "IdText": "event"
+                }
+            ],
+            "outputPorts": [
+                {
+                    "Id": "1b564b43-b3f0-4b92-97e1-fab12ea2aff3",
+                    "IdText": "event"
+                }
+            ],
+            "text": "wsclean scatter by channel-range",
+            "type": "Scatter"
+        },
+        {
+            "canHaveInputs": true,
+            "canHaveOutputs": true,
+            "category": "Component",
+            "categoryType": "ApplicationDrop",
+            "colour": " #1C2833",
+            "fields": [
+                {
+                    "name": "execution_time",
+                    "text": "Execution time",
+                    "value": "5"
+                },
+                {
+                    "name": "num_cpus",
+                    "text": "Num CPUs",
+                    "value": "1"
+                },
+                {
+                    "name": "group_start",
+                    "text": "Group start",
+                    "value": "0"
+                },
+                {
+                    "name": "appclass",
+                    "text": "Appclass",
+                    "value": "dlg_integrate.wsclean.wscleandrop.WSClean"
+                },
+                {
+                    "name": "Arg01",
+                    "text": "Arg01",
+                    "value": ""
+                },
+                {
+                    "name": "Arg02",
+                    "text": "Arg02",
+                    "value": ""
+                },
+                {
+                    "name": "Arg03",
+                    "text": "Arg03",
+                    "value": ""
+                },
+                {
+                    "name": "Arg04",
+                    "text": "Arg04",
+                    "value": ""
+                },
+                {
+                    "name": "Arg05",
+                    "text": "Arg05",
+                    "value": ""
+                },
+                {
+                    "name": "Arg06",
+                    "text": "Arg06",
+                    "value": ""
+                },
+                {
+                    "name": "Arg07",
+                    "text": "Arg07",
+                    "value": ""
+                },
+                {
+                    "name": "Arg08",
+                    "text": "Arg08",
+                    "value": ""
+                },
+                {
+                    "name": "Arg09",
+                    "text": "Arg09",
+                    "value": ""
+                },
+                {
+                    "name": "Arg10",
+                    "text": "Arg10",
+                    "value": ""
+                }
+            ],
+            "group": -20,
+            "inputPorts": [
+                {
+                    "Id": "input_string",
+                    "IdText": "event"
+                }
+            ],
+            "isData": false,
+            "isGroup": false,
+            "key": -22,
+            "loc": "475.203125 466",
+            "outputPorts": [
+                {
+                    "Id": "output_string",
+                    "IdText": "event"
+                }
+            ],
+            "text": "Clean",
+            "type": "Python App"
+        },
+        {
+            "canHaveInputs": true,
+            "canHaveOutputs": true,
+            "category": "file",
+            "categoryType": "DataDrop",
+            "colour": " #394BB2",
+            "fields": [
+                {
+                    "name": "data_volume",
+                    "text": "Data volume",
+                    "value": "5"
+                },
+                {
+                    "name": "group_end",
+                    "text": "Group end",
+                    "value": "0"
+                }
+            ],
+            "group": -20,
+            "inputPorts": [
+                {
+                    "Id": "111b3131-57a7-4023-ab14-ca67f6eec728",
+                    "IdText": "event"
+                }
+            ],
+            "isData": true,
+            "isGroup": false,
+            "key": -4,
+            "loc": "462.203125 308",
+            "outputPorts": [
+                {
+                    "Id": "0f4b9df1-ca4e-455c-adfd-d27f38fb0ab9",
+                    "IdText": "event"
+                }
+            ],
+            "shape": "Card",
+            "text": "args splitted by channel",
+            "type": "Memory Drop"
+        }
+    ]
+}
