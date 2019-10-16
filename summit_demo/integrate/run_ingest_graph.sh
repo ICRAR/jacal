@@ -3,15 +3,16 @@
 venv="$1"
 outdir="$2"
 apps_rootdir="$3"
-start_freq=$4
-freq_step=$5
-gpus_per_node=$6
-islands=$7
-verbosity=$8
-remote_mechanism=$9
-nodes=${10}
-relay_base_port=${11}
-pgtp_path=${12}
+direct_run="$4"
+start_freq=$5
+freq_step=$6
+gpus_per_node=$7
+islands=$8
+verbosity=$9
+remote_mechanism=$10
+nodes=${11}
+relay_base_port=${12}
+pgtp_path=${13}
 
 . common.sh
 
@@ -52,6 +53,12 @@ fi
 # OpenMP routines. Let's thus hardcode OMP_NUM_THREADS to 1
 # to get acceptable runtimes.
 export OMP_NUM_THREADS=1
+
+# TODO: Just a copy from run_image_graph.sh, needs fixing
+if [ $direct_run = yes ]; then
+	dlg unroll-and-partition $graph_option | python -m modify_image_pg start_freq=$start_freq freq_step=$freq_step channels_per_drop=$gpus_per_node relay_base_port=$relay_base_port | dlg submit -p 8000
+	exit 0
+fi
 
 $runner \
     python -m dlg.deploy.pawsey.start_dfms_cluster \

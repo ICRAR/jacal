@@ -41,6 +41,7 @@ Runtime options:
  -w <walltime>            Walltime, defaults to $DEFAULT_WALLTIME
  -M                       Use queue-specific, non-MPI-based daliuge cluster startup mechanism
  -p <pgtp path>           Absolute path to the physical graph template
+ -d                       Direct run (no queueing system, no mpirun)"
 
 Runtime paths:
  -b <baseline-exclusion>  The file containing the baseline exclusion map
@@ -53,6 +54,7 @@ EOF
 # Command line parsing
 venv=$SUMMIT_VENV
 outdir=`abspath .`
+direct_run=no
 nodes=$DEFAULT_NODES
 islands=$DEFAULT_ISLANDS
 channels_per_node=$DEFAULT_CHANNELS_PER_NODE
@@ -148,6 +150,9 @@ do
 		m)
 			ms_outdir="$OPTARG"
 			;;
+		d)
+			direct_run=yes
+			;;
 		*)
 			print_usage 1>&2
 			exit 1
@@ -216,6 +221,18 @@ s%SIGNAL_GENERATOR_ERROR_TOLERANCE%$signal_generator_error_tolerance%
 s%SINK_ERROR_TOLERANCE%$sink_error_tolerance%
 " `abspath $this_dir/graphs/$logical_graph` > $outdir/lg.json
 
+
+# Submit differently depending on your queueing system
+if [ ${direct_run} = yes ]; then
+	 . $this_dir/run_ingest_graph.sh \
+	         "$venv" "$outdir" "$apps_rootdir" yes \
+	         $start_freq $freq_step $channels_per_node \
+	         $islands $verbosity ${remote_mechanism:-slurm} \
+	         $nodes $relay_base_port "$pgtp"
+	return
+fi
+
+
 # Whatever number of nodes we want to use for simulation, add 1 to them
 # to account for the DIM node
 
@@ -233,7 +250,7 @@ if [ ! -z "$(command -v bsub 2> /dev/null)" ]; then
 	     -J ingest_graph \
 	     -alloc_flags "NVME" \
 	     $this_dir/run_ingest_graph.sh \
-	        "$venv" "$outdir" "$apps_rootdir" \
+	        "$venv" "$outdir" "$apps_rootdir" no \
 	        $start_freq $freq_step $channels_per_node \
 	        $islands $verbosity ${remote_mechanism:-dlg-hybrid} \
 	        $nodes $relay_base_port "$pgtp"
@@ -250,7 +267,7 @@ elif [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	       ${request_gpus} \
 	       -c $((${channels_per_node} + 4)) \
 	       $this_dir/run_ingest_graph.sh \
-	         "$venv" "$outdir" "$apps_rootdir" \
+	         "$venv" "$outdir" "$apps_rootdir" no \
 	         $start_freq $freq_step $channels_per_node \
 	         $islands $verbosity ${remote_mechanism:-slurm} \
 	         $nodes $relay_base_port "$pgtp"
