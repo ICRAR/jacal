@@ -362,6 +362,7 @@ build_and_install() {
 		_build
 		cd ..
 	elif [ -e CMakeLists.txt ]; then
+    git clone -b compilation_fixes https://bitbucket.csiro.au/scm/askapsdp/askap-cmake.git
 		_prebuild_cmake "$@"
 		_build
 		cd ../..
@@ -409,7 +410,7 @@ fi
 export LD_LIBRARY_PATH=$prefix/lib64:$LD_LIBRARY_PATH
 
 # Let's work with a virtualenv
-banner Setting up Python virtrual environment
+banner Setting up Python virtual environment
 
 source_venv
 try pip install numpy
