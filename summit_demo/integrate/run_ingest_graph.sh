@@ -54,9 +54,10 @@ fi
 # to get acceptable runtimes.
 export OMP_NUM_THREADS=1
 
-# TODO: Just a copy from run_image_graph.sh, needs fixing
+# TODO: Just a copy, with updates!, from run_image_graph.sh, needs fixing
 if [ $direct_run = yes ]; then
-	dlg unroll-and-partition $graph_option | python -m modify_image_pg start_freq=$start_freq freq_step=$freq_step channels_per_drop=$gpus_per_node relay_base_port=$relay_base_port | dlg submit -p 8000
+	#dlg unroll-and-partition $graph_option | python3 -m modify_ingest_pg $start_freq $freq_step $gpus_per_node $relay_base_port | dlg submit -p 8000
+	dlg unroll-and-partition $graph_option | python3 -m modify_ingest_pg $start_freq $freq_step $gpus_per_node $relay_base_port | dlg submit -p 8000
 	exit 0
 fi
 

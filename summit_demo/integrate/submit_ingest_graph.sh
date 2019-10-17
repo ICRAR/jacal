@@ -52,6 +52,7 @@ EOF
 }
 
 # Command line parsing
+hostname=`hostname`
 venv=$SUMMIT_VENV
 outdir=`abspath .`
 direct_run=no

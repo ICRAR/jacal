@@ -38,6 +38,19 @@ load_modules() {
 		module load summit_demo/default
     elif [ "${LMOD_SYSTEM_NAME}" == "summit" ]; then
 		source ../summit_bashrc
+        elif [ "$HOSTNAME" = "inspur-gpu01" ]; then
+		export BLDR_ROOT_DIR=/ssd/summit_pipeline/bldr
+		if [[ -d $BLDR_ROOT_DIR ]]
+		then
+        		pushd $PLEIADES_BLDR_ROOT_DIR > /dev/null
+        		source ./scripts/setup.sh
+        		popd > /dev/null
+		else
+			echo "Cannot find modules, exiting now"
+			exit 1
+		fi
+		module load python/3.7.4
+		echo On SHAO 8 GPU node, loaded modules
 	else
 		echo "Unsupported system, exiting now"
 		exit 1
@@ -93,6 +106,8 @@ get_runner() {
 		runner=jsrun
 	elif [ "$1" = mpi ]; then
 		runner=mpirun
+        elif [ "$HOSTNAME" = "inspur-gpu01" ]; then
+		echo On SHAO 8 GPU machine, not setting runner
 	else
 		echo "Unsupported remote mechanims: $1" 1>&2
 		exit 1
