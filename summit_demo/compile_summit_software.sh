@@ -481,6 +481,10 @@ if [ $build_oskar == yes ]; then
 	if [ $system == centos -a $compiler == clang ]; then
 		sed -i "s|library_dirs.*\$|\\0:$MPI_HOME/lib|" setup.cfg
 	fi
+	if [ $system == ubuntu ]; then
+	  sed -i "s|include_dirs.*\$|\\0:$MPI_HOME/include|" setup.cfg
+		sed -i "s|library_dirs.*\$|\\0:$MPI_HOME/lib|" setup.cfg
+  fi
 	try pip install mpi4py
 	try pip install .
 	cd ../..

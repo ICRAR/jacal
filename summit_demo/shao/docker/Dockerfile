@@ -26,7 +26,7 @@ RUN apt-get install -y \
     git
 
 WORKDIR /home
-RUN git clone https://github.com/ICRAR/jacal.git
+RUN git clone -b shao-demo https://github.com/ICRAR/jacal.git
 
 WORKDIR /home/jacal/summit_demo
 RUN ./compile_summit_software.sh -s ubuntu -j 6
