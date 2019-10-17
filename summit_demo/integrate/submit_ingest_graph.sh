@@ -77,7 +77,7 @@ ms_outdir=
 # physical graph template partition
 pgtp=
 
-while getopts "h?V:o:n:c:f:s:T:I:r:E:e:b:t:S:agv:w:i:Mp:m:" opt
+while getopts "h?V:o:n:c:f:s:T:I:r:E:e:b:t:S:agv:w:i:Mp:m:d" opt
 do
 	case "$opt" in
 		h?)

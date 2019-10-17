@@ -5,3 +5,5 @@ apps/askap/.clang_complete
 docs
 *.swp
 *.pyc
+summit_demo/integrate/nm-shao.sh
+summit_demo/integrate/dim-shao.sh
