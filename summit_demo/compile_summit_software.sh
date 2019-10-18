@@ -482,6 +482,7 @@ if [ $build_oskar == yes ]; then
 		sed -i "s|library_dirs.*\$|\\0:$MPI_HOME/lib|" setup.cfg
 	fi
 	if [ $system == ubuntu ]; then
+	  MPI_HOME=/usr/lib/x86_64-linux-gnu/openmpi
 	  sed -i "s|include_dirs.*\$|\\0:$MPI_HOME/include|" setup.cfg
 		sed -i "s|library_dirs.*\$|\\0:$MPI_HOME/lib|" setup.cfg
   fi
