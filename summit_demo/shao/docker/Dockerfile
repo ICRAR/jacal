@@ -21,9 +21,15 @@
 FROM nvidia/cuda:10.1-devel as buildenv
 
 RUN apt-get update
-
 RUN apt-get install -y \
-    git
+    git \
+    python \
+    python-pip \
+    libpython-dev
+
+RUN pip install virtualenv
+RUN virtualenv /usr/local
+RUN rm -rf /usr/local/local
 
 WORKDIR /home
 RUN git clone -b shao-demo https://github.com/ICRAR/jacal.git
@@ -34,5 +40,19 @@ RUN ./compile_summit_software.sh -s ubuntu -j 6
 ##############################################################
 # Create a new image based on only the executable parts of the old image
 FROM nvidia/cuda:10.1-runtime
-COPY --from=buildenv /usr/local /usr/local
+
+RUN apt-get update && \
+    apt-get install -y \
+    python
+
+#############################################################
+## This looks odd, but as the CUDA is in /usr/local I don't want to
+## copy the big heavy devel CUDA into the runtime
+WORKDIR /usr/local/bin
+COPY --from=buildenv /usr/local/bin .
+WORKDIR /usr/local/include
+COPY --from=buildenv /usr/local/include .
+WORKDIR /usr/local/lib
+COPY --from=buildenv /usr/local/lib .
+
 RUN ldconfig
