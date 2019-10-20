@@ -1,0 +1,9 @@
+module load gcc/4.8.5
+module load gsl
+module load fftw
+
+export SUMMIT_VENV=/gpfs/alpine/ast157/proj-shared/jacal_install_rhea
+export PATH=$SUMMIT_VENV/bin:$PATH
+export CPATH=$SUMMIT_VENV/include:$CPATH
+export LIBRARY_PATH=$SUMMIT_VENV/lib:$SUMMIT_VENV/lib64:$LIBRARY_PATH
+export LD_LIBRARY_PATH=$SUMMIT_VENV/lib:$SUMMIT_VENV/lib64:$LD_LIBRARY_PATH
