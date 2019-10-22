@@ -43,7 +43,22 @@ FROM nvidia/cuda:10.1-runtime
 
 RUN apt-get update && \
     apt-get install -y \
-    python
+    python \
+    libgomp1 \
+    libboost-dev \
+    libboost-filesystem-dev\
+    libboost-program-options-dev \
+    libboost-signals-dev \
+    libboost-system-dev \
+    libboost-thread-dev \
+    libcfitsio-dev \
+    libffi-dev \
+    libfftw3-dev \
+    libgsl-dev \
+    liblog4cxx-dev \
+    libopenblas-dev \
+    libopenmpi-dev  \
+    wcslib-dev
 
 #############################################################
 ## This looks odd, but as the CUDA is in /usr/local I don't want to
