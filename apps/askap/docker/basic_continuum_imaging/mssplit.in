@@ -1,0 +1,4 @@
+vis         = /data/ms/ASKAP_example.ms
+outputvis   = /data/ms/averaged_ASKAP_example.ms
+channel     = 1-192
+width       = 12

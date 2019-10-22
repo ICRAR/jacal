@@ -1,0 +1,581 @@
+{
+    "class": "go.GraphLinksModel",
+    "copiesArrayObjects": true,
+    "copiesArrays": true,
+    "linkDataArray": [
+        {
+            "from": -5,
+            "fromPort": "f4a6e1a0-bc73-46da-ad27-97b6506c1001",
+            "points": [
+                332.54999828338623,
+                150,
+                332.54999828338623,
+                160,
+                332.54999828338623,
+                160,
+                332.54999828338623,
+                160,
+                332.54999828338623,
+                221,
+                332.54999828338623,
+                231
+            ],
+            "to": -11,
+            "toPort": "3fe5e5c9-a30e-40fd-8ff5-fa68d7bd269f"
+        },
+        {
+            "from": -7,
+            "fromPort": "e130e190-ca5e-4828-8ae3-bcd4bb597554",
+            "points": [
+                551.0499992370605,
+                454,
+                561.0499992370605,
+                454,
+                561.0499992370605,
+                454,
+                561.0499992370605,
+                454,
+                579.3833312988281,
+                454,
+                589.3833312988281,
+                454
+            ],
+            "to": -8,
+            "toPort": "40eccb4e-8f44-4481-a3cd-8e2ece3d4069"
+        },
+        {
+            "from": -11,
+            "fromPort": "e130e190-ca5e-4828-8ae3-bcd4bb597554",
+            "points": [
+                484.88333225250244,
+                231,
+                484.88333225250244,
+                221,
+                484.88333225250244,
+                220,
+                453.54999828338623,
+                220,
+                453.54999828338623,
+                173,
+                453.54999828338623,
+                163
+            ],
+            "to": -12,
+            "toPort": "38e97a90-02e9-4898-81d4-cf96c2f6ed6d"
+        },
+        {
+            "from": -12,
+            "fromPort": "3f1a97c8-a5a0-44cd-bb8c-58506a8630c8",
+            "points": [
+                605.8833322525024,
+                163,
+                605.8833322525024,
+                173,
+                605.8833322525024,
+                172,
+                605.8833322525024,
+                172,
+                605.8833322525024,
+                220,
+                571.5499982833862,
+                220,
+                571.5499982833862,
+                221,
+                571.5499982833862,
+                231
+            ],
+            "to": -6,
+            "toPort": "3fe5e5c9-a30e-40fd-8ff5-fa68d7bd269f"
+        },
+        {
+            "from": -6,
+            "fromPort": "e130e190-ca5e-4828-8ae3-bcd4bb597554",
+            "points": [
+                723.8833322525024,
+                247,
+                723.8833322525024,
+                257,
+                723.8833322525024,
+                260,
+                723.8833322525024,
+                260,
+                723.8833322525024,
+                292,
+                427.04999828338623,
+                292,
+                427.04999828338623,
+                349.5,
+                427.04999828338623,
+                359.5
+            ],
+            "to": -9,
+            "toPort": "44742734-70b7-4596-b02c-66744c664cb7"
+        },
+        {
+            "from": -9,
+            "fromPort": "c2245717-3606-4117-9daa-c85b49c3e357",
+            "points": [
+                579.3833322525024,
+                375.5,
+                579.3833322525024,
+                385.5,
+                579.3833322525024,
+                388,
+                382.54999828338623,
+                388,
+                382.54999828338623,
+                436,
+                382.54999828338623,
+                446
+            ],
+            "to": -7,
+            "toPort": "3fe5e5c9-a30e-40fd-8ff5-fa68d7bd269f"
+        }
+    ],
+    "linkFromPortIdProperty": "fromPort",
+    "linkToPortIdProperty": "toPort",
+    "modelData": {
+        "fileType": "graph"
+    },
+    "nodeDataArray": [
+        {
+            "canHaveInputs": false,
+            "canHaveOutputs": false,
+            "category": "Description",
+            "categoryType": "Other",
+            "colour": " #9b3065",
+            "fields": [
+                {
+                    "text": "Description",
+                    "value": ""
+                }
+            ],
+            "inputPorts": [],
+            "isData": false,
+            "isGroup": false,
+            "key": -21,
+            "loc": "461 538",
+            "outputPorts": [],
+            "text": "Enter label",
+            "type": "Graph Description"
+        },
+        {
+            "canHaveInputs": true,
+            "canHaveOutputs": true,
+            "category": "file",
+            "categoryType": "DataDrop",
+            "colour": " #394BB2",
+            "fields": [
+                {
+                    "name": "data_volume",
+                    "text": "Data volume",
+                    "value": "5"
+                },
+                {
+                    "name": "group_end",
+                    "text": "Group end",
+                    "value": "0"
+                },
+                {
+                    "name": "check_filepath_exists",
+                    "text": "Check file path exists",
+                    "value": "1"
+                },
+                {
+                    "name": "filepath",
+                    "text": "File path",
+                    "value": ""
+                },
+                {
+                    "name": "dirname",
+                    "text": "Directory name",
+                    "value": ""
+                }
+            ],
+            "inputPorts": [],
+            "isData": true,
+            "isGroup": false,
+            "key": -5,
+            "loc": "196.38333129882812 114",
+            "outputPorts": [
+                {
+                    "Id": "f4a6e1a0-bc73-46da-ad27-97b6506c1001",
+                    "IdText": "event"
+                }
+            ],
+            "shape": "Card",
+            "text": "Start",
+            "type": "File Drop"
+        },
+        {
+            "canHaveInputs": true,
+            "canHaveOutputs": true,
+            "category": "docker",
+            "categoryType": "ApplicationDrop",
+            "colour": " #331c54",
+            "fields": [
+                {
+                    "name": "execution_time",
+                    "text": "Execution time",
+                    "value": "5"
+                },
+                {
+                    "name": "num_cpus",
+                    "text": "Num CPUs",
+                    "value": "1"
+                },
+                {
+                    "name": "group_start",
+                    "text": "Group start",
+                    "value": "0"
+                },
+                {
+                    "name": "image",
+                    "text": "Image",
+                    "value": "icrar/yandasoft"
+                },
+                {
+                    "name": "command",
+                    "text": "Command",
+                    "value": "/home/yandasoft/build/apps/ccalibrator -c /data/calibrator.in"
+                },
+                {
+                    "name": "user",
+                    "text": "User",
+                    "value": ""
+                },
+                {
+                    "name": "ensureUserAndSwitch",
+                    "text": "Ensure User And Switch",
+                    "value": "0"
+                },
+                {
+                    "name": "removeContainer",
+                    "text": "Remove Container",
+                    "value": "1"
+                },
+                {
+                    "name": "additionalBindings",
+                    "text": "Additional Bindings",
+                    "value": "/opt/jacal/apps/askap/docker/basic_continuum_imaging:/data"
+                }
+            ],
+            "inputPorts": [
+                {
+                    "Id": "3fe5e5c9-a30e-40fd-8ff5-fa68d7bd269f",
+                    "IdText": "event"
+                }
+            ],
+            "isData": false,
+            "isGroup": false,
+            "key": -11,
+            "loc": "316.3833312988281 211",
+            "outputPorts": [
+                {
+                    "Id": "e130e190-ca5e-4828-8ae3-bcd4bb597554",
+                    "IdText": "event"
+                }
+            ],
+            "text": "Yanda Calibrator",
+            "type": "Docker Drop"
+        },
+        {
+            "canHaveInputs": true,
+            "canHaveOutputs": true,
+            "category": "docker",
+            "categoryType": "ApplicationDrop",
+            "colour": " #331c54",
+            "fields": [
+                {
+                    "name": "execution_time",
+                    "text": "Execution time",
+                    "value": "5"
+                },
+                {
+                    "name": "num_cpus",
+                    "text": "Num CPUs",
+                    "value": "1"
+                },
+                {
+                    "name": "group_start",
+                    "text": "Group start",
+                    "value": "0"
+                },
+                {
+                    "name": "image",
+                    "text": "Image",
+                    "value": "icrar/yandasoft"
+                },
+                {
+                    "name": "command",
+                    "text": "Command",
+                    "value": "/home/yandasoft/build/apps/mssplit -c /data/mssplit.in"
+                },
+                {
+                    "name": "user",
+                    "text": "User",
+                    "value": ""
+                },
+                {
+                    "name": "ensureUserAndSwitch",
+                    "text": "Ensure User And Switch",
+                    "value": "0"
+                },
+                {
+                    "name": "removeContainer",
+                    "text": "Remove Container",
+                    "value": "1"
+                },
+                {
+                    "name": "additionalBindings",
+                    "text": "Additional Bindings",
+                    "value": "/opt/jacal/apps/askap/docker/basic_continuum_imaging:/data"
+                }
+            ],
+            "inputPorts": [
+                {
+                    "Id": "3fe5e5c9-a30e-40fd-8ff5-fa68d7bd269f",
+                    "IdText": "event"
+                }
+            ],
+            "isData": false,
+            "isGroup": false,
+            "key": -6,
+            "loc": "555.3833312988281 211",
+            "outputPorts": [
+                {
+                    "Id": "e130e190-ca5e-4828-8ae3-bcd4bb597554",
+                    "IdText": "event"
+                }
+            ],
+            "text": "Yanda MSSplit",
+            "type": "Docker Drop"
+        },
+        {
+            "canHaveInputs": true,
+            "canHaveOutputs": true,
+            "category": "docker",
+            "categoryType": "ApplicationDrop",
+            "colour": " #331c54",
+            "fields": [
+                {
+                    "name": "execution_time",
+                    "text": "Execution time",
+                    "value": "5"
+                },
+                {
+                    "name": "num_cpus",
+                    "text": "Num CPUs",
+                    "value": "1"
+                },
+                {
+                    "name": "group_start",
+                    "text": "Group start",
+                    "value": "0"
+                },
+                {
+                    "name": "image",
+                    "text": "Image",
+                    "value": "icrar/yandasoft"
+                },
+                {
+                    "name": "command",
+                    "text": "Command",
+                    "value": "/home/yandasoft/build/apps/cimager -c /data/dirty.in && cp -r /home/yandasoft/*.dirty* /data/data/"
+                },
+                {
+                    "name": "user",
+                    "text": "User",
+                    "value": ""
+                },
+                {
+                    "name": "ensureUserAndSwitch",
+                    "text": "Ensure User And Switch",
+                    "value": "0"
+                },
+                {
+                    "name": "removeContainer",
+                    "text": "Remove Container",
+                    "value": "1"
+                },
+                {
+                    "name": "additionalBindings",
+                    "text": "Additional Bindings",
+                    "value": "/opt/jacal/apps/askap/docker/basic_continuum_imaging:/data"
+                }
+            ],
+            "inputPorts": [
+                {
+                    "Id": "3fe5e5c9-a30e-40fd-8ff5-fa68d7bd269f",
+                    "IdText": "event"
+                }
+            ],
+            "isData": false,
+            "isGroup": false,
+            "key": -7,
+            "loc": "366.3833312988281 426",
+            "outputPorts": [
+                {
+                    "Id": "e130e190-ca5e-4828-8ae3-bcd4bb597554",
+                    "IdText": "event"
+                }
+            ],
+            "text": "Yanda Imager",
+            "type": "Docker Drop"
+        },
+        {
+            "canHaveInputs": true,
+            "canHaveOutputs": true,
+            "category": "file",
+            "categoryType": "DataDrop",
+            "colour": " #394BB2",
+            "fields": [
+                {
+                    "name": "data_volume",
+                    "text": "Data volume",
+                    "value": "5"
+                },
+                {
+                    "name": "group_end",
+                    "text": "Group end",
+                    "value": "0"
+                },
+                {
+                    "name": "check_filepath_exists",
+                    "text": "Check file path exists",
+                    "value": "1"
+                },
+                {
+                    "name": "filepath",
+                    "text": "File path",
+                    "value": ""
+                },
+                {
+                    "name": "dirname",
+                    "text": "Directory name",
+                    "value": ""
+                }
+            ],
+            "inputPorts": [
+                {
+                    "Id": "40eccb4e-8f44-4481-a3cd-8e2ece3d4069",
+                    "IdText": "event"
+                }
+            ],
+            "isData": true,
+            "isGroup": false,
+            "key": -8,
+            "loc": "589.3833312988281 426",
+            "outputPorts": [],
+            "shape": "Card",
+            "text": "End",
+            "type": "File Drop"
+        },
+        {
+            "canHaveInputs": true,
+            "canHaveOutputs": true,
+            "category": "file",
+            "categoryType": "DataDrop",
+            "colour": " #394BB2",
+            "fields": [
+                {
+                    "name": "data_volume",
+                    "text": "Data volume",
+                    "value": "5"
+                },
+                {
+                    "name": "group_end",
+                    "text": "Group end",
+                    "value": "0"
+                },
+                {
+                    "name": "check_filepath_exists",
+                    "text": "Check file path exists",
+                    "value": "1"
+                },
+                {
+                    "name": "filepath",
+                    "text": "File path",
+                    "value": ""
+                },
+                {
+                    "name": "dirname",
+                    "text": "Directory name",
+                    "value": ""
+                }
+            ],
+            "inputPorts": [
+                {
+                    "Id": "38e97a90-02e9-4898-81d4-cf96c2f6ed6d",
+                    "IdText": "event"
+                }
+            ],
+            "isData": true,
+            "isGroup": false,
+            "key": -12,
+            "loc": "437.3833312988281 109",
+            "outputPorts": [
+                {
+                    "Id": "3f1a97c8-a5a0-44cd-bb8c-58506a8630c8",
+                    "IdText": "event"
+                }
+            ],
+            "shape": "Card",
+            "text": "temp",
+            "type": "File Drop"
+        },
+        {
+            "canHaveInputs": true,
+            "canHaveOutputs": true,
+            "category": "file",
+            "categoryType": "DataDrop",
+            "colour": " #394BB2",
+            "fields": [
+                {
+                    "name": "data_volume",
+                    "text": "Data volume",
+                    "value": "5"
+                },
+                {
+                    "name": "group_end",
+                    "text": "Group end",
+                    "value": "0"
+                },
+                {
+                    "name": "check_filepath_exists",
+                    "text": "Check file path exists",
+                    "value": "1"
+                },
+                {
+                    "name": "filepath",
+                    "text": "File path",
+                    "value": ""
+                },
+                {
+                    "name": "dirname",
+                    "text": "Directory name",
+                    "value": ""
+                }
+            ],
+            "inputPorts": [
+                {
+                    "Id": "44742734-70b7-4596-b02c-66744c664cb7",
+                    "IdText": "event"
+                }
+            ],
+            "isData": true,
+            "isGroup": false,
+            "key": -9,
+            "loc": "410.8833312988281 321.5",
+            "outputPorts": [
+                {
+                    "Id": "c2245717-3606-4117-9daa-c85b49c3e357",
+                    "IdText": "event"
+                }
+            ],
+            "shape": "Card",
+            "text": "temp",
+            "type": "File Drop"
+        }
+    ]
+}
