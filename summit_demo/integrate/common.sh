@@ -36,20 +36,9 @@ load_modules() {
 	elif [ "$SLURM_SUBMIT_HOST" = bracewell-login ]; then
 		module use /flush1/tob020/modulefiles
 		module load summit_demo/default
-    elif [ "${LMOD_SYSTEM_NAME}" == "summit" ]; then
+	elif [ "${LMOD_SYSTEM_NAME}" == "summit" ]; then
 		source ../summit_bashrc
-        elif [ "$HOSTNAME" = "inspur-gpu01" ]; then
-		export BLDR_ROOT_DIR=/ssd/summit_pipeline/bldr
-		if [[ -d $BLDR_ROOT_DIR ]]
-		then
-        		pushd $BLDR_ROOT_DIR > /dev/null
-        		source ./scripts/setup.sh
-        		popd > /dev/null
-		else
-			echo "Cannot find modules, exiting now"
-			exit 1
-		fi
-		module load python/3.7.4
+	elif [ "$SLURM_SUBMIT_HOST" = x86-logon01 ]; then
 		echo On SHAO 8 GPU node, loaded modules
 	else
 		echo "Unsupported system, exiting now"

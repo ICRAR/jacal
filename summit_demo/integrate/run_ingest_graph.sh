@@ -56,14 +56,10 @@ export OMP_NUM_THREADS=1
 
 # TODO: Just a copy, with updates!, from run_image_graph.sh, needs fixing
 if [ $direct_run = yes ]; then
-	#dlg unroll-and-partition $graph_option | python3 -m modify_ingest_pg $start_freq $freq_step $gpus_per_node $relay_base_port | dlg submit -p 8000
-	#docker run -d -it --rm --name daliuge --mount type=bind,source=/ssd/summit_pipeline,target=/ssd/summit_pipeline      -u $(id -u ${USER}):$(id -g ${USER})     --workdir=$outdir         -p 8000:8000     192.168.6.123:5000/yanda/summit-demo     dlg nm -vvv -H 0.0.0.0 --log-dir "/ssd/summit_pipeline/logs/daliuge-nm-$(hostname -I | grep -Po '192\.168\.6\.[0-9]+')"     --max-request-size 10    --dlg-path /ssd/summit_pipeline/jacal/summit_demo/oskar/ingest
-	#docker run -d -it --name daliuge --mount type=bind,source=/ssd/summit_pipeline,target=/ssd/summit_pipeline      --user 10099:10031     --workdir $outdir         -p 8000:8000     192.168.6.123:5000/yanda/summit-demo     dlg nm -vvv -H 0.0.0.0 --log-dir "/ssd/summit_pipeline/logs/daliuge-nm-$(hostname -I | grep -Po '192\.168\.6\.[0-9]+')"     --max-request-size 10    --dlg-path /ssd/summit_pipeline/jacal/summit_demo/oskar/ingest
-	#docker run -d -it --name daliuge --mount type=bind,source=/ssd/summit_pipeline,target=/ssd/summit_pipeline      --user 10099:10031     --workdir $outdir         -p 8000:8000     192.168.6.123:5000/yanda/mark-test     dlg nm -vvv -H 0.0.0.0 --log-dir "/ssd/summit_pipeline/logs/daliuge-nm-$(hostname -I | grep -Po '192\.168\.6\.[0-9]+')"     --max-request-size 10    --dlg-path /ssd/summit_pipeline/jacal/summit_demo/oskar/ingest
-	docker run -d -it --name daliuge --mount type=bind,source=/ssd/summit_pipeline,target=/ssd/summit_pipeline      --user 10099:10031     --workdir $outdir         -p 8000:8000     --gpus all          --env OMP_NUM_THREADS --env USER --env PYTHONPATH=/ssd/summit_pipeline/jacal/summit_demo/oskar/ingest         192.168.6.123:5000/yanda/summit-demo       dlg nm -vvv -H 0.0.0.0 --log-dir "/ssd/summit_pipeline/logs/daliuge-nm-$(hostname -I | grep -Po '192\.168\.6\.[0-9]+')"     --max-request-size 10    --dlg-path /ssd/summit_pipeline/jacal/summit_demo/oskar/ingest
-	#dlg unroll-and-partition $graph_option | python3 -m modify_ingest_pg $start_freq $freq_step $gpus_per_node $relay_base_port | dlg submit -p 8000
-	dlg unroll-and-partition $graph_option | python3 -m modify_ingest_pg $start_freq $freq_step $gpus_per_node $relay_base_port > $outdir/pg.json
-	cat $outdir/pg.json | sed 's/#0/127.0.0.1/g' | dlg submit -p 8000
+	pushd ../.. > /dev/null;export bindmount=`pwd`;popd > /dev/null
+	docker run -d -it --name daliuge          --net=host         --mount type=bind,source=$bindmount,target=$bindmount      -u $(id -u ${USER}):$(id -g ${USER})     --workdir $outdir         --gpus all          --env OMP_NUM_THREADS --env USER --env PYTHONPATH=$bindmount/oskar/ingest         192.168.6.123:5000/yanda/summit-demo       dlg nm -vvv -H 0.0.0.0 --log-dir "daliuge-nm-$(hostname -I | grep -Po '192\.168\.6\.[0-9]+')"     --max-request-size 10          --dlg-path $bindmount/oskar/ingest
+	docker run -i --rm --name daliuge-unroll  --net=host  --mount type=bind,source=$bindmount,target=$bindmount     --workdir $outdir          192.168.6.123:5000/yanda/summit-demo dlg unroll-and-partition $graph_option | python -m modify_ingest_pg $start_freq $freq_step $gpus_per_node $relay_base_port > $outdir/pg.json
+	cat $outdir/pg.json | sed 's/#0/127.0.0.1/g' | docker run -i --rm --name daliuge-submit --net=host --mount type=bind,source=$bindmount,target=$bindmount     --workdir $outdir          192.168.6.123:5000/yanda/summit-demo dlg submit -p 8000
 	exit 0
 fi
 

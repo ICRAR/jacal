@@ -41,7 +41,8 @@ Runtime options:
  -w <walltime>            Walltime, defaults to $DEFAULT_WALLTIME
  -M                       Use queue-specific, non-MPI-based daliuge cluster startup mechanism
  -p <pgtp path>           Absolute path to the physical graph template
- -d                       Direct run (no queueing system, no mpirun)"
+ -d                       Direct run/Docker run
+ -q                       Queue or parition in batch submission system
 
 Runtime paths:
  -b <baseline-exclusion>  The file containing the baseline exclusion map
@@ -75,10 +76,11 @@ verbosity=1
 remote_mechanism=mpi
 walltime=$DEFAULT_WALLTIME
 ms_outdir=
+queue_name=inspur-gpu-ib
 # physical graph template partition
 pgtp=
 
-while getopts "h?V:o:n:c:f:s:T:I:r:E:e:b:t:S:agv:w:i:Mp:m:d" opt
+while getopts "h?V:o:n:c:f:s:T:I:r:E:e:b:t:S:agv:w:i:Mp:m:dq:" opt
 do
 	case "$opt" in
 		h?)
@@ -154,6 +156,9 @@ do
 		d)
 			direct_run=yes
 			;;
+		q)
+			queue_name="$OPTARG"
+			;;
 		*)
 			print_usage 1>&2
 			exit 1
@@ -222,15 +227,34 @@ s%SIGNAL_GENERATOR_ERROR_TOLERANCE%$signal_generator_error_tolerance%
 s%SINK_ERROR_TOLERANCE%$sink_error_tolerance%
 " `abspath $this_dir/graphs/$logical_graph` > $outdir/lg.json
 
+# Add check for GPUs here so can be used by direct/docker and sbatch only
+request_gpus=
+if [ $use_gpus = 1 ]; then
+	request_gpus="--gres=gpu:${channels_per_node}"
+fi
 
 # Submit differently depending on your queueing system
 if [ ${direct_run} = yes ]; then
-	 . $this_dir/run_ingest_graph.sh \
+#	 . $this_dir/run_ingest_graph.sh \
+#	         "$venv" "$outdir" "$apps_rootdir" yes \
+#	         $start_freq $freq_step $channels_per_node \
+#	         $islands $verbosity ${remote_mechanism:-slurm} \
+#	         $nodes $relay_base_port "$pgtp"
+#	return
+	sbatch --ntasks-per-node=1 \
+	       -o "$outdir"/ingest_graph.log \
+	       -N $nodes \
+	       -t ${walltime} \
+	       -J ingest_graph \
+	       ${request_gpus} \
+	       -c $((${channels_per_node} + 4)) \
+	       -p $queue_name \
+	       $this_dir/run_ingest_graph.sh \
 	         "$venv" "$outdir" "$apps_rootdir" yes \
 	         $start_freq $freq_step $channels_per_node \
 	         $islands $verbosity ${remote_mechanism:-slurm} \
 	         $nodes $relay_base_port "$pgtp"
-	return
+	exit 0
 fi
 
 
@@ -256,10 +280,6 @@ if [ ! -z "$(command -v bsub 2> /dev/null)" ]; then
 	        $islands $verbosity ${remote_mechanism:-dlg-hybrid} \
 	        $nodes $relay_base_port "$pgtp"
 elif [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
-	request_gpus=
-	if [ $use_gpus = 1 ]; then
-		request_gpus="--gres=gpu:${channels_per_node}"
-	fi
 	sbatch --ntasks-per-node=1 \
 	       -o "$outdir"/ingest_graph.log \
 	       -N $nodes \
