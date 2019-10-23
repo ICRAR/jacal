@@ -58,7 +58,8 @@ RUN apt-get update && \
     liblog4cxx-dev \
     libopenblas-dev \
     libopenmpi-dev  \
-    wcslib-dev
+    wcslib-dev \
+    openssh-client
 
 #############################################################
 ## This looks odd, but as the CUDA is in /usr/local I don't want to
