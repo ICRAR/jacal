@@ -309,7 +309,7 @@
                 {
                     "name": "command",
                     "text": "Command",
-                    "value": "/home/yandasoft/build/apps/mssplit -c /data/mssplit.in"
+                    "value": "/home/yandasoft/askap-pipelinetasks/build/askap/pipelinetasks/mssplit -c /data/mssplit.in"
                 },
                 {
                     "name": "user",
