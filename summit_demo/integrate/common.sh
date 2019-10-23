@@ -42,7 +42,7 @@ load_modules() {
 		export BLDR_ROOT_DIR=/ssd/summit_pipeline/bldr
 		if [[ -d $BLDR_ROOT_DIR ]]
 		then
-        		pushd $PLEIADES_BLDR_ROOT_DIR > /dev/null
+        		pushd $BLDR_ROOT_DIR > /dev/null
         		source ./scripts/setup.sh
         		popd > /dev/null
 		else
