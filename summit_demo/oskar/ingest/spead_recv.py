@@ -317,6 +317,8 @@ class VisibilityMSWriter(SpeadReceiver):
                 pass
             if baseline_map:
                 self.setup_baseline_filtering(baseline_map)
+            else:
+                self._baseline_map = None
             self.create_receivers()
         except:
             self.close(graceful=False)
@@ -353,10 +355,11 @@ class VisibilityMSWriter(SpeadReceiver):
         # check that the number of baselines the user supplied is the same
         # as the simulation baseline count. Only need to do this on the writing of
         # the MS as we don't do baseline exclusion on the relay.
-        supplied_baseline_count = len(self._baseline_exclude) + len(self._baseline_map)
-        if supplied_baseline_count != self._header['num_baselines']:
-            raise Exception('User baseline map != simulation baseline count {} != {}'
-                            .format(supplied_baseline_count, self._header['num_baselines']))
+        if self._baseline_map:
+            supplied_baseline_count = len(self._baseline_exclude) + len(self._baseline_map)
+            if supplied_baseline_count != self._header['num_baselines']:
+                raise Exception('User baseline map != simulation baseline count {} != {}'
+                                .format(supplied_baseline_count, self._header['num_baselines']))
 
         num_channels = first_datum['num_channels']
         if self.average:
@@ -415,12 +418,17 @@ class VisibilityMSWriter(SpeadReceiver):
         start_row *= num_baselines
         logger.info('Writing %d rows starting at row %d', num_baselines, start_row)
         if first_datum['channel_index'] == 0:
-            uu = np.array(
-                [i for j, i in enumerate(first_datum['vis']['uu']) if j not in self._baseline_exclude])
-            vv = np.array(
-                [i for j, i in enumerate(first_datum['vis']['vv']) if j not in self._baseline_exclude])
-            ww = np.array(
-                [i for j, i in enumerate(first_datum['vis']['ww']) if j not in self._baseline_exclude])
+            if self._baseline_exclude:
+                uu = np.array(
+                    [i for j, i in enumerate(first_datum['vis']['uu']) if j not in self._baseline_exclude])
+                vv = np.array(
+                    [i for j, i in enumerate(first_datum['vis']['vv']) if j not in self._baseline_exclude])
+                ww = np.array(
+                    [i for j, i in enumerate(first_datum['vis']['ww']) if j not in self._baseline_exclude])
+            else:
+                uu = first_datum['vis']['uu']
+                vv = first_datum['vis']['vv']
+                ww = first_datum['vis']['ww']
             self._measurement_set.write_coords(
                 start_row,
                 num_baselines,
