@@ -39,7 +39,8 @@ class TestAdios2Pipeline(unittest.TestCase):
             telescope_model_path='./conf/%s.tm' % tm,
             sky_model_file_path="./conf/eor_model_list.csv",
             num_time_steps=int(os.environ.get('NUM_TIME_STEPS', 1)),
-            baseline_exclusion_map_path='./conf/%s_baselines.csv' % tm
+            baseline_exclusion_map_path='./conf/%s_baselines.csv' % tm,
+            num_repetitions=int(os.environ.get('NUM_REPETITIONS', 100))
         )
         ms = FileDROP('2', '2', filepath=output)
         signal.addOutput(ms)

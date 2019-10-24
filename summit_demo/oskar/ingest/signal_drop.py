@@ -45,6 +45,7 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
         self.sky_model_file_path = kwargs.get('sky_model_file_path')
         self.obs_length = kwargs.get('obs_length', '06:00:00.0')
         self.num_time_steps = int(kwargs.get('num_time_steps', 5))
+        num_repetitions = int(kwargs.get('num_repetitions', 1))
 
         # mode of operations
         self.mode = int(kwargs.get('mode', 0))
@@ -69,7 +70,8 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
                     "port": 0,
                     "host": "127.0.0.1"
                 },
-            "write_ms": 0
+            "write_ms": 0,
+            "num_repetitions": num_repetitions
         }
 
         # SPEAD recv and avg local config template

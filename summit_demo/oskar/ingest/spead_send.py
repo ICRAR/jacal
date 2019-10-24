@@ -20,6 +20,7 @@ class SpeadSender(oskar.Interferometer):
     def __init__(self, spead_config, precision=None, oskar_settings=None):
         logger.info("Creating OSKAR interferometer")
         oskar.Interferometer.__init__(self, precision, oskar_settings)
+        self.num_repetitions = spead_config['num_repetitions']
         self._streams = []
         self._vis_pack = None
         self._write_ms = spead_config['write_ms']
@@ -141,14 +142,15 @@ class SpeadSender(oskar.Interferometer):
                 self._vis_pack['ww'] = block.baseline_ww_metres()[t, :]
                 self._vis_pack['amp'] = block.cross_correlations()[t, c, :, :]
 
-                # Channel index is relative to the channels in the stream.
-                heap['channel_index'].value = (
-                    channel_index - stream_index * max_channels_per_stream)
-
-                # Update the heap and send it.
-                heap['vis'].value = self._vis_pack
-                heap['time_index'].value = block.start_time_index + t
-                stream.send_heap(heap.get_heap())
+                for repetition in range(self.num_repetitions):
+                    # Channel index is relative to the channels in the stream.
+                    heap['channel_index'].value = (
+                        channel_index - stream_index * max_channels_per_stream)
+                    # Update the heap and send it.
+                    heap['vis'].value = self._vis_pack
+                    heap['time_index'].value = (block.start_time_index + t) * self.num_repetitions + repetition
+                    logger.debug('Sending heap, repetition %d/%d, row=%d', repetition + 1, self.num_repetitions, heap['time_index'].value)
+                    stream.send_heap(heap.get_heap())
 
     def _create_heaps(self, block):
         """Create SPEAD heap items based on content of the visibility block.
