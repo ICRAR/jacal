@@ -416,7 +416,7 @@ class VisibilityMSWriter(SpeadReceiver):
             start_row *= self.mpi_comm.Get_size()
             start_row += self.mpi_comm.Get_rank()
         start_row *= num_baselines
-        logger.info('Writing %d rows starting at row %d', num_baselines, start_row)
+        logger.debug('Writing %d rows starting at row %d', num_baselines, start_row)
         if first_datum['channel_index'] == 0:
             if self._baseline_exclude:
                 uu = np.array(
@@ -437,7 +437,7 @@ class VisibilityMSWriter(SpeadReceiver):
                 self._header['time_start_mjd_utc'] * 86400 +
                 time_inc_sec * (first_datum['time_index'] + 0.5))
 
-        logger.info('Writing visibilities for %d channel(s) to Measurement Set', num_channels)
+        logger.debug('Writing visibilities for %d channel(s) to Measurement Set', num_channels)
         self._measurement_set.write_vis(
             start_row,
             first_datum['channel_index'], num_channels,
