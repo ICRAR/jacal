@@ -57,9 +57,10 @@ export OMP_NUM_THREADS=1
 # TODO: Just a copy, with updates!, from run_image_graph.sh, needs fixing
 if [ $direct_run = yes ]; then
 	pushd ../.. > /dev/null;export bindmount=`pwd`;popd > /dev/null
-	docker run -d -it --name daliuge          --net=host         --mount type=bind,source=$bindmount,target=$bindmount      -u $(id -u ${USER}):$(id -g ${USER})     --workdir $outdir         --gpus all          --env OMP_NUM_THREADS --env USER --env PYTHONPATH=$bindmount/oskar/ingest         192.168.6.123:5000/yanda/summit-demo       dlg nm -vvv -H 0.0.0.0 --log-dir "daliuge-nm-$(hostname -I | grep -Po '192\.168\.6\.[0-9]+')"     --max-request-size 10          --dlg-path $bindmount/oskar/ingest
+	docker run -d -it --rm --name daliuge          --net=host         --mount type=bind,source=$bindmount,target=$bindmount      -u $(id -u ${USER}):$(id -g ${USER})     --workdir $outdir         --gpus all          --env OMP_NUM_THREADS --env USER --env PYTHONPATH=$bindmount/oskar/ingest         192.168.6.123:5000/yanda/summit-demo       dlg nm -vvv -H 0.0.0.0 --log-dir "daliuge-nm-$(hostname -I | grep -Po '192\.168\.6\.[0-9]+')"     --max-request-size 10          --dlg-path $bindmount/oskar/ingest
 	docker run -i --rm --name daliuge-unroll  --net=host  --mount type=bind,source=$bindmount,target=$bindmount     --workdir $outdir          192.168.6.123:5000/yanda/summit-demo dlg unroll-and-partition $graph_option | python -m modify_ingest_pg $start_freq $freq_step $gpus_per_node $relay_base_port > $outdir/pg.json
-	cat $outdir/pg.json | sed 's/#0/127.0.0.1/g' | docker run -i --rm --name daliuge-submit --net=host --mount type=bind,source=$bindmount,target=$bindmount     --workdir $outdir          192.168.6.123:5000/yanda/summit-demo dlg submit -p 8000
+	cat $outdir/pg.json | sed 's/#0/127.0.0.1/g' | docker run -i --rm --name daliuge-submit --net=host --mount type=bind,source=$bindmount,target=$bindmount     --workdir $outdir          192.168.6.123:5000/yanda/summit-demo dlg submit -w -p 8000
+	docker stop daliuge
 	exit 0
 fi
 
