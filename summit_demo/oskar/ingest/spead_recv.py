@@ -365,7 +365,6 @@ class VisibilityMSWriter(SpeadReceiver):
         if self.average:
             num_channels *= len(data)
 
-        is_rank0 = True
         msg = 'Creating %s MS under %s using %d antennas, %d channels'
         args = ('ADIOS' if self.use_adios2 else 'standard', self._file_name,
                 first_datum['num_stations'], num_channels)
