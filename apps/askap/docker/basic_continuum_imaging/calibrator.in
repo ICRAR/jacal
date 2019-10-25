@@ -1,0 +1,16 @@
+Ccalibrator.dataset                         = /data/ms/ASKAP_example.ms
+Ccalibrator.nAnt                            = 10
+Ccalibrator.nBeam                           = 10
+Ccalibrator.solve                           = gains
+#
+Ccalibrator.calibaccess                     = parset
+Ccalibrator.calibaccess.parset              = /data/ms/caldata-BEAM0.dat
+#
+Ccalibrator.sources.names                   = [field1]
+Ccalibrator.sources.field1.direction        = [19h39m25.036, -63.42.45.63, J2000]
+Ccalibrator.sources.field1.components       = src
+Ccalibrator.sources.src.calibrator          = 1934-638
+#
+Ccalibrator.gridder                         = SphFunc
+#
+Ccalibrator.ncycles                         = 5
