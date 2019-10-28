@@ -15,7 +15,7 @@ export CC=/sw/summit/gcc/6.4.0/bin/gcc
 export CXX=/sw/summit/gcc/6.4.0/bin/g++
 export FC=/sw/summit/gcc/6.4.0/bin/gfortran
 
-export SUMMIT_VENV=/gpfs/alpine/ast157/proj-shared/jacal_install
+export SUMMIT_VENV=/gpfs/alpine/ast157/proj-shared/parallel_ms_writer_with_adios2/jacal_install
 export PATH=$SUMMIT_VENV/bin:$PATH
 export CPATH=$SUMMIT_VENV/include:$CPATH
 export LIBRARY_PATH=$SUMMIT_VENV/lib:$SUMMIT_VENV/lib64:$LIBRARY_PATH
