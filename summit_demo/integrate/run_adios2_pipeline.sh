@@ -13,6 +13,7 @@ use_gpus=${10}
 verbosity=${11}
 telescope_model=${12}
 adios2_bufsize=${13}
+adios2_engine=${14}
 
 . common.sh
 
@@ -30,6 +31,7 @@ echo use_gpus = $use_gpus
 echo verbosity = $verbosity
 echo telescope_model = $telescope_model
 echo adios2_bufsize = $adios2_bufsize
+echo adios2_engine = $adios2_engine
 echo "**************************************"
 
 load_modules
@@ -61,6 +63,7 @@ export NUM_TIME_STEPS=$time_steps
 export NUM_REPETITIONS=$repetitions
 export CHANNELS_PER_NODE=$channels_per_node
 export ADIOS2_MAX_BUF_SIZE=$adios2_bufsize
+export ADIOS2_ENGINE=$adios2_engine
 export ADIOS2_ALL_COLUMNS=1
 
 $runner \

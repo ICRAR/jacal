@@ -9,6 +9,7 @@ DEFAULT_NUM_REPETITIONS=100
 DEFAULT_WALLTIME=00:30:00
 DEFAULT_TELESCOPE_MODEL=AA4
 DEFAULT_ADIOS2_BUFSIZE=10Gb
+DEFAULT_ADIOS2_ENGINE=BP3
 
 # Load common functionality
 cmd="cd \$(dirname $0); echo \$PWD; cd \$OLDPWD"
@@ -36,6 +37,7 @@ Runtime options:
  -w <walltime>            Walltime, defaults to $DEFAULT_WALLTIME
  -t <telescope-model>     The telescope model to use, defaults to $DEFAULT_TELESCOPE_MODEL
  -b <adios2-bufsize>      Maximum buffer size to be used by ADIOS2, defaults to $DEFAULT_ADIOS2_BUFSIZE
+ -e <adios2-engine>       The engine to use with ADIOS2, defaults to $DEFAULT_ADIOS2_ENGINE
 EOF
 }
 
@@ -53,8 +55,9 @@ verbosity=1
 walltime=$DEFAULT_WALLTIME
 telescope_model=$DEFAULT_TELESCOPE_MODEL
 adios2_bufsize=$DEFAULT_ADIOS2_BUFSIZE
+adios2_engine=$DEFAULT_ADIOS2_ENGINE
 
-while getopts "h?V:o:n:c:f:s:T:r:gv:w:t:b:" opt
+while getopts "h?V:o:n:c:f:s:T:r:gv:w:t:b:e:" opt
 do
 	case "$opt" in
 		h?)
@@ -100,6 +103,9 @@ do
 		b)
 			adios2_bufsize="$OPTARG"
 			;;
+		e)
+			adios2_engine="$OPTARG"
+			;;
 		*)
 			print_usage 1>&2
 			exit 1
@@ -123,7 +129,7 @@ if [ ! -z "$(command -v bsub 2> /dev/null)" ]; then
 	     $this_dir/run_adios2_pipeline.sh \
 	        "$venv" "$outdir" "$apps_rootdir" \
 	        $nodes $channels_per_node $start_freq $freq_step $time_steps $repetitions \
-	        $use_gpus $verbosity $telescope_model $adios2_bufsize
+	        $use_gpus $verbosity $telescope_model $adios2_bufsize $adios2_engine
 elif [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	request_gpus=
 	if [ $use_gpus = 1 ]; then
@@ -139,7 +145,7 @@ elif [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	       $this_dir/run_adios2_pipeline.sh \
 	           "$venv" "$outdir" "$apps_rootdir" \
 	           $nodes $channels_per_node $start_freq $freq_step $time_steps $repetitions \
-	           $use_gpus $verbosity $telescope_model $adios2_bufsize
+	           $use_gpus $verbosity $telescope_model $adios2_bufsize $adios2_engine
 else
 	error "Queueing system not supported, add support please"
 fi
