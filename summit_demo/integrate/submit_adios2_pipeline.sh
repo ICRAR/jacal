@@ -4,7 +4,6 @@ DEFAULT_NODES=1
 DEFAULT_CHANNELS_PER_NODE=6
 DEFAULT_START_FREQ=45991200
 DEFAULT_FREQ_STEP=6400
-DEFAULT_NUM_TIME_STEPS=1
 DEFAULT_NUM_REPETITIONS=100
 DEFAULT_WALLTIME=00:30:00
 DEFAULT_TELESCOPE_MODEL=AA4
@@ -30,7 +29,6 @@ Runtime options:
  -c <channels-per-node>   #channels to simulate per node, defaults to $DEFAULT_CHANNELS_PER_NODE
  -f <start-freq>          Global start frequency, in Hz. Default=$DEFAULT_START_FREQ
  -s <freq-step>           Frequency step, in Hz. Default=$DEFAULT_FREQ_STEP
- -T <time-steps>          Number of time steps. Default=$DEFAULT_NUM_TIME_STEPS
  -r <repetitions>         Number of times each time step is written. Default=$DEFAULT_NUM_REPETITIONS
  -g                       Use GPUs (one per channel)
  -v <verbosity>           1=INFO (default), 2=DEBUG
@@ -48,7 +46,6 @@ nodes=$DEFAULT_NODES
 channels_per_node=$DEFAULT_CHANNELS_PER_NODE
 start_freq=$DEFAULT_START_FREQ
 freq_step=$DEFAULT_FREQ_STEP
-time_steps=$DEFAULT_NUM_TIME_STEPS
 repetitions=$DEFAULT_NUM_REPETITIONS
 use_gpus=0
 verbosity=1
@@ -57,7 +54,7 @@ telescope_model=$DEFAULT_TELESCOPE_MODEL
 adios2_bufsize=$DEFAULT_ADIOS2_BUFSIZE
 adios2_engine=$DEFAULT_ADIOS2_ENGINE
 
-while getopts "h?V:o:n:c:f:s:T:r:gv:w:t:b:e:" opt
+while getopts "h?V:o:n:c:f:s:r:gv:w:t:b:e:" opt
 do
 	case "$opt" in
 		h?)
@@ -81,9 +78,6 @@ do
 			;;
 		s)
 			freq_step=$OPTARG
-			;;
-		T)
-			time_steps=$OPTARG
 			;;
 		r)
 			repetitions=$OPTARG
@@ -128,7 +122,7 @@ if [ ! -z "$(command -v bsub 2> /dev/null)" ]; then
 	     -J adios2_pipeline \
 	     $this_dir/run_adios2_pipeline.sh \
 	        "$venv" "$outdir" "$apps_rootdir" \
-	        $nodes $channels_per_node $start_freq $freq_step $time_steps $repetitions \
+	        $nodes $channels_per_node $start_freq $freq_step $repetitions \
 	        $use_gpus $verbosity $telescope_model $adios2_bufsize $adios2_engine
 elif [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	request_gpus=
@@ -144,7 +138,7 @@ elif [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	       -c $((${channels_per_node} + 4)) \
 	       $this_dir/run_adios2_pipeline.sh \
 	           "$venv" "$outdir" "$apps_rootdir" \
-	           $nodes $channels_per_node $start_freq $freq_step $time_steps $repetitions \
+	           $nodes $channels_per_node $start_freq $freq_step $repetitions \
 	           $use_gpus $verbosity $telescope_model $adios2_bufsize $adios2_engine
 else
 	error "Queueing system not supported, add support please"

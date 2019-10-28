@@ -7,13 +7,12 @@ nodes=$4
 channels_per_node=$5
 start_freq=$6
 freq_step=$7
-time_steps=$8
-repetitions=$9
-use_gpus=${10}
-verbosity=${11}
-telescope_model=${12}
-adios2_bufsize=${13}
-adios2_engine=${14}
+repetitions=$8
+use_gpus=${9}
+verbosity=${10}
+telescope_model=${11}
+adios2_bufsize=${12}
+adios2_engine=${13}
 
 . common.sh
 
@@ -25,7 +24,6 @@ echo nodes = $nodes
 echo channels_per_node = $channels_per_node
 echo start_freq = $start_freq
 echo freq_step = $freq_step
-echo time_steps = $time_steps
 echo repetitions = $repetitions
 echo use_gpus = $use_gpus
 echo verbosity = $verbosity
@@ -59,7 +57,7 @@ export START_FREQ=$start_freq
 export FREQ_STEP=$freq_step
 export USE_GPUS=$use_gpus
 export NUM_CHANNELS=1
-export NUM_TIME_STEPS=$time_steps
+export NUM_TIME_STEPS=1
 export NUM_REPETITIONS=$repetitions
 export CHANNELS_PER_NODE=$channels_per_node
 export ADIOS2_MAX_BUF_SIZE=$adios2_bufsize
