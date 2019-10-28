@@ -9,6 +9,7 @@ DEFAULT_WALLTIME=00:30:00
 DEFAULT_TELESCOPE_MODEL=AA4
 DEFAULT_ADIOS2_BUFSIZE=10Gb
 DEFAULT_ADIOS2_ENGINE=BP3
+DEFAULT_ADIOS2_THREADS=1
 
 # Load common functionality
 cmd="cd \$(dirname $0); echo \$PWD; cd \$OLDPWD"
@@ -36,6 +37,8 @@ Runtime options:
  -t <telescope-model>     The telescope model to use, defaults to $DEFAULT_TELESCOPE_MODEL
  -b <adios2-bufsize>      Maximum buffer size to be used by ADIOS2, defaults to $DEFAULT_ADIOS2_BUFSIZE
  -e <adios2-engine>       The engine to use with ADIOS2, defaults to $DEFAULT_ADIOS2_ENGINE
+ -T <adios2-threads>      #Threads ADIOS2 should use, defaults to $DEFAULT_ADIOS2_THREADS
+ -C                       Disable ADIOS2 collective metadata gatherting (BP3 only)
 EOF
 }
 
@@ -53,8 +56,10 @@ walltime=$DEFAULT_WALLTIME
 telescope_model=$DEFAULT_TELESCOPE_MODEL
 adios2_bufsize=$DEFAULT_ADIOS2_BUFSIZE
 adios2_engine=$DEFAULT_ADIOS2_ENGINE
+adios2_threads=$DEFAULT_ADIOS2_THREADS
+adios2_collective_metadata=ON
 
-while getopts "h?V:o:n:c:f:s:r:gv:w:t:b:e:" opt
+while getopts "h?V:o:n:c:f:s:r:gv:w:t:b:e:T:C" opt
 do
 	case "$opt" in
 		h?)
@@ -100,6 +105,12 @@ do
 		e)
 			adios2_engine="$OPTARG"
 			;;
+		T)
+			adios2_threads="$OPTARG"
+			;;
+		C)
+			adios2_collective_metadata=OFF
+			;;
 		*)
 			print_usage 1>&2
 			exit 1
@@ -123,7 +134,8 @@ if [ ! -z "$(command -v bsub 2> /dev/null)" ]; then
 	     $this_dir/run_adios2_pipeline.sh \
 	        "$venv" "$outdir" "$apps_rootdir" \
 	        $nodes $channels_per_node $start_freq $freq_step $repetitions \
-	        $use_gpus $verbosity $telescope_model $adios2_bufsize $adios2_engine
+	        $use_gpus $verbosity $telescope_model \
+	        $adios2_bufsize $adios2_engine $adios2_threads $adios2_collective_metadata
 elif [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	request_gpus=
 	if [ $use_gpus = 1 ]; then
@@ -139,7 +151,8 @@ elif [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 	       $this_dir/run_adios2_pipeline.sh \
 	           "$venv" "$outdir" "$apps_rootdir" \
 	           $nodes $channels_per_node $start_freq $freq_step $repetitions \
-	           $use_gpus $verbosity $telescope_model $adios2_bufsize $adios2_engine
+	           $use_gpus $verbosity $telescope_model \
+	           $adios2_bufsize $adios2_engine $adios2_threads $adios2_collective_metadata
 else
 	error "Queueing system not supported, add support please"
 fi

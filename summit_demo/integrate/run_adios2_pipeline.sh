@@ -13,6 +13,8 @@ verbosity=${10}
 telescope_model=${11}
 adios2_bufsize=${12}
 adios2_engine=${13}
+adios2_threads=${14}
+adios2_collective_metadata=${15}
 
 . common.sh
 
@@ -30,6 +32,8 @@ echo verbosity = $verbosity
 echo telescope_model = $telescope_model
 echo adios2_bufsize = $adios2_bufsize
 echo adios2_engine = $adios2_engine
+echo adios2_threads = $adios2_threads
+echo adios2_collective_metadata = $adios2_collective_metadata
 echo "**************************************"
 
 load_modules
@@ -62,6 +66,8 @@ export NUM_REPETITIONS=$repetitions
 export CHANNELS_PER_NODE=$channels_per_node
 export ADIOS2_MAX_BUF_SIZE=$adios2_bufsize
 export ADIOS2_ENGINE=$adios2_engine
+export ADIOS2_THREADS=$adios2_threads
+export ADIOS2_COLLECTIVE_METADATA=$adios2_collective_metadata
 export ADIOS2_ALL_COLUMNS=1
 
 $runner \
