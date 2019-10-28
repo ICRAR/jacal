@@ -9,6 +9,7 @@ CC=gcc
 INCLUDE_DIRS_DLG = -I`python -c "import dlg; print(dlg.get_include_dir())"`
 INCLUDE_DIRS = -I/usr/local/include \
                -I/usr/local/include/askap \
+               -I/usr/local/include/askap/scimath
 
 LIBRARY_DIRS = -L/usr/local/lib
 

@@ -43,7 +43,9 @@ RUN apt-get install -y \
     libboost-signals-dev \
     libboost-system-dev \
     libboost-thread-dev \
-    libcfitsio-dev
+    libcfitsio-dev \
+    liblog4cxx-dev \
+    wcslib-dev
 
 #############################################################
 ## Copy the YandaSoft libraries we need
@@ -53,6 +55,7 @@ COPY --from=jacal-003-build-yandasoft $PREFIX $PREFIX
 ## Copy the Daliuge libraries we need
 COPY --from=jacal-004-daliuge $PREFIX $PREFIX
 ENV PATH=$PREFIX/bin:$PATH
+RUN ldconfig
 
 #############################################################
 ## Move to the correct location
