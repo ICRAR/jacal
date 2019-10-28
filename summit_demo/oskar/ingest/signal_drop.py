@@ -46,6 +46,7 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
         self.obs_length = kwargs.get('obs_length', '06:00:00.0')
         self.num_time_steps = int(kwargs.get('num_time_steps', 5))
         num_repetitions = int(kwargs.get('num_repetitions', 1))
+        self.gpu_index_base = int(kwargs.get('gpu_index_base', 0))
 
         # mode of operations
         self.mode = int(kwargs.get('mode', 0))
@@ -154,7 +155,7 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
             oskar_conf = copy.deepcopy(self.oskar_conf)
             oskar_conf["observation"]["start_frequency_hz"] = freq
             oskar_conf["observation"]["frequency_inc_hz"] = self.freq_step
-            oskar_conf["simulator"]["cuda_device_ids"] = i
+            oskar_conf["simulator"]["cuda_device_ids"] = self.gpu_index_base + i
             oskar_conf["simulator"]["use_gpus"] = bool(self.use_gpus)
 
             # set model file for specific freq
