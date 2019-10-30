@@ -6,6 +6,6 @@
 #ifndef RENAME_H
 #define RENAME_H
 
-namespace casa = casacore
+namespace casa = casacore;
 
 #endif
