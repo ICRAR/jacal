@@ -10,6 +10,7 @@
 #ifndef ASKAP_FACTORY_OutputParams_H
 #define ASKAP_FACTORY_OutputParams_H
 
+#include "rename.h"
 #include <daliuge/DaliugeApplication.h>
 #include <factory/NEUtils.h>
 

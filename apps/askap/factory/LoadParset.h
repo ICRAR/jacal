@@ -8,6 +8,8 @@
 #ifndef ASKAP_FACTORY_LOADPARSET_H
 #define ASKAP_FACTORY_LOADPARSET_H
 
+#include "rename.h"
+
 #include <daliuge/DaliugeApplication.h>
 
 #include <boost/shared_ptr.hpp>

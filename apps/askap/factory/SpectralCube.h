@@ -8,6 +8,7 @@
 #ifndef ASKAP_FACTORY_SPECTRALCUBE_H
 #define ASKAP_FACTORY_SPECTRALCUBE_H
 
+#include "rename.h"
 #include <daliuge/DaliugeApplication.h>
 
 #include <imageaccess/ImageAccessFactory.h>

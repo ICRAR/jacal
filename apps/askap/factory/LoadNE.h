@@ -10,6 +10,8 @@
 #ifndef ASKAP_FACTORY_LOADNE_H
 #define ASKAP_FACTORY_LOADNE_H
 
+#include "rename.h"
+
 #include <daliuge/DaliugeApplication.h>
 
 #include <casacore/casa/Quanta/MVDirection.h>

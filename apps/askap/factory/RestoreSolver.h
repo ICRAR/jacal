@@ -10,6 +10,7 @@
 #ifndef ASKAP_FACTORY_RestoreSolver_H
 #define ASKAP_FACTORY_RestoreSolver_H
 
+#include "rename.h"
 #include <daliuge/DaliugeApplication.h>
 #include <factory/NEUtils.h>
 

@@ -5,6 +5,8 @@
 #ifndef ASKAP_DALIUGE_APPLICATION_FACTORY_H_
 #define ASKAP_DALIUGE_APPLICATION_FACTORY_H_
 
+#include "rename.h"
+
 // System includes
 #include<map>
 #include<mutex>

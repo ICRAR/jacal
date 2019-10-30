@@ -18,6 +18,8 @@
 #ifndef ASKAP_FACTORY_BP_CALIBRATOR_H
 #define ASKAP_FACTORY_BP_CALIBRATOR_H
 
+#include "rename.h"
+
 // own includes
 #include <daliuge/DaliugeApplication.h>
 #include "NEUtils.h"

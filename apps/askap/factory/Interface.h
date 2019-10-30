@@ -6,6 +6,8 @@
 // If Daliuge changes its API - you will have to change these functions
 // but hopefully all the issues will be hidden behind the structures
 
+#include "rename.h"
+
 #include<daliuge/DaliugeApplication.h>
 #include<factory/DaliugeApplicationFactory.h>
 
