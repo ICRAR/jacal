@@ -82,20 +82,20 @@ int NEUtils::getNChan(LOFAR::ParameterSet& parset) {
   // Read from the configruation the list of datasets to process
   const vector<string> ms = getDatasets(parset);
 
-  const casa::MeasurementSet in(ms[0]);
+  const casacore::MeasurementSet in(ms[0]);
 
-  return casa::ROScalarColumn<casa::Int>(in.spectralWindow(),"NUM_CHAN")(0);
+  return casacore::ROScalarColumn<casacore::Int>(in.spectralWindow(),"NUM_CHAN")(0);
 
 }
 
 double NEUtils::getChanWidth(LOFAR::ParameterSet& parset, int chan) {
   //FIXME: Assumes all datasets have the same chanWidth
   const vector<string> ms = getDatasets(parset);
-  const casa::MeasurementSet in(ms[0]);
-  const casa::ROMSColumns srcCols(in);
-  const casa::ROMSSpWindowColumns& sc = srcCols.spectralWindow();
+  const casacore::MeasurementSet in(ms[0]);
+  const casacore::ROMSColumns srcCols(in);
+  const casacore::ROMSSpWindowColumns& sc = srcCols.spectralWindow();
   int srow = sc.nrow()-1;
-  return sc.chanWidth()(srow)(casa::IPosition(1, chan));
+  return sc.chanWidth()(srow)(casacore::IPosition(1, chan));
 }
 
 double NEUtils::getFrequency(LOFAR::ParameterSet& parset, int chan, bool barycentre) {
@@ -104,27 +104,27 @@ double NEUtils::getFrequency(LOFAR::ParameterSet& parset, int chan, bool barycen
   const vector<string> ms = getDatasets(parset);
 
 
-  const casa::MeasurementSet in(ms[0]);
-  const casa::ROMSColumns srcCols(in);
+  const casacore::MeasurementSet in(ms[0]);
+  const casacore::ROMSColumns srcCols(in);
 
-  const casa::ROMSSpWindowColumns& sc = srcCols.spectralWindow();
-  const casa::ROMSFieldColumns& fc = srcCols.field();
-  const casa::ROMSObservationColumns& oc = srcCols.observation();
-  const casa::ROMSAntennaColumns& ac = srcCols.antenna();
-  const casa::ROArrayColumn<casa::Double> times = casa::ROArrayColumn<casa::Double>(oc.timeRange());
-  const casa::ROArrayColumn<casa::Double> ants = casa::ROArrayColumn<casa::Double>(ac.position());
-  const casa::uInt thisRef = casa::ROScalarColumn<casa::Int>(in.spectralWindow(),"MEAS_FREQ_REF")(0);
+  const casacore::ROMSSpWindowColumns& sc = srcCols.spectralWindow();
+  const casacore::ROMSFieldColumns& fc = srcCols.field();
+  const casacore::ROMSObservationColumns& oc = srcCols.observation();
+  const casacore::ROMSAntennaColumns& ac = srcCols.antenna();
+  const casacore::ROArrayColumn<casacore::Double> times = casacore::ROArrayColumn<casacore::Double>(oc.timeRange());
+  const casacore::ROArrayColumn<casacore::Double> ants = casacore::ROArrayColumn<casacore::Double>(ac.position());
+  const casacore::uInt thisRef = casacore::ROScalarColumn<casacore::Int>(in.spectralWindow(),"MEAS_FREQ_REF")(0);
 
-  casa::MVDirection Tangent;
-  casa::Vector<casa::MDirection> DirVec;
-  casa::MVEpoch Epoch;
-  casa::MPosition Position;
+  casacore::MVDirection Tangent;
+  casacore::Vector<casacore::MDirection> DirVec;
+  casacore::MVEpoch Epoch;
+  casacore::MPosition Position;
 
   DirVec = fc.phaseDirMeasCol()(0);
   Tangent = DirVec(0).getValue();
 
   // Read the position on Antenna 0
-  Array<casa::Double> posval;
+  Array<casacore::Double> posval;
   ants.get(0,posval,true);
   vector<double> pval = posval.tovector();
 
@@ -132,21 +132,21 @@ double NEUtils::getFrequency(LOFAR::ParameterSet& parset, int chan, bool barycen
   Quantity(pval[1], "m").getBaseValue(),
   Quantity(pval[2], "m").getBaseValue());
 
-  Position = MPosition(mvobs,casa::MPosition::ITRF);
+  Position = MPosition(mvobs,casacore::MPosition::ITRF);
 
   // Get the Epoch
-  Array<casa::Double> tval;
+  Array<casacore::Double> tval;
   vector<double> tvals;
 
   times.get(0,tval,true);
   tvals = tval.tovector();
   double mjd = tvals[0]/(86400.);
-  casa::MVTime dat(mjd);
+  casacore::MVTime dat(mjd);
 
   Epoch = MVEpoch(dat.day());
   int srow = sc.nrow()-1;
   if (barycentre == false) {
-    return sc.chanFreq()(srow)(casa::IPosition(1, chan));
+    return sc.chanFreq()(srow)(casacore::IPosition(1, chan));
   }
   else {
     // FIXME:
@@ -318,14 +318,14 @@ void NEUtils::receiveNE(askap::scimath::ImagingNormalEquations::ShPtr itsNE, dlg
           if ( parset.isDefined(param) ) {
               ASKAPLOG_WARN_STR(logger, "Frequency in Parset and it may need to be overridden");
           }
-          casa::Int nchanCube = NEUtils::getNChan(parset);
+          casacore::Int nchanCube = NEUtils::getNChan(parset);
           if (nchanCube >= 1) {
             ASKAPLOG_WARN_STR(logger, "Overridding parset frequency with channel based information from measurement set - Am I half a channel out?");
 
             ASKAPLOG_INFO_STR(logger, "Getting base frequency");
-            casa::Double baseFrequency = NEUtils::getFrequency(parset,chan);
+            casacore::Double baseFrequency = NEUtils::getFrequency(parset,chan);
             ASKAPLOG_INFO_STR(logger, "Getting chanwidth");
-            casa::Double chanWidth = NEUtils::getChanWidth(parset,chan);
+            casacore::Double chanWidth = NEUtils::getChanWidth(parset,chan);
             ASKAPLOG_INFO_STR(logger, "Setting chanwidth in parset");
             std::ostringstream pstr;
             pstr<<"["<< baseFrequency <<","<<baseFrequency+chanWidth <<"]";

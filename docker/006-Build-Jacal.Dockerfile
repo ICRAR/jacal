@@ -60,5 +60,5 @@ RUN ldconfig
 #############################################################
 ## Move to the correct location
 WORKDIR /home/jacal/apps/askap
-RUN make -f  Makefile.docker
+#RUN make -f  Makefile.docker
 

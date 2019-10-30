@@ -100,7 +100,7 @@ namespace askap {
     if (it == theirRegistry.end()) {
       // Unknown Application. Try to load from a dynamic library
       // with that lowercase name (without possible template extension).
-      std::string libname(casa::downcase(name));
+      std::string libname(casacore::downcase(name));
       const std::string::size_type pos = libname.find_first_of (".<");
       if (pos != std::string::npos) {
         libname = libname.substr (0, pos);      // only take before . or <
@@ -109,7 +109,7 @@ namespace askap {
       // Do not dlclose the library.
       ASKAPLOG_INFO_STR(logger, "Application " << name.c_str() << " is not in the Daliuge Application registry, attempting to load it dynamically");
 
-      casa::DynLib dl(libname, string("libaskap_"), "register_"+libname, false);
+      casacore::DynLib dl(libname, string("libaskap_"), "register_"+libname, false);
       if (dl.getHandle()) {
         // Successfully loaded. Get the creator function.
         ASKAPLOG_INFO_STR(logger, "Dynamically loaded ASKAP/Daliuge Application " << name.c_str());

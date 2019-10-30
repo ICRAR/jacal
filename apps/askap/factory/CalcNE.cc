@@ -117,8 +117,8 @@ namespace askap {
 
         // FIXME:
         // Arbitrarily setting frequency selection to 1
-        this->freqInterval = casa::IPosition(2,0);
-        this->timeInterval = casa::IPosition(2,0);
+        this->freqInterval = casacore::IPosition(2,0);
+        this->timeInterval = casacore::IPosition(2,0);
 
         this->freqInterval[0] = 0;
         this->freqInterval[1] = 1;
@@ -217,8 +217,8 @@ namespace askap {
             sel->chooseChannels(1, 0);
 
             accessors::IDataConverterPtr conv = ds.createConverter();
-            conv->setFrequencyFrame(casa::MFrequency::Ref(casa::MFrequency::TOPO), "Hz");
-            conv->setDirectionFrame(casa::MDirection::Ref(casa::MDirection::J2000));
+            conv->setFrequencyFrame(casacore::MFrequency::Ref(casacore::MFrequency::TOPO), "Hz");
+            conv->setDirectionFrame(casacore::MDirection::Ref(casacore::MDirection::J2000));
             conv->setEpochFrame();
 
             accessors::IDataSharedIter it = ds.createIterator(sel, conv);

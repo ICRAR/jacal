@@ -191,15 +191,15 @@ namespace askap {
         }
 
 
-        casa::Double baseFrequency = NEUtils::getFrequency(itsParset,0);
-        casa::Double chanWidth = NEUtils::getChanWidth(itsParset,0);
-        casa::Int nchanCube = NEUtils::getNChan(itsParset);
-        casa::Double channelFrequency = NEUtils::getFrequency(itsParset,itsChan);
+        casacore::Double baseFrequency = NEUtils::getFrequency(itsParset,0);
+        casacore::Double chanWidth = NEUtils::getChanWidth(itsParset,0);
+        casacore::Int nchanCube = NEUtils::getNChan(itsParset);
+        casacore::Double channelFrequency = NEUtils::getFrequency(itsParset,itsChan);
 
-        casa::Quantity f0(baseFrequency,"Hz");
+        casacore::Quantity f0(baseFrequency,"Hz");
       /// The width of a channel. THis does <NOT> take account of the variable width
       /// of Barycentric channels
-        casa::Quantity freqinc(chanWidth,"Hz");
+        casacore::Quantity freqinc(chanWidth,"Hz");
 
         std::vector<std::string> toFitParams = itsNe->unknowns();
         std::vector<std::string>::const_iterator iterCol = toFitParams.begin();
@@ -232,13 +232,13 @@ namespace askap {
 
                 ASKAPDEBUGASSERT(other.dataVector().find(*iterCol) != other.dataVector().end());
 
-                const casa::Vector<double> &newDataVec = other.dataVector().find(*iterCol)->second;
-                const casa::CoordinateSystem &newCoordSys = other.coordSys().find(*iterCol)->second;
-                const casa::IPosition &newShape = other.shape().find(*iterCol)->second;
+                const casacore::Vector<double> &newDataVec = other.dataVector().find(*iterCol)->second;
+                const casacore::CoordinateSystem &newCoordSys = other.coordSys().find(*iterCol)->second;
+                const casacore::IPosition &newShape = other.shape().find(*iterCol)->second;
                 /* for writing out as image */
-                casa::Array<double> newDataArr(newShape,newDataVec.data());
+                casacore::Array<double> newDataArr(newShape,newDataVec.data());
 
-                casa::write_array(newDataArr,img_name_arr);
+                casacore::write_array(newDataArr,img_name_arr);
 
                 // boost::shared_ptr<accessors::IImageAccess> itsImageAccessor;
 
@@ -296,9 +296,9 @@ namespace askap {
           if (std::regex_search(*it,m,image))
           {
             ASKAPLOG_INFO_STR(logger, "Matched image and writing "<< *it);
-            const casa::Array<double> imagePixels(itsModel->value(*it));
-            casa::Array<float> floatImagePixels(imagePixels.shape());
-            casa::convertArray<float, double>(floatImagePixels, imagePixels);
+            const casacore::Array<double> imagePixels(itsModel->value(*it));
+            casacore::Array<float> floatImagePixels(imagePixels.shape());
+            casacore::convertArray<float, double>(floatImagePixels, imagePixels);
             itsImageCube->writeSlice(floatImagePixels, itsChan);
           }
 
@@ -306,9 +306,9 @@ namespace askap {
           if (std::regex_search(*it,m,psf))
           {
             ASKAPLOG_INFO_STR(logger,"Matched PSF and writing " << *it);
-            const casa::Array<double> imagePixels(itsModel->value(*it));
-            casa::Array<float> floatImagePixels(imagePixels.shape());
-            casa::convertArray<float, double>(floatImagePixels, imagePixels);
+            const casacore::Array<double> imagePixels(itsModel->value(*it));
+            casacore::Array<float> floatImagePixels(imagePixels.shape());
+            casacore::convertArray<float, double>(floatImagePixels, imagePixels);
             itsPSFCube->writeSlice(floatImagePixels, itsChan);
           }
 
@@ -316,9 +316,9 @@ namespace askap {
           if (std::regex_search(*it,m,residual))
           {
             ASKAPLOG_INFO_STR(logger,"Matched residual and writing " << *it);
-            const casa::Array<double> imagePixels(itsModel->value(*it));
-            casa::Array<float> floatImagePixels(imagePixels.shape());
-            casa::convertArray<float, double>(floatImagePixels, imagePixels);
+            const casacore::Array<double> imagePixels(itsModel->value(*it));
+            casacore::Array<float> floatImagePixels(imagePixels.shape());
+            casacore::convertArray<float, double>(floatImagePixels, imagePixels);
             itsResidualCube->writeSlice(floatImagePixels, itsChan);
           }
 
@@ -326,18 +326,18 @@ namespace askap {
           if (std::regex_search(*it,m,weights))
           {
             ASKAPLOG_INFO_STR(logger,"Matched weights and writing " << *it);
-            const casa::Array<double> imagePixels(itsModel->value(*it));
-            casa::Array<float> floatImagePixels(imagePixels.shape());
-            casa::convertArray<float, double>(floatImagePixels, imagePixels);
+            const casacore::Array<double> imagePixels(itsModel->value(*it));
+            casacore::Array<float> floatImagePixels(imagePixels.shape());
+            casacore::convertArray<float, double>(floatImagePixels, imagePixels);
             itsWeightsCube->writeSlice(floatImagePixels, itsChan);
           }
           // Write restored
             // if (std::regex_search(*it,restored))
             // {
             //   ASKAPLOG_INFO_STR(logger,"Writing " << *it);
-            //   const casa::Array<double> imagePixels(itsModel->value(*it));
-            //   casa::Array<float> floatImagePixels(imagePixels.shape());
-            //   casa::convertArray<float, double>(floatImagePixels, imagePixels);
+            //   const casacore::Array<double> imagePixels(itsModel->value(*it));
+            //   casacore::Array<float> floatImagePixels(imagePixels.shape());
+            //   casacore::convertArray<float, double>(floatImagePixels, imagePixels);
             //   itsRestoredCube->writeSlice(floatImagePixels, itsChan);
             // }
         }
@@ -355,17 +355,17 @@ namespace askap {
                 // Write preconditioned PSF image
                 {
                     ASKAPLOG_INFO_STR(logger,"Writing preconditioned PSF");
-                    const casa::Array<double> imagePixels(params->value("psf.image.slice"));
-                    casa::Array<float> floatImagePixels(imagePixels.shape());
-                    casa::convertArray<float, double>(floatImagePixels, imagePixels);
+                    const casacore::Array<double> imagePixels(params->value("psf.image.slice"));
+                    casacore::Array<float> floatImagePixels(imagePixels.shape());
+                    casacore::convertArray<float, double>(floatImagePixels, imagePixels);
                     itsPSFimageCube->writeSlice(floatImagePixels, chan);
                 }
             // Write Restored image
             {
                 ASKAPLOG_INFO_STR(logger,"Writing Restored Image");
-                const casa::Array<double> imagePixels(itsModel->value("image.slice"));
-                casa::Array<float> floatImagePixels(imagePixels.shape());
-                casa::convertArray<float, double>(floatImagePixels, imagePixels);
+                const casacore::Array<double> imagePixels(itsModel->value("image.slice"));
+                casacore::Array<float> floatImagePixels(imagePixels.shape());
+                casacore::convertArray<float, double>(floatImagePixels, imagePixels);
                 itsRestoredCube->writeSlice(floatImagePixels, itsChan);
             }
         }

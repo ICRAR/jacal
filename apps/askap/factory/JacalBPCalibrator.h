@@ -142,20 +142,20 @@ namespace askap
 
       /// @brief number of antennas to solve for
       /// @return number of antennas to solve for
-      inline casa::uInt nAnt() const { return parset().getInt32("nAnt", 36); }
+      inline casacore::uInt nAnt() const { return parset().getInt32("nAnt", 36); }
 
       /// @brief number of beams to solve for
       /// @return number of beams to solve for
-      inline casa::uInt nBeam() const { return parset().getInt32("nBeam", 1); }
+      inline casacore::uInt nBeam() const { return parset().getInt32("nBeam", 1); }
 
       /// @brief number of channels to solve for
       /// @return number of channels to solve for
-      inline casa::uInt nChan() const { return parset().getInt32("nChan", 304); }
+      inline casacore::uInt nChan() const { return parset().getInt32("nChan", 304); }
 
 
       /// @brief number of channels to solve for
       /// @return number of channels per rank
-      inline casa::uInt nChanPerRank() const { return parset().getInt32("nChanPerRank", 54); }
+      inline casacore::uInt nChanPerRank() const { return parset().getInt32("nChanPerRank", 54); }
 
       inline const std::string dataColumn() const { return this->itsParset.getString("datacolumn", "DATA");}
 
@@ -165,7 +165,7 @@ namespace askap
       /// in the parallel case. This is done because calibration data are sent to the master asynchronously and there is no
       /// way of knowing what iteration in the worker they correspond to without looking at the data.
       /// @return pair of beam (first) and channel (second) indices
-      std::pair<casa::uInt, casa::uInt> currentBeamAndChannel() const;
+      std::pair<casacore::uInt, casacore::uInt> currentBeamAndChannel() const;
 
       /// @brief helper method to invalidate current solution
       void invalidateSolution();
@@ -182,7 +182,7 @@ namespace askap
       /// @param[in] ms Name of data set
       /// @param[in] chan channel to work with
       /// @param[in] beam beam to work with
-      void calcOne(const std::string& ms, const casa::uInt chan, const casa::uInt beam);
+      void calcOne(const std::string& ms, const casacore::uInt chan, const casacore::uInt beam);
 
       /// @brief send current model to the master
       /// @details This method is supposed to be called from workers in the parallel mode and
@@ -255,8 +255,8 @@ namespace askap
       bool isParallel;
 
       // I should use these to make the drop smaller
-      casa::IPosition freqInterval;
-      casa::IPosition timeInterval;
+      casacore::IPosition freqInterval;
+      casacore::IPosition timeInterval;
 
       // the Measurement sets
 

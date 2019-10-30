@@ -123,8 +123,8 @@ namespace askap {
         // Arbitrarily setting frequency selection to 1
 
 
-        this->freqInterval = casa::IPosition(2,0);
-        this->timeInterval = casa::IPosition(2,0);
+        this->freqInterval = casacore::IPosition(2,0);
+        this->timeInterval = casacore::IPosition(2,0);
 
         this->freqInterval[0] = this->itsChan;
         this->freqInterval[1] = this->itsChan+1;
@@ -221,8 +221,8 @@ namespace askap {
             // FIXME: Use time interval and perhaps beam?
 
             accessors::IDataConverterPtr conv = ds.createConverter();
-            conv->setFrequencyFrame(casa::MFrequency::Ref(casa::MFrequency::TOPO), "Hz");
-            conv->setDirectionFrame(casa::MDirection::Ref(casa::MDirection::J2000));
+            conv->setFrequencyFrame(casacore::MFrequency::Ref(casacore::MFrequency::TOPO), "Hz");
+            conv->setDirectionFrame(casacore::MDirection::Ref(casacore::MDirection::J2000));
             conv->setEpochFrame();
 
             accessors::IDataSharedIter it = ds.createIterator(sel, conv);

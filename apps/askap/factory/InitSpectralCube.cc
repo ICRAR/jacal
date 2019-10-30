@@ -174,17 +174,17 @@ namespace askap {
             return -1;
         }
         ASKAPLOG_INFO_STR(logger, "Getting base frequency");
-        casa::Double baseFrequency = NEUtils::getFrequency(itsParset,0);
+        casacore::Double baseFrequency = NEUtils::getFrequency(itsParset,0);
         ASKAPLOG_INFO_STR(logger, "Getting chanwidth");
-        casa::Double chanWidth = NEUtils::getChanWidth(itsParset,0);
+        casacore::Double chanWidth = NEUtils::getChanWidth(itsParset,0);
         ASKAPLOG_INFO_STR(logger, "Getting nchan");
-        casa::Int nchanCube = NEUtils::getNChan(itsParset);
+        casacore::Int nchanCube = NEUtils::getNChan(itsParset);
 
 
-        casa::Quantity f0(baseFrequency,"Hz");
+        casacore::Quantity f0(baseFrequency,"Hz");
     /// The width of a channel. THis does <NOT> take account of the variable width
     /// of Barycentric channels
-        casa::Quantity freqinc(chanWidth,"Hz");
+        casacore::Quantity freqinc(chanWidth,"Hz");
 
     /// these names need to match the spectral cube names - maybe put them in a header?
 

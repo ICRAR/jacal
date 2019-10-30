@@ -26,7 +26,7 @@
 
 namespace askap {
   /// @brief Loads visibility set
-  /// @details Loads a configuration from a file drop and a visibility set from a CASA::Measurement Set
+  /// @details Loads a configuration from a file drop and a visibility set from a casacore::Measurement Set
     class LoadVis : public DaliugeApplication
 
     {
@@ -64,13 +64,13 @@ namespace askap {
 
             // Its channel of data
 
-            casa::IPosition freqInterval;
+            casacore::IPosition freqInterval;
 
 
-            casa::IPosition timeInterval;
+            casacore::IPosition timeInterval;
 
             // Its tangent point
-            std::vector<casa::MVDirection> itsTangent;
+            std::vector<casacore::MVDirection> itsTangent;
 
             int itsChan;
 

@@ -70,13 +70,13 @@ namespace askap {
 
             // Its channel of data
 
-            casa::IPosition freqInterval; ///< which channel range of the measurement set we are interested in
+            casacore::IPosition freqInterval; ///< which channel range of the measurement set we are interested in
 
 
-            casa::IPosition timeInterval;  ///< the time range we are interested in
+            casacore::IPosition timeInterval;  ///< the time range we are interested in
 
             // Its tangent point
-            std::vector<casa::MVDirection> itsTangent; ///< the tangent point of the current grid
+            std::vector<casacore::MVDirection> itsTangent; ///< the tangent point of the current grid
 
 
             // utility to build an Imaging Normal Equation from a parset

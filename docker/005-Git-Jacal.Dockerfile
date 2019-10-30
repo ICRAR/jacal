@@ -40,4 +40,5 @@ RUN git remote add origin https://github.com/ICRAR/jacal.git
 RUN git config core.sparseCheckout true
 RUN echo "apps/" >> .git/info/sparse-checkout
 RUN echo '!*.ms' >> .git/info/sparse-checkout
+RUN echo '!functests' >> .git/info/sparse-checkout
 RUN git pull origin master
