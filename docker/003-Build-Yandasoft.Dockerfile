@@ -37,3 +37,4 @@ RUN ./build_all.sh -s ubuntu -p $PREFIX -S -c -a -r -y -j $JOBS
 # Create a new image based on only the executable parts of the old image
 FROM debian:stretch-slim
 COPY --from=buildenv $PREFIX $PREFIX
+COPY --from=buildenv /home/yandasoft/askap/askap_synthesis.h $PREFIX
