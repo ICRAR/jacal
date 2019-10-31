@@ -33,8 +33,8 @@ FROM python:3.7-slim-stretch as buildenv
 
 ARG PREFIX=/usr/local
 
-RUN apt-get update
-RUN apt-get install -y --no-install-recommends \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
         libc6-dev \
         libffi-dev \
         libssl-dev \
@@ -47,6 +47,10 @@ RUN pip3 install daliuge
 ##############################################################
 # Create a new image based on only the executable parts of the old image
 FROM debian:stretch-slim
+
+# In multistage builds arguments don't copy over
+ARG PREFIX=/usr/local
+
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
@@ -57,5 +61,5 @@ RUN apt-get update && \
         netbase \
         libexpat1
 
-COPY --from=buildenv $PREFIX $PREFIX
-ENV PATH=$PREFIX/bin:$PATH
+COPY --from=buildenv ${PREFIX} ${PREFIX}
+ENV PATH=${PREFIX}/bin:$PATH

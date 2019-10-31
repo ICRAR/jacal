@@ -25,16 +25,21 @@
 #    MA 02111-1307  USA
 #
 
+
 FROM jacal-002-libraries as buildenv
 
 ARG PREFIX=/usr/local
 ARG JOBS=6
 
 WORKDIR /home/yandasoft
-RUN ./build_all.sh -s ubuntu -p $PREFIX -S -c -a -r -y -j $JOBS
+RUN ./build_all.sh -s ubuntu -p ${PREFIX} -S -c -a -r -y -j ${JOBS}
+
+WORKDIR /
 
 ##############################################################
 # Create a new image based on only the executable parts of the old image
 FROM debian:stretch-slim
-COPY --from=buildenv $PREFIX $PREFIX
-COPY --from=buildenv /home/yandasoft/askap/askap_synthesis.h $PREFIX
+# In multistage builds arguments don't copy over
+ARG PREFIX=/usr/local
+COPY --from=buildenv ${PREFIX} ${PREFIX}
+COPY --from=buildenv /home/yandasoft/askap/askap_synthesis.h ${PREFIX}/include/askap

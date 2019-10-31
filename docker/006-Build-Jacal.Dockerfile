@@ -25,13 +25,12 @@
 #    MA 02111-1307  USA
 #
 
-
-
-FROM jacal-005-git-jacal
+FROM jacal-005-git-jacal as buildenv
 
 ARG PREFIX=/usr/local
 
-RUN apt-get install -y \
+RUN apt-get update && \
+    apt-get install -y \
     g++ \
     make
 
@@ -60,5 +59,51 @@ RUN ldconfig
 #############################################################
 ## Move to the correct location
 WORKDIR /home/jacal/apps/askap
-#RUN make -f  Makefile.docker
+ARG PREFIX=/usr/local
+RUN sed -i 's/namespace casa/namespace casacore/'  $PREFIX/include/askap/askap/CasacoreFwdDefines.h
+RUN make -f  Makefile.docker
+
+FROM debian:stretch-slim
+# In multistage builds arguments don't copy over
+ARG PREFIX=/usr/local
+
+RUN apt-get update && \
+    apt-get install -y \
+    libboost-dev \
+    libboost-filesystem-dev \
+    libboost-program-options-dev \
+    libboost-python-dev \
+    libboost-signals-dev \
+    libboost-system-dev \
+    libboost-thread-dev \
+    libc6 \
+    libcfitsio-dev \
+    libexpat1 \
+    libffi-dev \
+    libfftw3-dev \
+    libgsl-dev \
+    liblog4cxx-dev \
+    libopenblas-dev               `# casacore` \
+    libopenmpi-dev                `# adios, casacore, oskar` \
+    libssl1.1 \
+    ca-certificates \
+    netbase \
+    wcslib-dev
+
+ENV PATH=${PREFIX}/bin:$PATH
+
+#############################################################
+## Copy jacal
+COPY --from=buildenv ${PREFIX} ${PREFIX}
+
+#############################################################
+## Copy the YandaSoft libraries we need
+COPY --from=jacal-003-build-yandasoft $PREFIX $PREFIX
+
+#############################################################
+## Copy the Daliuge libraries we need
+COPY --from=jacal-004-daliuge $PREFIX $PREFIX
+ENV PATH=$PREFIX/bin:$PATH
+
+RUN ldconfig
 
