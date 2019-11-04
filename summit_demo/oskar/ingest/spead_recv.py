@@ -6,6 +6,7 @@ import logging
 import math
 import socket
 import subprocess
+import time
 
 import oskar
 import spead2
@@ -17,6 +18,12 @@ import numpy as np
 
 logger = logging.getLogger(__name__)
 
+
+def get_ms_size(msdir):
+    size = 0
+    for root, dirs, files in os.walk(msdir):
+        size += sum(os.path.getsize(os.path.join(root, name)) for name in files)
+    return size
 
 class ToleranceReached(Exception):
     pass
@@ -342,11 +349,13 @@ class VisibilityMSWriter(SpeadReceiver):
         if self._measurement_set:
             logger.info("Closing measurement set %s", self._file_name)
             self._measurement_set = None
+            write_duration = time.time() - self.ms_creation_time
             logger.info("Measurement set closed")
-            ms_size = int(subprocess.check_output(['du', '-bs',
-                self._file_name]).split()[0])
-            logger.info('Measurement set %s volume is %d bytes',
-                    self._file_name, ms_size)
+            if self.mpi_comm and self.mpi_comm.Get_rank() == 0:
+                ms_size = get_ms_size(self._file_name)
+                write_rate_mbs = ms_size / write_duration / 1024 / 1024
+                logger.info('Measurement set %s volume is %d bytes written at %.3f [MB/s]',
+                        self._file_name, ms_size, write_rate_mbs)
 
     def process_header(self, data):
 
@@ -377,6 +386,7 @@ class VisibilityMSWriter(SpeadReceiver):
                 first_datum['freq_start_hz'], first_datum['freq_inc_hz'],
                 self._baseline_map, use_adios2=self.use_adios2,
                 mpi_comm=self.mpi_comm)
+            self.ms_creation_time = time.time()
 
             self._measurement_set.set_phase_centre(
                 math.radians(first_datum['phase_centre_ra_deg']),
