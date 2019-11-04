@@ -28,7 +28,7 @@ channels_per_node = int(os.environ.get('CHANNELS_PER_NODE', 6))
 try:
     from mpi4py import MPI
     rank = MPI.COMM_WORLD.Get_rank()
-    internal_port += rank * 10
+    internal_port += rank
     start_freq += rank * freq_step
     gpu_index = rank % channels_per_node
     logging.info('Using internal/stream ports %d', internal_port)
