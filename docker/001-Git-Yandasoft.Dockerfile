@@ -67,6 +67,9 @@ RUN git clone https://bitbucket.csiro.au/scm/askapsdp/base-accessors.git
 WORKDIR /home/yandasoft
 RUN git clone https://bitbucket.csiro.au/scm/askapsdp/base-components.git
 
+WORKDIR /home/yandasoft
+RUN git clone https://bitbucket.csiro.au/scm/askapsdp/askap-pipelinetasks.git
+
 #############################################################
 ## Get the Common CasaCore data
 WORKDIR $PREFIX/share/casacore/data

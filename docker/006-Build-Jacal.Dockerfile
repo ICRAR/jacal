@@ -59,9 +59,9 @@ RUN ldconfig
 #############################################################
 ## Move to the correct location
 WORKDIR /home/jacal/apps/askap
-ARG PREFIX=/usr/local
 RUN sed -i 's/namespace casa/namespace casacore/'  $PREFIX/include/askap/askap/CasacoreFwdDefines.h
 RUN make -f  Makefile.docker
+RUN cp libaskapsoft_dlg.so $PREFIX/lib
 
 FROM debian:stretch-slim
 # In multistage builds arguments don't copy over
@@ -83,8 +83,8 @@ RUN apt-get update && \
     libfftw3-dev \
     libgsl-dev \
     liblog4cxx-dev \
-    libopenblas-dev               `# casacore` \
-    libopenmpi-dev                `# adios, casacore, oskar` \
+    libopenblas-dev \
+    libopenmpi-dev \
     libssl1.1 \
     ca-certificates \
     netbase \
@@ -106,4 +106,3 @@ COPY --from=jacal-004-daliuge $PREFIX $PREFIX
 ENV PATH=$PREFIX/bin:$PATH
 
 RUN ldconfig
-

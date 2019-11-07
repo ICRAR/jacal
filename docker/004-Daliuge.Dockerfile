@@ -31,18 +31,17 @@
 
 FROM python:3.7-slim-stretch as buildenv
 
-ARG PREFIX=/usr/local
-
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         libc6-dev \
         libffi-dev \
         libssl-dev \
         make \
-        g++
+        g++ \
+        git
 
 RUN pip3 install --upgrade pip
-RUN pip3 install daliuge
+RUN pip3 install git+https://github.com/ICRAR/daliuge.git
 
 ##############################################################
 # Create a new image based on only the executable parts of the old image

@@ -1,6 +1,6 @@
 #
 #    ICRAR - International Centre for Radio Astronomy Research
-#    (c) UWA - The University of Western Australia, 2018
+#    (c) UWA - The University of Western Australia, 2019
 #    Copyright by UWA (in the framework of the ICRAR)
 #
 #    (c) Copyright 2018 CSIRO
@@ -24,23 +24,3 @@
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 #    MA 02111-1307  USA
 #
-
-
-FROM jacal-002-libraries as buildenv
-
-ARG PREFIX=/usr/local
-ARG JOBS=6
-
-WORKDIR /home/yandasoft
-RUN sed -i 's%build_and_install https://bitbucket.csiro.au/scm/askapsdp/askap-analysis.git%#build_and_install https://bitbucket.csiro.au/scm/askapsdp/askap-analysis.git%'  build_all.sh
-RUN ./build_all.sh -s ubuntu -p ${PREFIX} -S -c -a -r -e -y -j ${JOBS}
-
-WORKDIR /
-
-##############################################################
-# Create a new image based on only the executable parts of the old image
-FROM debian:stretch-slim
-# In multistage builds arguments don't copy over
-ARG PREFIX=/usr/local
-COPY --from=buildenv ${PREFIX} ${PREFIX}
-COPY --from=buildenv /home/yandasoft/askap/askap_synthesis.h ${PREFIX}/include/askap
