@@ -1,0 +1,63 @@
+#
+# Skeleton Makefile to compile the code in this module as a shared library. It
+# assumes ASKAPSoft can be found under ASKAP_ROOT and that DALiuGE is installed
+# and can be loaded by the python executable
+#
+CXX=g++
+CC=gcc
+
+INCLUDE_DIRS_DLG = -I`python -c "import dlg; print(dlg.get_include_dir())"`
+INCLUDE_DIRS = -I/usr/local/include \
+               -I/usr/local/include/askap \
+               -I/usr/local/include/askap/scimath
+
+LIBRARY_DIRS = -L/usr/local/lib
+
+ASKAP_LIBS = -llog4cxx -laskap_askap -lcommon -lblob -laskap_accessors -lyanda_synthesis -laskap_scimath -lboost_regex -lboost_system  
+CASA_LIBS = -lcasa_ms -lcasa_tables -lcasa_casa -lcasa_measures -lcasa_coordinates -lcfitsio
+
+# Combined flags
+CXXFLAGS += -DHAVE_CASACORE3 -Dcasa=casacore -std=c++11 -fPIC -I. -g $(INCLUDE_DIRS) $(INCLUDE_DIRS_DLG)
+LDFLAGS += $(LIBRARY_DIRS)
+
+#
+# These are the ones we need to build
+#
+OBJS = factory/DaliugeApplicationFactory.o \
+       factory/Interface.o \
+       factory/LoadParset.o \
+       factory/LoadVis.o \
+       factory/LoadNE.o \
+       factory/NEUtils.o \
+       factory/SolveNE.o \
+       factory/CalcNE.o \
+       factory/OutputParams.o \
+       factory/SpectralCube.o \
+       factory/NESpectralCube.o \
+       factory/InitSpectralCube.o \
+       factory/JacalBPCalibrator.o \
+       factory/MajorCycle.o \
+       factory/RestoreSolver.o
+
+.PHONY: all clean
+
+all: libaskapsoft_dlg.so standalone standalone_cube
+
+clean:
+	rm -f factory/*.o daliuge/*.o *.o *.so standalone standalone_cube
+
+libaskapsoft_dlg.so: $(OBJS)
+	$(CXX) -shared -o $@ $(OBJS) $(LDFLAGS) $(ASKAP_LIBS) $(CASA_LIBS)
+
+standalone: standalone.o libaskapsoft_dlg.so
+	$(CXX) -fstack-protector -o $@ standalone.o -pthread -L. $(LDFLAGS) -laskapsoft_dlg
+standalone_cube: standalone_cube.o libaskapsoft_dlg.so
+	$(CXX) -o $@ standalone_cube.o -I$(INCLUDE_DIRS) -pthread -L. $(LDFLAGS) -laskapsoft_dlg
+
+factory/%.o: factory/%.cc
+	$(CXX) -fstack-protector -c $< $(CXXFLAGS) -o $@
+
+standalone.o: standalone.cpp
+	$(CXX) -fstack-protector -c $< $(CXXFLAGS) -o $@
+standalone_cube.o: standalone_cube.cpp
+	$(CXX) -fstack-protector -c $< $(CXXFLAGS) -o $@
