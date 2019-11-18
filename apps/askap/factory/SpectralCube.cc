@@ -42,32 +42,32 @@ namespace askap {
 #include <Blob/BlobIStream.h>
 // ASKAP Logger
 
-#include <askap/AskapLogging.h>
-#include <askap/AskapError.h>
+#include <askap/askap/AskapLogging.h>
+#include <askap/askap/AskapError.h>
 
 // Data accessors
-#include <dataaccess/TableConstDataSource.h>
-#include <dataaccess/IConstDataIterator.h>
-#include <dataaccess/IDataConverter.h>
-#include <dataaccess/IDataSelector.h>
-#include <dataaccess/IDataIterator.h>
-#include <dataaccess/SharedIter.h>
+#include <askap/dataaccess/TableConstDataSource.h>
+#include <askap/dataaccess/IConstDataIterator.h>
+#include <askap/dataaccess/IDataConverter.h>
+#include <askap/dataaccess/IDataSelector.h>
+#include <askap/dataaccess/IDataIterator.h>
+#include <askap/dataaccess/SharedIter.h>
 
 // Image accessors
-#include <imageaccess/ImageAccessFactory.h>
+#include <askap/imageaccess/ImageAccessFactory.h>
 
 // params helpers
-#include <measurementequation/SynthesisParamsHelper.h>
-#include <measurementequation/ImageParamsHelper.h>
-#include <measurementequation/ImageFFTEquation.h>
-#include <parallel/GroupVisAggregator.h>
+#include <askap/measurementequation/SynthesisParamsHelper.h>
+#include <askap/measurementequation/ImageParamsHelper.h>
+#include <askap/measurementequation/ImageFFTEquation.h>
+#include <askap/parallel/GroupVisAggregator.h>
 
 
-#include <gridding/IVisGridder.h>
-#include <gridding/VisGridderFactory.h>
+#include <askap/gridding/IVisGridder.h>
+#include <askap/gridding/VisGridderFactory.h>
 
 
-#include <utils/PolConverter.h>
+#include <askap/scimath/utils/PolConverter.h>
 
 // casacore
 
@@ -238,19 +238,19 @@ namespace askap {
           ASKAPLOG_INFO_STR(logger,"Configuring New Spectral Cube");
 
 
-          itsImageCube.reset(new cp::CubeBuilder(itsParset, nchanCube, f0, freqinc,img_name));
-          itsPSFCube.reset(new cp::CubeBuilder(itsParset, nchanCube, f0, freqinc, psf_name));
-          itsResidualCube.reset(new cp::CubeBuilder(itsParset, nchanCube, f0, freqinc, residual_name));
-          itsWeightsCube.reset(new cp::CubeBuilder(itsParset, nchanCube, f0, freqinc, weights_name));
+          itsImageCube.reset(new cp::CubeBuilder<casacore::Float>(itsParset, nchanCube, f0, freqinc,img_name));
+          itsPSFCube.reset(new cp::CubeBuilder<casacore::Float>(itsParset, nchanCube, f0, freqinc, psf_name));
+          itsResidualCube.reset(new cp::CubeBuilder<casacore::Float>(itsParset, nchanCube, f0, freqinc, residual_name));
+          itsWeightsCube.reset(new cp::CubeBuilder<casacore::Float>(itsParset, nchanCube, f0, freqinc, weights_name));
         }
         else {
-          itsImageCube.reset(new cp::CubeBuilder(itsParset, img_name));
-          itsPSFCube.reset(new cp::CubeBuilder(itsParset,  psf_name));
-          itsResidualCube.reset(new cp::CubeBuilder(itsParset,  residual_name));
-          itsWeightsCube.reset(new cp::CubeBuilder(itsParset, weights_name));
+          itsImageCube.reset(new cp::CubeBuilder<casacore::Float>(itsParset, img_name));
+          itsPSFCube.reset(new cp::CubeBuilder<casacore::Float>(itsParset,  psf_name));
+          itsResidualCube.reset(new cp::CubeBuilder<casacore::Float>(itsParset,  residual_name));
+          itsWeightsCube.reset(new cp::CubeBuilder<casacore::Float>(itsParset, weights_name));
 
           if (itsParset.getBool("restore", false)) {
-            itsRestoredCube.reset(new cp::CubeBuilder(itsParset, restored_name));
+            itsRestoredCube.reset(new cp::CubeBuilder<casacore::Float>(itsParset, restored_name));
           }
 
           handleImageParams();
@@ -349,33 +349,6 @@ namespace askap {
       catch (...) {
         std::cout << "Unknown exception caught: " << '\n';
       }
-        /*
-        if (itsParset.getBool("restore", false)) {
-
-            if (itsDoingPreconditioning) {
-                // Write preconditioned PSF image
-                {
-                    ASKAPLOG_INFO_STR(logger,"Writing preconditioned PSF");
-                    const casacore::Array<double> imagePixels(params->value("psf.image.slice"));
-                    casacore::Array<float> floatImagePixels(imagePixels.shape());
-                    casacore::convertArray<float, double>(floatImagePixels, imagePixels);
-                    itsPSFimageCube->writeSlice(floatImagePixels, chan);
-                }
-            // Write Restored image
-            {
-                ASKAPLOG_INFO_STR(logger,"Writing Restored Image");
-                const casacore::Array<double> imagePixels(itsModel->value("image.slice"));
-                casacore::Array<float> floatImagePixels(imagePixels.shape());
-                casacore::convertArray<float, double>(floatImagePixels, imagePixels);
-                itsRestoredCube->writeSlice(floatImagePixels, itsChan);
-            }
-        }
-
-*/
-
+    
     }
-
-
-
-
 } // namespace

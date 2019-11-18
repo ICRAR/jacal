@@ -199,15 +199,15 @@ namespace askap {
         ASKAPLOG_INFO_STR(logger,"nchan: " << nchanCube << " base f0: " << f0.getValue("MHz") << " MHz "
         << " width: " << freqinc.getValue("MHz"));
 
-        itsImageCube.reset(new cp::CubeBuilder(itsParset, nchanCube, f0, freqinc,img_name));
-        itsPSFCube.reset(new cp::CubeBuilder(itsParset, nchanCube, f0, freqinc, psf_name));
-        itsResidualCube.reset(new cp::CubeBuilder(itsParset, nchanCube, f0, freqinc, residual_name));
-        itsWeightsCube.reset(new cp::CubeBuilder(itsParset, nchanCube, f0, freqinc, weights_name));
+        itsImageCube.reset(new cp::CubeBuilder<casacore::Float> (itsParset, nchanCube, f0, freqinc,img_name));
+        itsPSFCube.reset(new cp::CubeBuilder<casacore::Float> (itsParset, nchanCube, f0, freqinc, psf_name));
+        itsResidualCube.reset(new cp::CubeBuilder<casacore::Float> (itsParset, nchanCube, f0, freqinc, residual_name));
+        itsWeightsCube.reset(new cp::CubeBuilder<casacore::Float> (itsParset, nchanCube, f0, freqinc, weights_name));
 
 // Need to add the restore cube test and build here
 
         if (itsParset.getBool("restore", false)) {
-          itsRestoredCube.reset(new cp::CubeBuilder(itsParset, nchanCube, f0, freqinc, restored_name));
+          itsRestoredCube.reset(new cp::CubeBuilder<casacore::Float> (itsParset, nchanCube, f0, freqinc, restored_name));
         }
 
         return 0;

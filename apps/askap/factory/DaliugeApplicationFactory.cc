@@ -21,14 +21,14 @@ namespace askap {
 
 /// The version of the package
 #define ASKAP_PACKAGE_VERSION askap::getAskapPackageVersion_DaliugeApplicationFactory()
-#include <askap/AskapLogging.h>
-#include <askap/AskapError.h>
+#include <askap/askap/AskapLogging.h>
+#include <askap/askap/AskapError.h>
 
 
 
 // ASKAPsoft includes
 
-#include <askap/AskapError.h>
+#include <askap/askap/AskapError.h>
 #include <casacore/casa/OS/DynLib.h>        // for dynamic library loading
 #include <casacore/casa/BasicSL/String.h>   // for downcase
 #include <boost/program_options.hpp>

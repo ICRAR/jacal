@@ -76,7 +76,7 @@ namespace askap {
 
             scimath::ImagingNormalEquations::ShPtr itsNe;
 
-            boost::shared_ptr<cp::CubeBuilder> itsNECube;
+            boost::shared_ptr<cp::CubeBuilder<casacore::Float> > itsNECube;
 
             int itsChan;
 

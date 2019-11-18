@@ -16,6 +16,6 @@
  */
 
 #include <casacore/casa/Utilities.h>
-namespace casa = casacore;
+//namespace casa = casacore;
 
 #endif

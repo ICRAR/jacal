@@ -71,12 +71,12 @@ namespace askap {
             //! @details key value list of configuration options
             LOFAR::ParameterSet itsParset;
 
-            boost::shared_ptr<cp::CubeBuilder> itsImageCube;
-            boost::shared_ptr<cp::CubeBuilder> itsPSFCube;
-            boost::shared_ptr<cp::CubeBuilder> itsResidualCube;
-            boost::shared_ptr<cp::CubeBuilder> itsWeightsCube;
-            boost::shared_ptr<cp::CubeBuilder> itsPSFimageCube;
-            boost::shared_ptr<cp::CubeBuilder> itsRestoredCube;
+            boost::shared_ptr<cp::CubeBuilder<casacore::Float> > itsImageCube;
+            boost::shared_ptr<cp::CubeBuilder<casacore::Float> > itsPSFCube;
+            boost::shared_ptr<cp::CubeBuilder<casacore::Float> > itsResidualCube;
+            boost::shared_ptr<cp::CubeBuilder<casacore::Float> > itsWeightsCube;
+            boost::shared_ptr<cp::CubeBuilder<casacore::Float> > itsPSFimageCube;
+            boost::shared_ptr<cp::CubeBuilder<casacore::Float> > itsRestoredCube;
 
             int itsChan;
 
