@@ -67,6 +67,7 @@ ASKAP_LOGGER(logger, ".parallel");
 #include <askap/measurementequation/NoXPolBeamIndependentGain.h>
 #include <askap/measurementequation/ImagingEquationAdapter.h>
 #include <askap/measurementequation/IMeasurementEquation.h>
+#include <askap/parallel/CalibratorParallel.h>
 #include <askap/gridding/VisGridderFactory.h>
 #include <askap/askapparallel/AskapParallel.h>
 #include <Common/ParameterSet.h>
@@ -204,6 +205,21 @@ int JacalBPCalibrator::run() {
       /// Create solver in workers
       itsSolver.reset(new scimath::LinearSolver(1e3));
       ASKAPCHECK(itsSolver, "Solver not defined correctly");
+
+      // Set solver parameters.
+      const std::string solverType = itsParset.getString("solver", "SVD");
+      itsSolver->setAlgorithm(solverType);
+
+      if (solverType == "LSQR") {
+
+          ASKAPLOG_INFO_STR(logger, "solver type LSQR");
+          std::map<std::string, std::string> solverParams = synthesis::CalibratorParallel::getLSQRSolverParameters(itsParset);
+          solverParams["nChan"] = itsParset.getString("nChan");
+          itsSolver->setParameters(solverParams);
+      }
+      else {
+          ASKAPLOG_INFO_STR(logger, "solver type SVD");
+      }
       ASKAPCHECK(!itsParset.isDefined("refgain"), "usage of refgain is deprecated, define reference antenna instead");
       itsRefAntenna = itsParset.getInt32("refantenna",-1);
       if (itsRefAntenna >= 0) {
@@ -568,7 +584,6 @@ void JacalBPCalibrator::solveNE()
       ASKAPDEBUGASSERT(itsModel);
       itsSolver->init();
       itsSolver->addNormalEquations(*itsNe);
-      itsSolver->setAlgorithm("SVD");
       itsSolver->solveNormalEquations(*itsModel,q);
       ASKAPLOG_INFO_STR(logger, "Solved normal equations in "<< timer.real() << " seconds ");
       ASKAPLOG_INFO_STR(logger, "Solution quality: "<<q);
