@@ -73,6 +73,7 @@ RUN apt-get update && \
     libboost-filesystem-dev \
     libboost-program-options-dev \
     libboost-python-dev \
+    libboost-regex-dev \
     libboost-signals-dev \
     libboost-system-dev \
     libboost-thread-dev \

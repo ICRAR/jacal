@@ -11,9 +11,9 @@ INCLUDE_DIRS = -I/usr/local/include \
                -I/usr/local/include/askap \
                -I/usr/local/include/askap/scimath
 
-LIBRARY_DIRS = -L/usr/local/lib
+LIBRARY_DIRS = -L/usr/local/lib -L/usr/lib
 
-ASKAP_LIBS = -llog4cxx -laskap_askap -lcommon -lblob -laskap_accessors -laskap_synthesis -laskap_scimath -laskap_imager -lboost_regex -lboost_system  
+ASKAP_LIBS = -llog4cxx -laskap_askap -lCommon -lblob -laskap_accessors -laskap_scimath -lboost_regex -lboost_system
 CASA_LIBS = -lcasa_ms -lcasa_tables -lcasa_casa -lcasa_measures -lcasa_coordinates -lcfitsio
 
 # Combined flags
