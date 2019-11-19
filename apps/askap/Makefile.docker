@@ -18,7 +18,7 @@ CASA_LIBS = -lcasa_ms -lcasa_tables -lcasa_casa -lcasa_measures -lcasa_coordinat
 
 # Combined flags
 CXXFLAGS += -std=c++11 -fPIC -I. -g $(INCLUDE_DIRS) $(INCLUDE_DIRS_DLG)
-LDFLAGS += $(LIBRARY_DIRS)
+LDFLAGS += $(LIBRARY_DIRS) $(ASKAP_LIBS) $(CASA_LIBS)
 
 #
 # These are the ones we need to build
