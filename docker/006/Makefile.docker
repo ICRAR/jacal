@@ -13,7 +13,7 @@ INCLUDE_DIRS = -I/usr/local/include \
 
 LIBRARY_DIRS = -L/usr/local/lib -L/usr/lib
 
-ASKAP_LIBS = -llog4cxx -laskap_askap -lCommon -lBlob -laskap_accessors -laskap_scimath -lboost_regex -lboost_system
+ASKAP_LIBS = -llog4cxx -laskap_askap -lCommon -lBlob -laskap_accessors -laskap_scimath -lboost_regex -lboost_system -lyanda_synthesis
 CASA_LIBS = -lcasa_ms -lcasa_tables -lcasa_casa -lcasa_measures -lcasa_coordinates -lcfitsio
 
 # Combined flags

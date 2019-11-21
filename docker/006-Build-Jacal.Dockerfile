@@ -61,7 +61,8 @@ RUN ldconfig
 ## Move to the correct location
 WORKDIR /home/jacal/apps/askap
 RUN sed -i 's/namespace casa/namespace casacore/'  $PREFIX/include/askap/askap/CasacoreFwdDefines.h
-RUN make -f  Makefile.docker
+COPY 006/Makefile.docker Makefile.docker
+RUN make -f Makefile.docker
 RUN cp libaskapsoft_dlg.so $PREFIX/lib
 
 FROM debian:stretch-slim
@@ -70,6 +71,7 @@ ARG PREFIX=/usr/local
 
 RUN apt-get update && \
     apt-get install -y \
+    ca-certificates \
     libboost-dev \
     libboost-filesystem-dev \
     libboost-program-options-dev \
@@ -80,6 +82,7 @@ RUN apt-get update && \
     libboost-thread-dev \
     libc6 \
     libcfitsio-dev \
+    libcppunit-dev \
     libexpat1 \
     libffi-dev \
     libfftw3-dev \
@@ -88,7 +91,7 @@ RUN apt-get update && \
     libopenblas-dev \
     libopenmpi-dev \
     libssl1.1 \
-    ca-certificates \
+    libxerces-c-dev \
     netbase \
     wcslib-dev
 
