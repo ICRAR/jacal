@@ -24,8 +24,13 @@
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 #    MA 02111-1307  USA
 #
-from dlg.drop import AppDROP
+import logging
+from time import sleep
+
+from dlg.drop import BarrierAppDROP
 from dlg.io import ErrorIO, OpenMode
+
+LOGGER = logging.getLogger(__name__)
 
 # The split files
 FILES = {
@@ -38,7 +43,11 @@ FILES = {
 }
 
 
-class DingoFrequencySplit(AppDROP):
+class DingoFrequencySplit(BarrierAppDROP):
+    def initialize(self, **kwargs):
+        super(DingoFrequencySplit, self).initialize(**kwargs)
+        LOGGER.info("initialize DingoFrequencySplit")
+
     def getIO(self):
         """
         This type of DROP cannot be accessed directly
@@ -50,13 +59,16 @@ class DingoFrequencySplit(AppDROP):
         return "DingoFrequencySplit"
 
     def run(self):
+        LOGGER.info("running DingoFrequencySplit")
         outputs = self.outputs
         for index, (key, value) in enumerate(FILES.items()):
             output_drop = outputs[index]
             drop_io = output_drop.getIO()
-            drop_io = drop_io.open(OpenMode.OPEN_WRITE)
-            drop_io.write(f'''
-Cimager.dataset                                 = {value}     # scienceData_SB8171_G12_T0-0A.beam00.ms
+            drop_io.open(OpenMode.OPEN_WRITE)
+            drop_io.write(
+                bytes(
+                    f'''
+Cimager.dataset                                 = {value[0]}     # scienceData_SB8171_G12_T0-0A.beam00.ms
 Cimager.imagetype                               = fits
 # Apply a maximum UV cutoff
 Cimager.MaxUV                                   = 6000
@@ -118,5 +130,22 @@ Cimager.restore                                 = true
 Cimager.restore.beam                            = fit
 Cimager.restore.beam.cutoff                     = 0.5
 Cimager.restore.beamReference                   = mid
-''')
+''',
+                    encoding='utf-8'))
             drop_io.close()
+
+
+class DoNothing(BarrierAppDROP):
+    def initialize(self, **kwargs):
+        super(DoNothing, self).initialize(**kwargs)
+        LOGGER.info("initialize DoNothing")
+
+    def getIO(self):
+        return ErrorIO()
+
+    def dataURL(self):
+        return "DoNothing"
+
+    def run(self):
+        LOGGER.info(f"Do nothing: {self.__dict__}")
+        sleep(1)

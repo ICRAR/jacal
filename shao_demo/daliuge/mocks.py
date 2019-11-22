@@ -29,24 +29,32 @@ Mock objects for testing
 """
 import logging
 
-from dlg.drop import AppDROP
+from dlg.drop import BarrierAppDROP
 from dlg.io import OpenMode
 
 LOGGER = logging.getLogger(__name__)
 
 
-class DynLibAppMock(AppDROP):
+class DynLibAppMock(BarrierAppDROP):
     def initialize(self, **kwargs):
         super(DynLibAppMock, self).initialize(**kwargs)
+        LOGGER.info("initialize DynLibAppMock")
 
     def run(self):
+        LOGGER.info("run DynLibAppMock")
         for input_ in self.inputs:
-            try:
-                descriptor = input_.open(OpenMode.OPEN_READ)
-                data = self.read(descriptor)
-                LOGGER.info(f"name: {input_}, data: {data}")
-            finally:
-                input_.close()
+            LOGGER.info(f"dict: {input_.__dict__}")
+            drop_io = input_.getIO()
+            drop_io.open(OpenMode.OPEN_READ)
+            byte_array = bytearray()
+            while True:
+                data = drop_io.read(1024)
+                LOGGER.info(f"data: {data}")
+                byte_array.extend(data)
+                if len(data) == 0:
+                    break
+            LOGGER.info(f"data: {byte_array}")
+            drop_io.close()
 
     def dataURL(self):
         return "DynLibAppMock"
