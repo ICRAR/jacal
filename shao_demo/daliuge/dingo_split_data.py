@@ -79,15 +79,15 @@ Cimager.imagetype                               = fits
 # Apply a maximum UV cutoff
 Cimager.MaxUV                                   = 6000
 #
-Cimager.Images.Names                            = [image.i.SB8171.cube.G12_T0-0A.beam00]
-Cimager.Images.shape                            = [3072, 3072]
+Cimager.Images.Names                            = [image.{value[0]}.beam00]
+Cimager.Images.shape                            = [1024, 1024]
 Cimager.Images.cellsize                         = [2arcsec, 2arcsec]
 Cimager.Images.direction                        = [11h50m60.000, -00.26.59.96, J2000]
 Cimager.Images.restFrequency                    = HI
 # Options for the alternate imager
 Cimager.nchanpercore                            = 20
 Cimager.usetmpfs                                = false
-Cimager.tmpfs                                   = /dev/shm
+Cimager.tmpfs                                   = /tmp
 # barycentre and multiple solver mode not supported in continuum imaging (yet)
 Cimager.barycentre                              = true
 Cimager.solverpercore                           = true

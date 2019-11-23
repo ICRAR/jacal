@@ -32,7 +32,8 @@ ARG PREFIX=/usr/local
 RUN apt-get update && \
     apt-get install -y \
     g++ \
-    make
+    make \
+    git
 
 RUN apt-get install -y \
     libboost-dev \
@@ -46,6 +47,11 @@ RUN apt-get install -y \
     libcfitsio-dev \
     liblog4cxx-dev \
     wcslib-dev
+
+#############################################################
+## Pull the latest version
+WORKDIR /home/jacal
+RUN git pull origin master
 
 #############################################################
 ## Copy the YandaSoft libraries we need
