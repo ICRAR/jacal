@@ -245,6 +245,7 @@ namespace askap {
             itsEquation->calcEquations(*itsNe);
 
             // lets dump out some images
+            ASKAPLOG_INFO_STR(logger,"sending data to the output port 'Normal'");
             NEUtils::sendNE(itsNe, output("Normal"));
         }
 

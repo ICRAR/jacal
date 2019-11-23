@@ -25,6 +25,7 @@
 #    MA 02111-1307  USA
 #
 import logging
+from os.path import join
 from time import sleep
 
 from dlg.drop import BarrierAppDROP
@@ -34,19 +35,21 @@ LOGGER = logging.getLogger(__name__)
 
 # The split files
 FILES = {
-    1: ['file_1294.9_1319.0.ms', 7746, 9046],
-    2: ['file_1319.0_1343.1.ms', 9047, 10347],
-    3: ['file_1343.1_1367.2.ms', 10348, 11648],
-    4: ['file_1367.2_1391.3.ms', 11649, 12949],
-    5: ['file_1391.3_1415.4.ms', 12950, 14250],
-    6: ['file_1415.4_1439.5.ms', 14251, 15551],
+    1: ["file_1294.9_1319.0.ms", 7746, 9046],
+    2: ["file_1319.0_1343.1.ms", 9047, 10347],
+    3: ["file_1343.1_1367.2.ms", 10348, 11648],
+    4: ["file_1367.2_1391.3.ms", 11649, 12949],
+    5: ["file_1391.3_1415.4.ms", 12950, 14250],
+    6: ["file_1415.4_1439.5.ms", 14251, 15551],
 }
 
 
 class DingoFrequencySplit(BarrierAppDROP):
     def initialize(self, **kwargs):
         super(DingoFrequencySplit, self).initialize(**kwargs)
-        LOGGER.info("initialize DingoFrequencySplit")
+        LOGGER.info(f"initialize DingoFrequencySplit: {kwargs}")
+        self._mkn = self._getArg(kwargs, "mkn", None)
+        self._file_path = self._getArg(kwargs, "file_path", "/tmp/123456")
 
     def getIO(self):
         """
@@ -59,16 +62,19 @@ class DingoFrequencySplit(BarrierAppDROP):
         return "DingoFrequencySplit"
 
     def run(self):
-        LOGGER.info("running DingoFrequencySplit")
+        LOGGER.info(f"running DingoFrequencySplit: {self.__dict__}")
         outputs = self.outputs
         for index, (key, value) in enumerate(FILES.items()):
+            if self._mkn is not None and index >= self._mkn[1]:
+                break
+
             output_drop = outputs[index]
             drop_io = output_drop.getIO()
             drop_io.open(OpenMode.OPEN_WRITE)
             drop_io.write(
                 bytes(
-                    f'''
-Cimager.dataset                                 = {value[0]}     # scienceData_SB8171_G12_T0-0A.beam00.ms
+                    f"""
+Cimager.dataset                                 = {join(self._file_path, value[0])}
 Cimager.imagetype                               = fits
 # Apply a maximum UV cutoff
 Cimager.MaxUV                                   = 6000
@@ -130,15 +136,17 @@ Cimager.restore                                 = true
 Cimager.restore.beam                            = fit
 Cimager.restore.beam.cutoff                     = 0.5
 Cimager.restore.beamReference                   = mid
-''',
-                    encoding='utf-8'))
+""",
+                    encoding="utf-8",
+                )
+            )
             drop_io.close()
 
 
 class DoNothing(BarrierAppDROP):
     def initialize(self, **kwargs):
         super(DoNothing, self).initialize(**kwargs)
-        LOGGER.info("initialize DoNothing")
+        LOGGER.info(f"initialize DoNothing: {kwargs}")
 
     def getIO(self):
         return ErrorIO()

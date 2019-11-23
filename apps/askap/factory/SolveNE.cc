@@ -195,6 +195,7 @@ namespace askap {
               int iteration = 1;
               itsModel->add("iteration",iteration);
             }
+            ASKAPLOG_INFO_STR(logger, "Sending data to port 'Model'");
             NEUtils::sendParams(itsModel, output("Model"));
         }
 

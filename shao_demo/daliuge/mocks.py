@@ -38,10 +38,11 @@ LOGGER = logging.getLogger(__name__)
 class DynLibAppMock(BarrierAppDROP):
     def initialize(self, **kwargs):
         super(DynLibAppMock, self).initialize(**kwargs)
-        LOGGER.info("initialize DynLibAppMock")
+        LOGGER.info(f"initialize DynLibAppMock: {kwargs}")
+        self._dictionary = {key:value for (key,value) in kwargs.items()}
 
     def run(self):
-        LOGGER.info("run DynLibAppMock")
+        LOGGER.info(f"run DynLibAppMock: {self.__dict__}")
         for input_ in self.inputs:
             LOGGER.info(f"dict: {input_.__dict__}")
             drop_io = input_.getIO()
@@ -49,10 +50,10 @@ class DynLibAppMock(BarrierAppDROP):
             byte_array = bytearray()
             while True:
                 data = drop_io.read(1024)
-                LOGGER.info(f"data: {data}")
-                byte_array.extend(data)
                 if len(data) == 0:
                     break
+                LOGGER.info(f"data: {data}")
+                byte_array.extend(data)
             LOGGER.info(f"data: {byte_array}")
             drop_io.close()
 
