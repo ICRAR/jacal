@@ -1,0 +1,17 @@
+# Input measurement set
+# Default: <no default>
+vis         = /data/file_1319.0_1343.1.ms
+
+# Output measurement set
+# Default: <no default>
+outputvis   = /data/chan1.ms
+
+# The channel range to split out into its own measurement set
+# Can be either a single integer (e.g. 1) or a range (e.g. 1-300). The range
+# is inclusive of both the start and end, indexing is one-based.
+# Default: <no default>
+channel     = 1-3
+
+# Defines the number of channel to average to form the one output channel
+# Default: 1
+width       = 1

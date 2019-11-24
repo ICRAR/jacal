@@ -1,0 +1,17 @@
+# Input measurement set
+# Default: <no default>
+vis         = /data/scienceData_SB8171_G12_T0-0A.beam00.ms
+
+# Output measurement set
+# Default: <no default>
+outputvis   = /data/file_1294.9_1319.0.ms
+
+# The channel range to split out into its own measurement set
+# Can be either a single integer (e.g. 1) or a range (e.g. 1-300). The range
+# is inclusive of both the start and end, indexing is one-based.
+# Default: <no default>
+channel     = 7746-9046
+
+# Defines the number of channel to average to form the one output channel
+# Default: 1
+width       = 1
