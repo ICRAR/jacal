@@ -1,4 +1,4 @@
-#
+
 #    ICRAR - International Centre for Radio Astronomy Research
 #    (c) UWA - The University of Western Australia, 2019
 #    Copyright by UWA (in the framework of the ICRAR)
@@ -26,8 +26,7 @@
 #
 from os.path import join
 
-infile = '/data/scienceData_SB8171_G12_T0-0A.beam00.ms'
-out_path = '/data'
+out_path = 'dummy'
 channel1_freq = 1151500000.0
 channel_width = 18518.518518518198
 bottom_channel = 7746
@@ -40,7 +39,7 @@ loop_count = 1
 
 for i in range(bottom_channel, top_channel, step_size):
     upper = i + step_size -1
-    spw_text = '0:{}~{}'.format(i, upper)
+    spw_text = f'0:{i}~{upper}'
     low = i * channel_width
     low += channel1_freq
     low /= 1e6
@@ -49,12 +48,6 @@ for i in range(bottom_channel, top_channel, step_size):
     high += channel1_freq
     high /= 1e6
     high = round(high, 1)
-    output_vis = join(out_path, 'file_{}_{}.ms'.format(low, high))
-    print('{}: ["file_{}_{}.ms", {}, {}],'.format(loop_count, low, high, i, upper))
+    output_vis = join(f'{out_path}', f'file_{low}_{high}.ms')
+    print(f'{loop_count}: ["file_{low}_{high}.ms", {i}, {upper}],')
     loop_count += 1
-    mstransform(
-        infile,
-        outputvis=output_vis,
-        spw=spw_text,
-        datacolumn='data',
-        usewtspectrum=True)
