@@ -26,8 +26,11 @@
 #
 from os.path import join
 
-infile = '/data/scienceData_SB8171_G12_T0-0A.beam00.ms'
-out_path = '/data'
+infile = '/mnt/hidata2/dingo/aws/g12/G12_test/scienceData_SB8171_G12_T0-0A.beam00.ms'
+out_path = '/scratch/kvinsen/dingo_split-145'
+#infile = '/data/scienceData_SB8171_G12_T0-0A.beam00.ms'
+#out_path = '/data'
+
 channel1_freq = 1151500000.0
 channel_width = 18518.518518518198
 bottom_channel = 7746
