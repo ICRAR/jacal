@@ -208,9 +208,7 @@ class DingoFrequencySplit(BarrierAppDROP):
                 break
 
             output_drop = outputs[index]
-            drop_io = output_drop.getIO()
-            drop_io.open(OpenMode.OPEN_WRITE)
-            drop_io.write(
+            output_drop.write(
                 bytes(
                     f"""
 Cimager.dataset                                 = {join(self._file_path, value[0])}
@@ -279,7 +277,6 @@ Cimager.restore.beamReference                   = mid
                     encoding="utf-8",
                 )
             )
-            drop_io.close()
 
 
 class DoNothing(BarrierAppDROP):
