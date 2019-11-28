@@ -24,9 +24,9 @@
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 #    MA 02111-1307  USA
 #
-import io
 import logging
 import math
+from os import listdir, remove
 from os.path import join, exists
 from shutil import copyfile
 from time import sleep
@@ -186,6 +186,7 @@ FILES = {
     144: ["file_1437.9_1438.9.ms", 15468, 15521],
     145: ["file_1438.9_1439.9.ms", 15522, 15575],
 }
+DEFAULT_BUFFER_SIZE = pow(2, 22)
 
 
 class DingoFrequencySplit(BarrierAppDROP):
@@ -207,6 +208,14 @@ class DingoFrequencySplit(BarrierAppDROP):
 
     def run(self):
         LOGGER.info(f"running DingoFrequencySplit: {self.__dict__}")
+
+        LOGGER.info(f"Clearing directory")
+        for file in listdir(None):
+            LOGGER.info(f"Checking {file}")
+            if file.endswith('.fits'):
+                LOGGER.info(f"Removing {file}")
+                remove(file)
+
         outputs = self.outputs
         for index, (key, value) in enumerate(FILES.items()):
             if self._mkn is not None and index >= self._mkn[1]:
@@ -301,9 +310,9 @@ class DoNothing(BarrierAppDROP):
 
 
 class FitsImageAggregator(BarrierAppDROP):
-    def iniialize(self, **kwargs):
-        self.freq_step = kwargs.get('freq_step', None)
-        self.fits_output = kwargs.get('fits_output', None)
+    def initialize(self, **kwargs):
+        self.freq_step = kwargs.get("freq_step", None)
+        self.fits_output = kwargs.get("fits_output", None)
         super(FitsImageAggregator, self).initialize(**kwargs)
 
     def run(self):
@@ -312,35 +321,43 @@ class FitsImageAggregator(BarrierAppDROP):
             if input_drop.status != DROPStates.COMPLETED:
                 continue
             file_path = f"image.{FILES[i+1][0]}.beam00.restored.fits"
+            LOGGER.info(f"Checking: {file_path}, i: {i}")
             header = get_header(file_path)
-            channel_order[header['CRVAL4']] = file_path
+            channel_order[header["CRVAL4"]] = file_path
 
         fits_input = [channel_order[key] for key in sorted(channel_order)]
+        LOGGER.info(f"fits_input: {fits_input}, fits_output: {self.fits_output}")
         concat_images(self.fits_output, fits_input, self.freq_step)
 
 
 def eformat(f, prec, exp_digits):
-    s = "%.*E"%(prec, f)
-    mantissa, exp = s.split('E')
+    s = "%.*E" % (prec, f)
+    mantissa, exp = s.split("E")
     # add 1 to digits as 1 is taken by sign +/-
-    return "%sE%+0*d"%(mantissa, exp_digits+1, int(exp))
+    return "%sE%+0*d" % (mantissa, exp_digits + 1, int(exp))
 
 
 def get_header(fits_file):
     header = fits.getheader(fits_file, 0)
-    if header['NAXIS'] != 4:
-        raise Exception('Invalid number of axis')
-    if header['CTYPE4'].strip() != 'FREQ':
-        raise Exception('4th axis is not FREQ')
+    if header["NAXIS"] != 4:
+        raise Exception("Invalid number of axis")
+    if header["CTYPE4"].strip() != "FREQ":
+        raise Exception("4th axis is not FREQ")
     return header
 
 
 def get_image_size_bytes(header):
-    return int(header['NAXIS1'] * header['NAXIS2'] * header['NAXIS3'] * header['NAXIS4'] * math.fabs(header['BITPIX']) / 8)
+    return int(header["NAXIS1"] * header["NAXIS2"] * math.fabs(header["BITPIX"]) / 8)
 
 
 def get_image_dimension(header):
-    return header['NAXIS1'], header['NAXIS2'], header['NAXIS3'], header['NAXIS4'], header['BITPIX']
+    return (
+        header["NAXIS1"],
+        header["NAXIS2"],
+        header["NAXIS3"],
+        header["NAXIS4"],
+        header["BITPIX"],
+    )
 
 
 def header_size_obj(fits_input_obj):
@@ -348,9 +365,9 @@ def header_size_obj(fits_input_obj):
     row_size = 80
 
     while True:
-        row = fits_input_obj.read(row_size).decode('ascii')
+        row = fits_input_obj.read(row_size).decode("ascii")
         num_bytes += row_size
-        if row.replace(' ', '') == 'END':
+        if row.replace(" ", "") == "END":
             break
 
     while fits_input_obj.tell() % 2880 != 0:
@@ -362,34 +379,36 @@ def header_size_obj(fits_input_obj):
 
 def format_card(key, value):
     if len(key) > 8:
-        raise Exception('key is too long')
+        raise Exception("key is too long")
 
     if isinstance(value, str):
         val = "'{0}'".format(str(value))
-        val_white_space = [' ']
+        val_white_space = [" "]
     else:
         val = value
         if isinstance(value, float):
             val = eformat(value, 12, 2)
-        val_white_space = [' ']*(21-len(str(val)))
+        val_white_space = [" "] * (21 - len(str(val)))
 
-    key_white_space = [' ']*(8-len(key))
-    entry = "{0}{1}={2}{3}".format(key, ''.join(key_white_space), ''.join(val_white_space), val)
+    key_white_space = [" "] * (8 - len(key))
+    entry = "{0}{1}={2}{3}".format(
+        key, "".join(key_white_space), "".join(val_white_space), val
+    )
     if len(entry) > 80:
-        raise Exception('card > 80 bytes')
-    return bytes(entry.encode('ascii')) + bytes([0x20]*(80-len(entry)))
+        raise Exception("card > 80 bytes")
+    return bytes(entry.encode("ascii")) + bytes([0x20] * (80 - len(entry)))
 
 
 def modify_header(fits_file, key, value):
     row_bytes = format_card(key, value)
     read_bytes = 0
 
-    with open(fits_file, 'rb+') as fits_input_obj:
+    with open(fits_file, "rb+") as fits_input_obj:
         while True:
-            row = fits_input_obj.read(80).decode('ascii')
+            row = fits_input_obj.read(80).decode("ascii")
 
-            if row.replace(' ', '') == 'END':
-                raise Exception('{0} not found'.format(key))
+            if row.replace(" ", "") == "END":
+                raise Exception("{0} not found".format(key))
 
             if row.startswith(key):
                 fits_input_obj.seek(read_bytes)
@@ -403,24 +422,26 @@ def insert_header(fits_file, key, value):
     row_bytes = format_card(key, value)
     read_bytes = 0
 
-    with open(fits_file, 'rb+') as fits_input_obj:
+    with open(fits_file, "rb+") as fits_input_obj:
         while True:
-            row = fits_input_obj.read(80).decode('ascii')
+            row = fits_input_obj.read(80).decode("ascii")
 
             # if entry already exists then ignore it
             if row.startswith(key):
                 break
 
-            if row.replace(' ', '') == 'END':
+            if row.replace(" ", "") == "END":
                 remain = fits_input_obj.tell() % 2880
                 # TODO: extend header if needed, just except if there is not enough space for now
                 if remain < 80:
-                    raise Exception('Not enough space in the header to insert')
+                    raise Exception("Not enough space in the header to insert")
 
                 fits_input_obj.seek(read_bytes)
                 fits_input_obj.write(row_bytes)
-                end_val = 'END'
-                end = bytes(end_val.encode('ascii')) + bytes([0x20]*(80-len(end_val)))
+                end_val = "END"
+                end = bytes(end_val.encode("ascii")) + bytes(
+                    [0x20] * (80 - len(end_val))
+                )
                 fits_input_obj.write(end)
                 break
 
@@ -428,7 +449,7 @@ def insert_header(fits_file, key, value):
 
 
 def header_size(fits_file):
-    with open(fits_file, 'rb') as fits_input_obj:
+    with open(fits_file, "rb") as fits_input_obj:
         return header_size_obj(fits_input_obj)
 
 
@@ -437,6 +458,7 @@ def concat_images(fits_cube_output, fits_image_input, freq_step=None):
 
     if not exists(fits_cube_output):
         first_input = next(input_iter)
+        LOGGER.info(f"Copying the first file: {first_input}")
         copyfile(first_input, fits_cube_output)
 
     hdr_size = header_size(fits_cube_output)
@@ -444,16 +466,17 @@ def concat_images(fits_cube_output, fits_image_input, freq_step=None):
     orig_x, orig_y, orig_stokes, orig_num_chan, orig_bit = get_image_dimension(hdr)
     image_size = get_image_size_bytes(hdr)
 
-    total_size = hdr_size + (image_size * orig_num_chan)
+    total_size = hdr_size + (image_size * orig_stokes * orig_num_chan)
     total_channels = orig_num_chan
 
     delta_freq = freq_step
 
-    with open(fits_cube_output, 'rb+') as f:
+    with open(fits_cube_output, "rb+") as f:
         f.seek(total_size)
 
         # loop through input and append images to original cube
         for input_fits in input_iter:
+            LOGGER.info(f"Processing: {input_fits}")
             in_hdr = get_header(input_fits)
             in_x, in_y, in_stokes, in_num_channels, in_bit = get_image_dimension(in_hdr)
             in_image_size = get_image_size_bytes(in_hdr)
@@ -462,31 +485,36 @@ def concat_images(fits_cube_output, fits_image_input, freq_step=None):
                 raise Exception("image dimensions do not match")
 
             if delta_freq is None:
-                delta_freq = float(in_hdr['CRVAL4']) - float(hdr['CRVAL4'])
+                delta_freq = float(in_hdr["CRVAL4"]) - float(hdr["CRVAL4"])
 
             total_channels += in_num_channels
 
-            with open(input_fits, 'rb') as inf:
+            with open(input_fits, "rb") as inf:
                 header_size_obj(inf)
 
                 total_to_read = in_image_size * in_num_channels
                 total_size += total_to_read
+                LOGGER.info(f"total_size: {total_size}")
 
                 while total_to_read > 0:
-                    buff = inf.read(io.DEFAULT_BUFFER_SIZE
-                                    if total_to_read >= io.DEFAULT_BUFFER_SIZE
-                                    else total_to_read)
+                    buff = inf.read(
+                        DEFAULT_BUFFER_SIZE
+                        if total_to_read >= DEFAULT_BUFFER_SIZE
+                        else total_to_read
+                    )
+
+                    LOGGER.info(f"buff: {len(buff)}")
                     if not buff:
-                        raise Exception("Error reading fits")
+                        raise Exception(f"Error reading fits: {input_fits}")
                     total_to_read -= len(buff)
                     f.write(buff)
 
         # pad with zeros if cube is not in 2880 increments
         remain = 2880 - (total_size % 2880)
         if 0 < remain < 2880:
-            f.write(bytes([0]*remain))
+            f.write(bytes([0] * remain))
 
     # update the total number of freq channels in final image cube
-    modify_header(fits_cube_output, 'NAXIS4', total_channels)
-    modify_header(fits_cube_output, 'CDELT4', delta_freq)
-    insert_header(fits_cube_output, 'RESTFREQ', float(1420405751.786))
+    modify_header(fits_cube_output, "NAXIS4", total_channels)
+    modify_header(fits_cube_output, "CDELT4", delta_freq)
+    insert_header(fits_cube_output, "RESTFREQ", float(1420405751.786))
