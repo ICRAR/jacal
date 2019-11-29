@@ -30,11 +30,25 @@ FROM jacal-002-libraries as buildenv
 
 ARG PREFIX=/usr/local
 ARG JOBS=6
+## To turn on verbose make -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
+ARG OPTS=""
 
+####################################################
+##
+## Cheap and cheerful way of creating the fixes I need
 WORKDIR /home/yandasoft
 RUN sed -i 's%build_and_install https://bitbucket.csiro.au/scm/askapsdp/askap-analysis.git%#build_and_install https://bitbucket.csiro.au/scm/askapsdp/askap-analysis.git%'  build_all.sh
-RUN ./build_all.sh -s ubuntu -p ${PREFIX} -S -c -a -r -e -y -j ${JOBS}
+RUN sed -i 's/^#ifdef/\/\/ #ifdef/g' ./base-scimath/askap/scimath/fft/FFTWrapper.cc
+RUN sed -i 's/^#endif/\/\/ #endif/g' ./base-scimath/askap/scimath/fft/FFTWrapper.cc
 
+WORKDIR /home/yandasoft
+# -O "${OPTS}"
+RUN ./build_all.sh -s ubuntu -p ${PREFIX} -S
+RUN ./build_all.sh -s ubuntu -p ${PREFIX} -c -j ${JOBS}
+RUN ./build_all.sh -s ubuntu -p ${PREFIX} -r -j ${JOBS}
+RUN ./build_all.sh -s ubuntu -p ${PREFIX} -a -j ${JOBS}
+RUN ./build_all.sh -s ubuntu -p ${PREFIX} -e -j ${JOBS}
+RUN ./build_all.sh -s ubuntu -p ${PREFIX} -y -j ${JOBS}
 WORKDIR /
 
 ##############################################################

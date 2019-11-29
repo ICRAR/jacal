@@ -18,17 +18,6 @@
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 #    MA 02111-1307  USA
 
-##############################################################
-##
-## | \ | |/ _ \_   _| ____|
-## |  \| | | | || | |  _|
-## | |\  | |_| || | | |___
-## |_| \_|\___/ |_| |_____|
-##
-## The two dockerfiles need to be kept in sync
-##
-##############################################################
-
 FROM python:3.7-slim-stretch as buildenv
 
 RUN apt-get update && \

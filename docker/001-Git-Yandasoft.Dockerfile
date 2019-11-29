@@ -39,36 +39,64 @@ RUN apt-get install -y \
 #
 WORKDIR /home
 RUN git clone https://bitbucket.csiro.au/scm/askapsdp/yandasoft.git
+WORKDIR /home/yandasoft
+RUN git clone https://bitbucket.csiro.au/scm/askapsdp/askap-cmake
 
 WORKDIR /home/yandasoft
 RUN git clone https://bitbucket.csiro.au/scm/askapsdp/lofar-common.git
+WORKDIR /home/yandasoft/lofar-common
+RUN git clone https://bitbucket.csiro.au/scm/askapsdp/askap-cmake
 
 WORKDIR /home/yandasoft
 RUN git clone https://bitbucket.csiro.au/scm/askapsdp/lofar-blob.git
+WORKDIR /home/yandasoft/lofar-blob
+RUN git clone https://bitbucket.csiro.au/scm/askapsdp/askap-cmake
 
 WORKDIR /home/yandasoft
 RUN git clone https://bitbucket.csiro.au/scm/askapsdp/base-askap.git
+WORKDIR /home/yandasoft/base-askap
+RUN git clone https://bitbucket.csiro.au/scm/askapsdp/askap-cmake
 
 WORKDIR /home/yandasoft
 RUN git clone https://bitbucket.csiro.au/scm/askapsdp/base-logfilters.git
+WORKDIR /home/yandasoft/base-logfilters
+RUN git clone https://bitbucket.csiro.au/scm/askapsdp/askap-cmake
 
 WORKDIR /home/yandasoft
 RUN git clone https://bitbucket.csiro.au/scm/askapsdp/base-imagemath.git
+WORKDIR /home/yandasoft/base-imagemath
+RUN git clone https://bitbucket.csiro.au/scm/askapsdp/askap-cmake
 
 WORKDIR /home/yandasoft
 RUN git clone https://bitbucket.csiro.au/scm/askapsdp/base-askapparallel.git
+WORKDIR /home/yandasoft/base-askapparallel
+RUN git clone https://bitbucket.csiro.au/scm/askapsdp/askap-cmake
 
 WORKDIR /home/yandasoft
 RUN git clone https://bitbucket.csiro.au/scm/askapsdp/base-scimath.git
+WORKDIR /home/yandasoftbase-scimath
+RUN git clone https://bitbucket.csiro.au/scm/askapsdp/askap-cmake
 
 WORKDIR /home/yandasoft
 RUN git clone https://bitbucket.csiro.au/scm/askapsdp/base-accessors.git
+WORKDIR /home/yandasoft/base-accessors
+RUN git clone https://bitbucket.csiro.au/scm/askapsdp/askap-cmake
 
 WORKDIR /home/yandasoft
 RUN git clone https://bitbucket.csiro.au/scm/askapsdp/base-components.git
+WORKDIR /home/yandasoft/base-components
+RUN git clone https://bitbucket.csiro.au/scm/askapsdp/askap-cmake
 
 WORKDIR /home/yandasoft
 RUN git clone https://bitbucket.csiro.au/scm/askapsdp/askap-pipelinetasks.git
+WORKDIR /home/yandasoft/askap-pipelinetasks
+RUN git clone https://bitbucket.csiro.au/scm/askapsdp/askap-cmake
+
+WORKDIR /home/yandasoft
+RUN git clone https://github.com/casacore/casacore
+
+WORKDIR /home/yandasoft
+RUN git clone https://github.com/steve-ord/casarest -b components-only
 
 #############################################################
 ## Get the Common CasaCore data
@@ -76,3 +104,5 @@ WORKDIR $PREFIX/share/casacore/data
 RUN wget ftp://ftp.astron.nl/outgoing/Measures/WSRT_Measures.ztar
 RUN tar -xvf WSRT_Measures.ztar
 RUN rm WSRT_Measures.ztar
+
+WORKDIR /home/yandasoft
