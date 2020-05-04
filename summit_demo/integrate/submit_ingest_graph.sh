@@ -6,6 +6,7 @@ DEFAULT_CHANNELS_PER_NODE=6
 DEFAULT_START_FREQ=45991200
 DEFAULT_FREQ_STEP=6400
 DEFAULT_NUM_TIME_STEPS=5
+DEFAULT_MAX_SPC=50000
 DEFAULT_INTERNAL_PORT=12345
 DEFAULT_RELAY_BASE_PORT=23456
 DEFAULT_WALLTIME=00:30:00
@@ -31,6 +32,7 @@ Runtime options:
  -f <start-freq>          Global start frequency, in Hz. Default=$DEFAULT_START_FREQ
  -s <freq-step>           Frequency step, in Hz. Default=$DEFAULT_FREQ_STEP
  -T <time-steps>          Number of time steps. Default=$DEFAULT_NUM_TIME_STEPS
+ -x <max-spc>             Max number of sources processed per chunk on a device. Default=$DEFAULT_MAX_SPC
  -I <internal port base>  Base port for spead2 in signal drop, defaults to $DEFAULT_INTERNAL_PORT
  -r <relay port base>     Base port for spead2 relay, defaults to $DEFAULT_RELAY_BASE_PORT
  -E <error tolerance>     Error tolerance of the signal generator, as % (0-100), defaults to 0.
@@ -59,6 +61,7 @@ channels_per_node=$DEFAULT_CHANNELS_PER_NODE
 start_freq=$DEFAULT_START_FREQ
 freq_step=$DEFAULT_FREQ_STEP
 time_steps=$DEFAULT_NUM_TIME_STEPS
+max_spc=$DEFAULT_MAX_SPC
 internal_port=$DEFAULT_INTERNAL_PORT
 relay_base_port=$DEFAULT_RELAY_BASE_PORT
 signal_generator_error_tolerance=0
@@ -75,7 +78,7 @@ ms_outdir=
 # physical graph template partition
 pgtp=
 
-while getopts "h?V:o:n:c:f:s:T:I:r:E:e:b:t:S:agv:w:i:Mp:m:" opt
+while getopts "h?V:o:n:c:f:s:T:x:I:r:E:e:b:t:S:agv:w:i:Mp:m:" opt
 do
 	case "$opt" in
 		h?)
@@ -102,6 +105,9 @@ do
 			;;
 		T)
 			time_steps=$OPTARG
+			;;
+		x)
+			max_spc=$OPTARG
 			;;
 		I)
 			internal_port=$OPTARG
@@ -202,6 +208,9 @@ s/\"use_gpus=.*\"/\"use_gpus=$use_gpus\"/
 
 # Number of time steps to simulate
 s%\"num_time_steps=.*\"%\"num_time_steps=$time_steps\"%
+
+# Number of time steps to simulate
+s%\"max_sources_per_chunk=.*\"%\"max_sources_per_chunk=$max_spc\"%
 
 # The base port used for internal spead2 communications
 s%\"internal_port=.*\"%\"internal_port=$internal_port\"%
