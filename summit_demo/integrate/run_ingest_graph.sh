@@ -52,7 +52,7 @@ fi
 # down heavily in high-CPU environments during its sky setup
 # OpenMP routines. Let's thus hardcode OMP_NUM_THREADS to 1
 # to get acceptable runtimes.
-export OMP_NUM_THREADS=1
+export OMP_NUM_THREADS=4
 
 $runner \
     python -m dlg.deploy.pawsey.start_dfms_cluster \

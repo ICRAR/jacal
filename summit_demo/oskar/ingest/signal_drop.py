@@ -102,8 +102,8 @@ class SignalGenerateAndAverageDrop(BarrierAppDROP):
                     {
                         "max_sources_per_chunk": self.max_sources_per_chunk,
                         "use_gpus": "false",
-                        "cuda_device_ids": 0,
-                        "num_devices": 1,
+                        #"cuda_device_ids": 0,
+                        #"num_devices": 1,
                         "double_precision": "false",
                     },
                 "sky":
