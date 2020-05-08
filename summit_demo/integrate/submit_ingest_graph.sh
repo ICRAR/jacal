@@ -252,6 +252,8 @@ elif [ ! -z "$(command -v sbatch 2> /dev/null)" ]; then
 		request_gpus="--gres=gpu:${channels_per_node}"
 	fi
 	sbatch --ntasks-per-node=1 \
+	       -p uwaicrar \
+	       --comment=/p8/mcc_uwaicrar \
 	       -o "$outdir"/ingest_graph.log \
 	       -N $nodes \
 	       -t ${walltime} \

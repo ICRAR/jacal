@@ -35,6 +35,7 @@ runner="`get_runner $remote_mechanism $nodes`"
 echo "Using $runner to start dlg cluster using the $remote_mechanism mechanism"
 
 export PYTHONPATH="${apps_rootdir}:$PYTHONPATH"
+export PYTHON_EGG_CACHE=$TMPDIR/Python-Eggs
 env > $outdir/env.txt
 git rev-parse HEAD > $outdir/commit.txt
 

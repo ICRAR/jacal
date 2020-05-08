@@ -38,6 +38,12 @@ load_modules() {
 		module load summit_demo/default
     elif [ "${LMOD_SYSTEM_NAME}" == "summit" ]; then
 		source ../summit_bashrc
+        elif [ -n "$DUGEO_SOFTWARE" ]; then
+		module use /p8/mcc_uwaicrar/sw/modulefiles
+		module add OSKAR/2.7.1-summit
+		module add daliuge
+		module rm Nemo
+		module add openmpi/4.0.3-mlnx intel-rt
 	else
 		echo "Unsupported system, exiting now"
 		exit 1
@@ -92,7 +98,7 @@ get_runner() {
 	elif [ "$1" = lsf ]; then
 		runner=jsrun
 	elif [ "$1" = mpi ]; then
-		runner=mpirun
+		runner="mpirun --mca io ompio --mca pml ucx"
 	else
 		echo "Unsupported remote mechanims: $1" 1>&2
 		exit 1
