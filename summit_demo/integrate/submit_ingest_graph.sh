@@ -209,7 +209,7 @@ s/\"use_gpus=.*\"/\"use_gpus=$use_gpus\"/
 # Number of time steps to simulate
 s%\"num_time_steps=.*\"%\"num_time_steps=$time_steps\"%
 
-# Number of time steps to simulate
+# Maximum number of sources to simulate in a single work packet
 s%\"max_sources_per_chunk=.*\"%\"max_sources_per_chunk=$max_spc\"%
 
 # The base port used for internal spead2 communications
