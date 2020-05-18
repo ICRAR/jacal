@@ -35,6 +35,7 @@ runner="`get_runner $remote_mechanism $nodes`"
 echo "Using $runner to start dlg cluster using the $remote_mechanism mechanism"
 
 export PYTHONPATH="${apps_rootdir}:$PYTHONPATH"
+export PYTHON_EGG_CACHE=$TMPDIR/Python-Eggs
 env > $outdir/env.txt
 git rev-parse HEAD > $outdir/commit.txt
 
@@ -51,7 +52,7 @@ fi
 # down heavily in high-CPU environments during its sky setup
 # OpenMP routines. Let's thus hardcode OMP_NUM_THREADS to 1
 # to get acceptable runtimes.
-export OMP_NUM_THREADS=1
+export OMP_NUM_THREADS=4
 
 $runner \
     python -m dlg.deploy.pawsey.start_dfms_cluster \

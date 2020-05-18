@@ -308,6 +308,8 @@ class SpeadReceiver(object):
                     msg = 'Creating %s MS under %s'
                     args = 'ADIOS' if self.use_adios2 else 'standard', self._file_name
                     if self.mpi_comm:
+                        # mpi4py isn't explicitly referenced, but without importing the module creating the MS can fail
+                        from mpi4py import MPI
                         msg += ' from rank %d/%d (comm=%s)'
                         args += (self.mpi_comm.Get_rank() + 1, self.mpi_comm.Get_size(),
                                 self.mpi_comm.Get_name())
