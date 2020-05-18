@@ -98,7 +98,7 @@ get_runner() {
 	elif [ "$1" = lsf ]; then
 		runner=jsrun
 	elif [ "$1" = mpi ]; then
-		runner="mpirun --mca io ompio --mca pml ucx"
+		runner=mpirun
 	else
 		echo "Unsupported remote mechanims: $1" 1>&2
 		exit 1
