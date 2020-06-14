@@ -566,7 +566,12 @@
                     "name": "Arg11",
                     "text": "Arg11",
                     "value": "disconnect_tolerance=SIGNAL_GENERATOR_ERROR_TOLERANCE"
-                }
+                },
+                {
+                    "name": "Arg12",
+                    "text": "Arg12",
+                    "value": "max_sources_per_chunk=50000"
+                }                
             ],
             "group": -11,
             "inputPorts": [
