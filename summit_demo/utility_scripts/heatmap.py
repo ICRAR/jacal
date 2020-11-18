@@ -3,6 +3,7 @@ import itertools
 import multiprocessing
 import os
 import sys
+import math
 
 from matplotlib import pyplot as plt
 import numpy as np
@@ -67,7 +68,7 @@ def heatmap(n_nodes, nodes, times, events):
     nodes = np.array(nodes)
     times = np.array(times)
     events = np.array(events)
-    time_bins = min(1000, np.max(times))
+    time_bins = min(1000, int(np.max(times)))
     exec_time = np.max(times)
 
     _heatmap(nodes, times, n_nodes, time_bins, exec_time)
@@ -76,7 +77,7 @@ def heatmap(n_nodes, nodes, times, events):
         node_bins = n_nodes
         if evt == 'ms_write':
             # ceiling division
-            node_bins = (node_bins + 5) / 6
+            node_bins = math.ceil((node_bins + 5) / 6)
         _heatmap(nodes[selection], times[selection],
                 node_bins, time_bins, exec_time, suffix="_%s" % evt)
 
