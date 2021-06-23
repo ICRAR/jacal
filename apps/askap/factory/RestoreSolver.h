@@ -34,10 +34,18 @@ namespace askap {
     * \param gitrepo $(GIT_REPO)
     * \param version $(PROJECT_VERSION)
     * \param category DynlibApp
-    * \param[in] param/Config
-    * \param[in] param/Model
-    * \param[in] param/Normal
-    * \param[out] param/Restored Model
+    * \param[in] port/Config/LOFAR::ParameterSet
+    *     /~English ParameterSet descriptor for the image solver
+    *     /~Chinese
+    * \param[in] port/Model/scimath::Params
+    *     /~English Params of solved normal equations
+    *     /~Chinese
+    * \param[in] port/Normal/scimath::ImagingNormalEquations
+    *     /~English ImagingNormalEquations to solve
+    *     /~Chinese
+    * \param[out] port/Restored Model/scimath::Params
+    *     /~English
+    *     /~Chinese
     * \par EAGLE_END
     */
     class RestoreSolver : public DaliugeApplication

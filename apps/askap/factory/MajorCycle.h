@@ -33,9 +33,15 @@ namespace askap {
     * \param gitrepo $(GIT_REPO)
     * \param version $(PROJECT_VERSION)
     * \param category DynlibApp
-    * \param[in] param/Config
-    * \param[in] param/Solved Model
-    * \param[out] param/Normal
+    * \param[in] port/Config/LOFAR::ParameterSet
+    *     /~English ParameterSet descriptor for the image solver
+    *     /~Chinese
+    * \param[in] port/Solved Model/scimath::Params
+    *     /~English
+    *     /~Chinese
+    * \param[out] port/Normal/scimath::ImagingNormalEquations
+    *     /~English ImagingNormalEquations to solve
+    *     /~Chinese
     * \par EAGLE_END
     */
     class MajorCycle : public DaliugeApplication

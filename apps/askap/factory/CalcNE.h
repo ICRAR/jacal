@@ -35,9 +35,15 @@ namespace askap {
     * \param gitrepo $(GIT_REPO)
     * \param version $(PROJECT_VERSION)
     * \param category DynlibApp
-    * \param[in] param/Config
-    * \param[in] param/Model
-    * \param[out] param/Normal
+    * \param[in] port/Config/LOFAR::ParameterSet
+    *     /~English ParameterSet descriptor for the image solver
+    *     /~Chinese
+    * \param[in] port/Model/scimath::Params
+    *     /~English Params of solved normal equations
+    *     /~Chinese
+    * \param[out] port/Normal/scimath::ImagingNormalEquations
+    *     /~English ImagingNormalEquations to solve
+    *     /~Chinese
     * \par EAGLE_END
     */
     class CalcNE : public DaliugeApplication
@@ -61,10 +67,6 @@ namespace askap {
         virtual void data_written(const char *uid, const char *data, size_t n);
 
         virtual void drop_completed(const char *uid, drop_status status);
-
-
-
-
 
         private:
 

@@ -41,8 +41,15 @@ namespace askap {
     * \param gitrepo $(GIT_REPO)
     * \param version $(PROJECT_VERSION)
     * \param category DynlibApp
-    * \param[in] param/Config
-    * \param[in] param/Model
+    * \param[in] port/Config/LOFAR::ParameterSet
+    *     /~English ParameterSet descriptor for the image solver
+    *     /~Chinese
+    * \param[in] port/Model/scimath::Params
+    *     /~English Params of solved normal equations
+    *     /~Chinese
+    * \param[out] port/Cube/undefined
+    *     /~English
+    *     /~Chinese
     * \par EAGLE_END
     */
     class SpectralCube : public DaliugeApplication

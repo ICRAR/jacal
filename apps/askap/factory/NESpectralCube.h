@@ -41,8 +41,12 @@ namespace askap {
     * \param gitrepo $(GIT_REPO)
     * \param version $(PROJECT_VERSION)
     * \param category DynlibApp
-    * \param[in] param/Config
-    * \param[in] param/Normal
+    * \param[in] port/Config/LOFAR::ParameterSet
+    *     /~English ParameterSet descriptor for the image solver
+    *     /~Chinese
+    * \param[in] port/Normal/scimath::imagingNormalEquations
+    *     /~English ImagingNormalEquations to solve
+    *     /~Chinese
     * \par EAGLE_END
     */
     class NESpectralCube : public DaliugeApplication

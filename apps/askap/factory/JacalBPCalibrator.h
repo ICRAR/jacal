@@ -50,10 +50,15 @@ namespace askap
     * \param gitrepo $(GIT_REPO)
     * \param version $(PROJECT_VERSION)
     * \param category DynlibApp
-    * \param[in] param/Config
-    * \param[in] param/Model
-    * \param[in] param/theInput TODO
-    * \param[out] param/Model
+    * \param[in] port/Config/LOFAR::ParameterSet
+    *     /~English ParameterSet descriptor for the image solver
+    *     /~Chinese
+    * \param[in] port/Model/scimath::Params
+    *     /~English Params of solved normal equations
+    *     /~Chinese
+    * \param[out] port/Model/scimath::Params
+    *     /~English
+    *     /~Chinese
     * \par EAGLE_END
     */
     class JacalBPCalibrator : public DaliugeApplication

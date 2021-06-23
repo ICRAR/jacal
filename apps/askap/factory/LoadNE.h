@@ -32,7 +32,9 @@ namespace askap {
     * \param gitrepo $(GIT_REPO)
     * \param version $(PROJECT_VERSION)
     * \param category DynlibApp
-    * \param[in] param/0
+    * \param[in] port/Normal/scimath::ImagingNormalEquations
+    *     /~English ImagingNormalEquations to solve
+    *     /~Chinese
     * \par EAGLE_END
     */
     class LoadNE : public DaliugeApplication

@@ -24,8 +24,11 @@ namespace askap {
     * \param gitrepo $(GIT_REPO)
     * \param version $(PROJECT_VERSION)
     * \param category DynlibApp
-    * \param[in] param/0
-    * \param[out] param/TODO
+    * \param[in] port/Config/LOFAR::ParameterSet
+    *     /~English ParameterSet descriptor for the image solver
+    *     /~Chinese
+    * \param[out] port/Config/LOFAR::ParameterSet
+    * \param[out] port/Config/LOFAR::ParameterSet
     * \par EAGLE_END
     */
     class LoadParset : public DaliugeApplication
