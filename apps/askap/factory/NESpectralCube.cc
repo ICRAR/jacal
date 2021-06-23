@@ -197,7 +197,7 @@ namespace askap {
         casacore::Double channelFrequency = NEUtils::getFrequency(itsParset,itsChan);
 
         casacore::Quantity f0(baseFrequency,"Hz");
-      /// The width of a channel. THis does <NOT> take account of the variable width
+      /// The width of a channel. THis does NOT take account of the variable width
       /// of Barycentric channels
         casacore::Quantity freqinc(chanWidth,"Hz");
 

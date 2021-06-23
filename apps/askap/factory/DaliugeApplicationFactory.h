@@ -50,7 +50,7 @@ namespace askap
       /// (in lowercase) is loaded and it executes its register<name>
       /// function which must register its creator function in the registry
       /// using function registerDaliugeApplication.
-      /// @param name The name function
+      /// @param dlg_app The name function
       ///
 
       static DaliugeApplication::ShPtr createDaliugeApplication (dlg_app_info *dlg_app);

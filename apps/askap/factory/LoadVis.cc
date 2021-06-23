@@ -182,7 +182,7 @@ namespace askap {
               NEUtils::receiveParams(itsModel, input("Model"));
             }
             catch (std::runtime_error) {
-              ASKAPLOG_INFO_STR(logger, "Failed to receive model setting up empty one");
+              ASKAPLOG_INFO_STR(logger, "Failed to receive model, setting up empty one");
               askap::synthesis::SynthesisParamsHelper::setUpImages(itsModel,
                                         this->itsParset.makeSubset("Images."));
             }
