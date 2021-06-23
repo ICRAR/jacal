@@ -33,16 +33,20 @@
 
 
 namespace askap {
-
-    /// @brief Build an output image cube from input NormalEquations
-    /// @details This class builds the output cube is whatever format specified
-    /// by the parset.
-    ///
-
+    /*!
+    * \brief Build an output image cube from input NormalEquations
+    * \details This class builds the output cube is whatever format specified
+    * by the parset.
+    * \par EAGLE_START
+    * \param gitrepo $(GIT_REPO)
+    * \param version $(PROJECT_VERSION)
+    * \param category DynlibApp
+    * \param[in] param/Config
+    * \param[in] param/Normal
+    * \par EAGLE_END
+    */
     class NESpectralCube : public DaliugeApplication
-
     {
-
     public:
 
         typedef boost::shared_ptr<NESpectralCube> ShPtr;

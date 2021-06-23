@@ -27,14 +27,21 @@
 
 namespace askap {
 
-    /// @brief Calculates the Normal Equations
-    /// @details This class encorporates all the tasks to read from a measurement set;
-    /// subtract a model; grid residual visibilities and FFT the grid
-
+    /*!
+    * \brief Calculates the Normal Equations
+    * \details This class encorporates all the tasks to read from a measurement set;
+    *  subtract a model; grid residual visibilities and FFT the grid
+    * \par EAGLE_START
+    * \param gitrepo $(GIT_REPO)
+    * \param version $(PROJECT_VERSION)
+    * \param category DynlibApp
+    * \param[in] param/Config
+    * \param[in] param/Model
+    * \param[out] param/Normal
+    * \par EAGLE_END
+    */
     class CalcNE : public DaliugeApplication
-
     {
-
     public:
 
         typedef boost::shared_ptr<CalcNE> ShPtr;

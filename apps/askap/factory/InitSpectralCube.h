@@ -31,16 +31,19 @@
 
 
 namespace askap {
-
-    /// @brief Build the output image cube
-    /// @details This class builds the output cube is whatever format specified
-    /// by the parset.
-    ///
-
+    /*!
+    * \brief Build the output image cube
+    * \details This class builds the output cube is whatever format specified
+    * by the parset.
+    * \par EAGLE_START
+    * \param gitrepo $(GIT_REPO)
+    * \param version $(PROJECT_VERSION)
+    * \param category DynlibApp
+    * \param[in] param/Config
+    * \par EAGLE_END
+    */
     class InitSpectralCube : public DaliugeApplication
-
     {
-
     public:
 
         typedef boost::shared_ptr<InitSpectralCube> ShPtr;

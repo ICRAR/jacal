@@ -17,12 +17,19 @@
 
 
 namespace askap {
-    /// @brief Loads a configuration
-    /// @details Loads a configuration from a file drop and generates a LOFAR::ParameterSet
+    /*!
+    * \brief Loads a configuration
+    * \details Loads a configuration from a file drop and generates a LOFAR::ParameterSet
+    * \par EAGLE_START
+    * \param gitrepo $(GIT_REPO)
+    * \param version $(PROJECT_VERSION)
+    * \param category DynlibApp
+    * \param[in] param/0
+    * \param[out] param/TODO
+    * \par EAGLE_END
+    */
     class LoadParset : public DaliugeApplication
-
     {
-
     public:
 
         typedef boost::shared_ptr<LoadParset> ShPtr;

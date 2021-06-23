@@ -25,12 +25,18 @@
 
 
 namespace askap {
-    /// @brief Example calss that simply loads Normal Equations from a drop
-    /// @details Just accepts the drop
+    /*!
+    * \brief Example class that simply loads Normal Equations from a drop
+    * \details Just accepts the drop
+    * \par EAGLE_START
+    * \param gitrepo $(GIT_REPO)
+    * \param version $(PROJECT_VERSION)
+    * \param category DynlibApp
+    * \param[in] param/0
+    * \par EAGLE_END
+    */
     class LoadNE : public DaliugeApplication
-
     {
-
     public:
 
         typedef boost::shared_ptr<LoadNE> ShPtr;

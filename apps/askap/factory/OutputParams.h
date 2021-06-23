@@ -26,13 +26,19 @@
 #include <measurementequation/ImageParamsHelper.h>
 
 namespace askap {
-  /// @brief Outputs the Params class as images
-  /// @details This drop actually generates the output images based upon the contents of the Params object
-  
+    /*!
+    * @brief Outputs the Params class as images
+    * @details This drop actually generates the output images based upon the contents of the Params object
+    * \par EAGLE_START
+    * \param gitrepo $(GIT_REPO)
+    * \param version $(PROJECT_VERSION)
+    * \param category DynlibApp
+    * \param[in] param/Config
+    * \param[out] param/Model
+    * \par EAGLE_END
+    */
     class OutputParams : public DaliugeApplication
-
     {
-
     public:
 
         typedef boost::shared_ptr<OutputParams> ShPtr;

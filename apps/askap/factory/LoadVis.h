@@ -27,12 +27,20 @@
 
 
 namespace askap {
-  /// @brief Loads visibility set
-  /// @details Loads a configuration from a file drop and a visibility set from a casacore::Measurement Set
+    /*!
+    * \brief Loads visibility set
+    * \details Loads a configuration from a file drop and a visibility set from a casacore::Measurement Set
+    * \par EAGLE_START
+    * \param gitrepo $(GIT_REPO)
+    * \param version $(PROJECT_VERSION)
+    * \param category DynlibApp
+    * \param[in] param/Config
+    * \param[in] param/Model
+    * \param[out] param/Normal
+    * \par EAGLE_END
+    */
     class LoadVis : public DaliugeApplication
-
     {
-
     public:
 
         typedef boost::shared_ptr<LoadVis> ShPtr;

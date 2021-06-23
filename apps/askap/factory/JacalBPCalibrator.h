@@ -43,8 +43,19 @@
 
 namespace askap
 {
-
-
+    /*!
+    * \brief
+    * \details
+    * \par EAGLE_START
+    * \param gitrepo $(GIT_REPO)
+    * \param version $(PROJECT_VERSION)
+    * \param category DynlibApp
+    * \param[in] param/Config
+    * \param[in] param/Model
+    * \param[in] param/theInput TODO
+    * \param[out] param/Model
+    * \par EAGLE_END
+    */
     class JacalBPCalibrator : public DaliugeApplication
     {
       public:

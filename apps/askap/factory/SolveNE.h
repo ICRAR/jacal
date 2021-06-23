@@ -26,17 +26,22 @@
 #include <measurementequation/ImageParamsHelper.h>
 
 namespace askap {
-
-  /// @brief Implements an ASKAP Solver
-  /// @details This takes a configuration and a set of normal equations and uses the Solver requested in
-  /// in the ParameterSet to produce an ouput model.
-
+    /*!
+    * \brief Implements an ASKAP Solver
+    * \details This takes a configuration and a set of normal equations and uses the Solver requested in
+    * in the ParameterSet to produce an ouput model.
+    * \par EAGLE_START
+    * \param gitrepo $(GIT_REPO)
+    * \param version $(PROJECT_VERSION)
+    * \param category DynlibApp
+    * \param[in] param/Config
+    * \param[in] param/Normal
+    * \param[out] param/Model
+    * \par EAGLE_END
+    */
     class SolveNE : public DaliugeApplication
-
     {
-
     public:
-
         typedef boost::shared_ptr<SolveNE> ShPtr;
 
         SolveNE(dlg_app_info *raw_app);
